@@ -1,0 +1,10 @@
+{
+  "name": "lolomi-calc",
+  "version": "1.1.0",
+  "author": "洛洛米",
+  "description": "原神角色伤害计算",
+  "type": "module",
+  "imports": {
+    "#lolomi": "./components/index.js"
+  }
+}
