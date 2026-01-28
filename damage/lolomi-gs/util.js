@@ -1,8 +1,16 @@
-/**
- * 队伍配置
- */
+// 圣遗物映射
+const artifactMap = {
+  'jincheng': '烬城',
+  'yege': '夜歌',
+  'jiaoguan': '教官',
+  'fengtao': '风套',
+  'caotao': '草套',
+  'qianyan': '千岩',
+  'panyan': '磐岩',
+  'zongshi': '宗室'
+};
 
-// 角色名称映射
+// 角色映射
 const characterMap = {
   'KamisatoAyaka': '神里绫华',
   'Jean': '琴',
@@ -110,14 +118,31 @@ const characterMap = {
   'Nefer': '奈芙尔',
   'Jahoda': '雅珂达',
   'Durin': '杜林',
-  'Columbina': '哥伦比娅'
+  'Columbina': 'Columbina'
 };
 
 /**
- * 根据命座数生成队友配置参数
- * @param {number} cons - 命座数
- * @param {string[]} teammateNames - 队友名称数组，calc里严格按照characterMap里定义的名称写
- * @returns {Object} 生成的参数对象
+ * @param {...string} artifactNames - 队友圣遗物
+ * @returns {Object}
+ */
+const ArtifactConfig = (...artifactNames) => {
+  let params = {};
+  
+  artifactNames.forEach(artifactName => {
+    if (artifactMap[artifactName]) {
+      params[artifactName] = true;
+    } else {
+        params[artifactName] = true;
+      }
+  });
+  
+  return params;
+};
+
+/**
+ * @param {number} cons
+ * @param {string[]} teammateNames - 队友名称，calc里严格按照characterMap里定义的名称写
+ * @returns {Object}
  */
 const TeammateConfig = (cons, teammateNames = []) => {
   const [isLow, isMid, isBest] = [cons < 2, cons >= 2 && cons < 6, cons >= 6]; 
@@ -142,7 +167,7 @@ const TeammateConfig = (cons, teammateNames = []) => {
 };
 
 const getCharacterInitial = (characterName) => {
-  // 个别角色常规叫法
+  // 个别角色使用常规叫法
   const specialInitials = {
     '枫原万叶': '万',
     '申鹤': '鹤',
@@ -155,11 +180,11 @@ const getCharacterInitial = (characterName) => {
 };
 
 /**
- * 根据主角色命座数和队友名称生成配置标题前缀
+ * 根据主角色命座和队友生成配置标题前缀
  * @param {number} cons
- * @param {string[]} teammateNames - 队友名称数组
+ * @param {string[]} teammateNames - 队友
  * @param {string} mainCharName - 主角色名称
- * @returns {string} 生成的标题前缀
+ * @returns {string} 标题前缀
  */
 const getTeamtitle = (cons, teammateNames, mainCharName = null) => {
   let configLevel;
@@ -191,4 +216,21 @@ const getTeamtitle = (cons, teammateNames, mainCharName = null) => {
   return `${configLevel} ${teamName}`;
 };
 
-export { TeammateConfig, getTeamtitle };
+/**
+ * @param {number} cons
+ * @param {string[]} teammateNames - 队友
+ * @param {string[]} artifactNames - 队友圣遗物
+ * @param {string} mainCharName - 主角色
+ * @returns {Object}
+ */
+const TeamConfig = (cons, teammateNames = [], artifactNames = [], mainCharName = null) => {
+  return {
+    params: {
+      ...TeammateConfig(cons, teammateNames),
+      ...ArtifactConfig(...artifactNames)
+    },
+    title: getTeamtitle(cons, teammateNames, mainCharName)
+  };
+};
+
+export { TeammateConfig, getTeamtitle, ArtifactConfig, TeamConfig };

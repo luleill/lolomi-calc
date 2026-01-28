@@ -188,6 +188,34 @@ let TeamBuff = [
         params.Bennett_best ? 139 * 865.2 / 100 : 
         params.Bennett_mid ? 139 * 756.2 / 100 : 
         params.Bennett_low ? 120.8 * 645.2 / 100 : 0
+    },
+  },{ 
+    check: ({ params }) => params.Furina_low || params.Furina_mid || params.Furina_best,
+    title: '芙宁娜',
+    data: {
+      dmg: ({ params }) => 
+        params.Furina_best ? 124: 
+        params.Furina_mid ? 100 : 
+        params.Furina_low ? 75 : 0
+    }
+  },{
+    _getEscoffierValue: (params, element, highValue, lowValue) => {
+      if (params.Escoffier_best && element === '冰') return highValue;
+      if (params.Escoffier_mid && element === '冰') return lowValue;
+      return 0;
+    },
+    check: ({ params }) => params.Escoffier_low || params.Escoffier_mid || params.Escoffier_best,
+    title: '爱可菲',
+    data: {
+      kx: 55,
+      cdmg : ({ params, element }) => (params.Escoffier_best || params.Escoffier_mid && element === '冰') ? 60 : 0,
+      _getValue: (params, element) => (params.Escoffier_best && element === '冰') ? 9600 : (params.Escoffier_mid && element === '冰') ? 8400 : 0,
+      aplus: ({ params, element }) => (params.Escoffier_best && element === '冰') ? 9600 : (params.Escoffier_mid && element === '冰') ? 8400 : 0,
+      a2plus: ({ params, element }) => (params.Escoffier_best && element === '冰') ? 9600 : (params.Escoffier_mid && element === '冰') ? 8400 : 0,
+      a3plus: ({ params, element }) => (params.Escoffier_best && element === '冰') ? 9600 : (params.Escoffier_mid && element === '冰') ? 8400 : 0,
+      eplus: ({ params, element }) => (params.Escoffier_best && element === '冰') ? 9600 : (params.Escoffier_mid && element === '冰') ? 8400 : 0,
+      qplus: ({ params, element }) => (params.Escoffier_best && element === '冰') ? 9600 : (params.Escoffier_mid && element === '冰') ? 8400 : 0,
+      atkPct: ({ params}) => params.Escoffier_best ? 64 : params.Escoffier_mid ? 32 : 0
     }
   },{
     check: ({ params }) => params.Sara_low || params.Sara_mid || params.Sara_best,

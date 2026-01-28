@@ -1,5 +1,12 @@
 import { TeamBuff } from '../teambuffs.js'
-import { TeammateConfig, getTeamtitle } from '../util.js'
+import { TeamConfig } from '../util.js'
+
+const mainCharName = '莫娜'
+
+const team = ['茜特菈莉','希诺宁','玛薇卡']
+
+const artifact_normal = ['烬城', '千岩']
+const artifact_reaction = ['烬城', '教官', '千岩']
 
 export const details = [
 {
@@ -19,16 +26,17 @@ export const details = [
   params: { q: true },
   dmg: ({ talent }, dmg) => dmg(talent.q['泡影破裂伤害'], 'q')
 },{
-  title: ({ cons }) => `${getTeamtitle(cons, ['茜特菈莉', '希诺宁','玛薇卡'], '莫娜')}开Q重击`,
+  // 队伍伤害
+  title: ({ cons }) => `${TeamConfig(cons, team, artifact_normal, mainCharName).title}开Q重击`,
   params: ({cons}) => ({
-    ...TeammateConfig(cons, ['茜特菈莉', '希诺宁','玛薇卡']), 
+    ...TeamConfig(cons, team, artifact_normal).params, 
     q: true
   }),
   dmg: ({ talent }, dmg) => dmg(talent.a['重击伤害'], 'a2'),
 },{
-  title: ({ cons }) => `${getTeamtitle(cons, ['茜特菈莉', '希诺宁','玛薇卡'], '莫娜')}开Q重击蒸发`,
+  title: ({ cons }) => `${TeamConfig(cons, team, artifact_reaction, mainCharName).title}开Q重击蒸发`,
   params: ({cons}) => ({
-    ...TeammateConfig(cons, ['茜特菈莉', '希诺宁','玛薇卡']), 
+    ...TeamConfig(cons, team, artifact_reaction).params, 
     q: true
   }),
   dmg: ({ talent }, dmg) => dmg(talent.a['重击伤害'], 'a2', 'vaporize'),
