@@ -1,5 +1,6 @@
 # Yunzai目录下安装
-git clone --depth=1 https://gitee.com/land-route_lu/lolomi.git ./plugins/lolomi-calc/
+git clone --depth=1 https://gitee.com/land-route_lu/lolomi-calc.git ./plugins/lolomi-calc/
+
 # 声明
 复用liangshi-calc框架
 源地址 https://gitee.com/liangshi233/liangshi-calc/tree/master
