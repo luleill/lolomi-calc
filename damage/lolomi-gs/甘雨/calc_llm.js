@@ -26,26 +26,26 @@ export const details = [
     title: '霜华矢绽发融化伤害',
     dmg: ({ talent }, dmg) => dmg(talent.a['霜华矢·霜华绽发伤害'], 'a2', 'melt')
   }, {
-    title: '山泽麟迹伤害',
+    title: '「山泽麟迹」伤害',
     dmg: ({ talent }, dmg) => dmg(talent.e['技能伤害'], 'e')
   }, {
-    title: '山泽麟迹融化伤害',
+    title: '「山泽麟迹」融化伤害',
     dmg: ({ talent }, dmg) => dmg(talent.e['技能伤害'], 'e', 'melt')
   }, {
     params: {q: true },
-    title: '降众天华冰凌伤害',
+    title: '「降众天华」冰凌伤害',
     dmg: ({ talent }, dmg) => dmg(talent.q['冰棱伤害'], 'q')
   },{
-    title: ({ cons }) => `${getTeamtitle(cons, ['申鹤', '万叶','班尼特'], '甘雨')}霜华矢绽发融化伤害`,
+    title: ({ cons }) => `${getTeamtitle(cons, ['申鹤', '枫原万叶','班尼特'], '甘雨')}霜华矢绽发融化伤害`,
     params: ({cons}) => ({
-      ...TeammateConfig(cons, ['申鹤', '万叶','班尼特']), 
+      ...TeammateConfig(cons, ['申鹤', '枫原万叶','班尼特']), 
       zongshi: true, fengtao: true,
     }),
-    dmg: ({ attr, calc, talent }, { basic }) => basic(calc(attr.atk) * talent.a['霜华矢·霜华绽发伤害'] / 100, 'a2', 'melt')
+    dmg: ({ talent }, dmg) => dmg(talent.a['霜华矢·霜华绽发伤害'], 'a2', 'melt')
   },{
-    title: ({ cons }) => `${getTeamtitle(cons, ['申鹤', '爱可菲','芙宁娜'], '甘雨')}霜华矢一箭总伤`,
+    title: ({ cons }) => `${getTeamtitle(cons, ['申鹤','爱可菲','芙宁娜'], '甘雨')}霜华矢一箭总伤`,
     params: ({cons}) => ({
-      ...TeammateConfig(cons, ['申鹤', '爱可菲','芙宁娜']), 
+      ...TeammateConfig(cons, ['申鹤','爱可菲','芙宁娜']), 
       qianyan: true,
     }),
     dmg: ({ talent }, dmg) => dmg(talent.a['霜华矢·霜华绽发伤害'] + talent.a['霜华矢命中伤害'], 'a2'),

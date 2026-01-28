@@ -189,6 +189,24 @@ let TeamBuff = [
         params.Bennett_mid ? 139 * 756.2 / 100 : 
         params.Bennett_low ? 120.8 * 645.2 / 100 : 0
     }
+  },{
+    check: ({ params }) => params.Sara_low || params.Sara_mid || params.Sara_best,
+    title: '九条裟罗',
+    // 高配13级e精五终末 中配13级e精一终末 低配10级e西风弓
+    data: {
+      atkPlus: ({ params }) => 
+        params.Sara_best ? 91.29 * 803 / 100 : 
+        params.Sara_mid ? 91.29 * 803 / 100 : 
+        params.Sara_low ? 77.33 * 649 / 100 : 0,
+      cdmg: ({ params , element }) => 
+        (params.Sara_best && element === '雷') ? 60 : 0,
+      atkPct: ({ params }) => 
+        params.Sara_best ? 40 : 
+        params.Sara_mid ? 20 : 0,
+      mastery: ({ params }) => 
+        params.Sara_best ? 200 : 
+        params.Sara_mid ? 100 : 0,
+    }
   },
   {
     check: ({ params }) => params.Mona_low || params.Mona_mid || params.Mona_best || params.Hexenzirkel_Mona,

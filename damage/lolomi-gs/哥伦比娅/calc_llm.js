@@ -95,7 +95,7 @@ export const details = [
     params: ({cons}) => ({
       ...TeammateConfig(cons, ['伊涅芙','妮露','希诺宁']), 
       q: true, gravity: true, is_luna: true, Charged: true, hydro_two: true,
-      Xilonen_hydro: isMid, Xilonen_hydro: isBest,
+      ...(cons >= 2 && { Xilonen_hydro: true }),
     }),
     dmg: ({ attr, calc, talent, params }, { basic }) => {
       let lunarChargedDamage = calc(attr.hp) * talent.e['引力干涉·月感电伤害'] / 100;
@@ -107,11 +107,11 @@ export const details = [
   },{
     title: ({ cons }) => {
       if (cons >= 6) {
-        return '高配哥菈妮草「月露涤荡」重击伤害';
+        return '高配 哥菈妮草「月露涤荡」重击伤害';
       } else if (cons >= 2) {
-        return '中配哥菈妮草「月露涤荡」重击伤害';
+        return '中配 哥菈妮草「月露涤荡」重击伤害';
       } else {
-        return '低配哥菈爱草「月露涤荡」重击伤害';
+        return '低配 哥菈爱草「月露涤荡」重击伤害';
       }
     },
     params: ({cons}) => {
