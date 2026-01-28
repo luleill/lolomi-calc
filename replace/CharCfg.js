@@ -4,7 +4,6 @@ import lodash from 'lodash'
 import fs from 'node:fs'
 
 const cfgL = Config.getConfig('user', 'config')
-let calcmodel = cfgL.calcmodel
 
 let cfgMap = {
   char: {},
@@ -13,22 +12,22 @@ let cfgMap = {
     this.game = game
     let chars = fs.readdirSync(`${miaoPath}/resources/meta-${game}/character`)
     if (cfgL.lolomicalc || cfgL.lolomiartis) {
-      if (!fs.existsSync(`${rootPath}/plugins/lolomi-calc/damage/${calcmodel}-${game}`)) {
+      if (!fs.existsSync(`${rootPath}/plugins/lolomi-calc/damage/lolomi-${game}`)) {
        if (!fs.existsSync(`${rootPath}/plugins/lolomi-calc/damage/lolomi-${game}`)) {
         chars = fs.readdirSync(`${miaoPath}/resources/meta-${game}/character`)
        } else {
         chars = fs.readdirSync(`${rootPath}/plugins/lolomi-calc/damage/lolomi-${game}`)
        }
       } else {
-       chars = fs.readdirSync(`${rootPath}/plugins/lolomi-calc/damage/${calcmodel}-${game}`)
+       chars = fs.readdirSync(`${rootPath}/plugins/lolomi-calc/damage/lolomi-${game}`)
       }
     }
     for (let char of chars) {
       cfgMap.char[char] = {}
       let curr = cfgMap.char[char]
       // 评分规则
-      if (cfgMap.exists(char, 'artis_basic') && cfgL.lolomiartis) {
-        curr.artis = await cfgMap.getCfg(char, 'artis_basic', 'default')
+      if (cfgMap.exists(char, 'artis_llm') && cfgL.lolomiartis) {
+        curr.artis = await cfgMap.getCfg(char, 'artis_llm', 'default')
       } else if (cfgMap.exists(char, 'artis', 'miao')) {
         curr.artis = await cfgMap.getCfg(char, 'artis', 'default')
       }
@@ -47,10 +46,10 @@ let cfgMap = {
   async getCfg(char, file, module = '') {
     let cfg = await Data.importModule(`resources/meta-${this.game}/character/${char}/${file}.js`, 'miao');
     if (module && cfgL.lolomiartis) {
-      if (!fs.existsSync(`${rootPath}/plugins/lolomi-calc/damage/${calcmodel}-${this.game}`)) {
+      if (!fs.existsSync(`${rootPath}/plugins/lolomi-calc/damage/lolomi-${this.game}`)) {
        cfg = await Data.importModule(`damage/lolomi-${this.game}/${char}/${file}.js`)
       } else {
-       cfg = await Data.importModule(`damage/${calcmodel}-${this.game}/${char}/${file}.js`)
+       cfg = await Data.importModule(`damage/lolomi-${this.game}/${char}/${file}.js`)
       }
     }
     if (module) return cfg[module]
@@ -81,11 +80,9 @@ let CharCfg = {
     }
   },
   getArtisCfg(char) {
-    if (char.game !== 'sr') {
+    if (char.game === 'gs') {
       let charName = char.isTraveler ? "旅行者" : char.name
       return cfgMapGs.char[charName]?.artis || false
-    } else {
-      return cfgMapSr.char[char.name]?.artis || false
     }
   }
 }
