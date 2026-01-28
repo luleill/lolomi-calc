@@ -57,12 +57,6 @@ export const helpList = [
         title: '辅助面板',
         desc: '已定义的所有角色辅助面板'
       },
-    ]
-  },
-  {
-    group: '管理命令',
-    auth: 'master',
-    list: [
       {
         icon: 81,
         title: '#启用洛洛米计算',

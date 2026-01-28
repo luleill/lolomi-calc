@@ -12,7 +12,7 @@ const Start = {
     ProfileDmg.dmgRulePath = (name, game = 'gs') => {
       const _path = process.cwd()
       let dmgFile = [
-        { file: 'calc_llm', name: 'lolomicalc', test: () => cfg.lolomicalc },
+        { file: 'calc_llm', name: 'lolomi-calc', test: () => cfg.lolomicalc },
         { file: 'calc', name: 'miao-plugin' }
       ]
       let newName = name

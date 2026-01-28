@@ -166,18 +166,28 @@ let TeamBuff = [
       enemyDef: ({ params }) => (params.Klee_best || params.Klee_mid) ? 23 : 0,
       dmg: ({ params , element }) => (params.Klee_best && element === '火' ) ? 10 : 0,
     }
-  },
-  {
+  },{
+    check: ({ params }) => params.ZhongLi_mark,
+    title: '钟离',
+    data: {
+      kx: 20
+    }
+  },{
+    check: ({ params }) => params.Hexenzirkel_Fischl_overloaded || params.Hexenzirkel_Fischl_charged,
+    title: '菲谢尔',
+    data: {
+      atkPct: ({ params }) => params.Hexenzirkel_Fischl_overloaded ? 22.5 : 0,
+      mastery: ({ params }) => params.Hexenzirkel_Fischl_charged ? 90 : 0,
+    }
+  },{
     check: ({ params }) => params.Bennett_low || params.Bennett_mid || params.Bennett_best,
     title: '班尼特',
     // 高配13级q风鹰剑 中配13级q原木刀 低配10级q西风剑
     data: {
-      atkPlus: ({ params }) => {
-        if (params.Bennett_best) return 139 * 865.2 / 100;
-        if (params.Bennett_mid) return 139 * 756.2 / 100;
-        if (params.Bennett_low) return 120.8 * 645.2 / 100;
-        return 0;
-      }
+      atkPlus: ({ params }) => 
+        params.Bennett_best ? 139 * 865.2 / 100 : 
+        params.Bennett_mid ? 139 * 756.2 / 100 : 
+        params.Bennett_low ? 120.8 * 645.2 / 100 : 0
     }
   },
   {

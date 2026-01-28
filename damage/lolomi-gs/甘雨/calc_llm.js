@@ -1,4 +1,5 @@
 import { TeamBuff } from '../teambuffs.js'
+import { TeammateConfig, getTeamtitle } from '../util.js'
 export const details = [
   {
     title: '单人触发满特效后攻击力',
@@ -35,46 +36,20 @@ export const details = [
     title: '降众天华冰凌伤害',
     dmg: ({ talent }, dmg) => dmg(talent.q['冰棱伤害'], 'q')
   },{
-    params: ({cons}) => {
-      const [isLow, isMid, isBest] = [cons < 2, cons >= 2 && cons < 6, cons >= 6]; 
-      return {
-        zongshi: true, fengtao: true,
-        ShenHe_best: isBest, ShenHe_mid: isMid, ShenHe_low: isLow,
-        Kazuha_best: isBest, Kazuha_mid: isMid, Kazuha_low: isLow,
-        Bennett_best: isBest, Bennett_mid: isMid, Bennett_low: isLow
-      };
-    },
-    title: ({ cons }) => {
-      if (cons >= 6) {
-        return '高配甘鹤万班霜华矢绽发融化伤害';
-      } else if (cons >= 2) {
-        return '中配甘鹤万班霜华矢绽发融化伤害';
-      } else {
-        return '低配甘鹤万班霜华矢绽发融化伤害';
-      }
-    },
+    title: ({ cons }) => `${getTeamtitle(cons, ['申鹤', '万叶','班尼特'], '甘雨')}霜华矢绽发融化伤害`,
+    params: ({cons}) => ({
+      ...TeammateConfig(cons, ['申鹤', '万叶','班尼特']), 
+      zongshi: true, fengtao: true,
+    }),
     dmg: ({ attr, calc, talent }, { basic }) => basic(calc(attr.atk) * talent.a['霜华矢·霜华绽发伤害'] / 100, 'a2', 'melt')
   },{
-    params: ({cons}) => {
-      const [isLow, isMid, isBest] = [cons < 2, cons >= 2 && cons < 6, cons >= 6]; 
-      return {
-        ShenHe_best: isBest, ShenHe_mid: isMid, ShenHe_low: isLow,
-        Escoffier_best: isBest, Escoffier_mid: isMid, Escoffier_low: isLow,
-        Furina_best: isBest, Furina_mid: isMid, Furina_low: isLow
-      };
-    },
-    title: ({ cons }) => {
-      if (cons >= 6) {
-        return '高配甘鹤爱芙霜华矢一箭总伤';
-      } else if (cons >= 2) {
-        return '中配甘鹤爱芙霜华矢一箭总伤';
-      } else {
-        return '低配甘鹤爱芙霜华矢一箭总伤';
-      }
-    },
+    title: ({ cons }) => `${getTeamtitle(cons, ['申鹤', '爱可菲','芙宁娜'], '甘雨')}霜华矢一箭总伤`,
+    params: ({cons}) => ({
+      ...TeammateConfig(cons, ['申鹤', '爱可菲','芙宁娜']), 
+      qianyan: true,
+    }),
     dmg: ({ talent }, dmg) => dmg(talent.a['霜华矢·霜华绽发伤害'] + talent.a['霜华矢命中伤害'], 'a2'),
-  },
-  {
+  },{
     params: { 
       zongshi: true, fengtao: true, legend_max: true,
       ShenHe_best: true, Kazuha_best: true, Bennett_best : true,
@@ -119,5 +94,4 @@ export const details = [
       }
     }
   ]
-  export const createdBy = 'lolomi-calc'
   

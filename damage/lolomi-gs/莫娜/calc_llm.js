@@ -1,4 +1,6 @@
 import { TeamBuff } from '../teambuffs.js'
+import { TeammateConfig, getTeamtitle } from '../util.js'
+
 export const details = [
 {
   title: '开Q重击伤害',
@@ -16,14 +18,37 @@ export const details = [
   title: '「星命定轨」泡影破裂伤害',
   params: { q: true },
   dmg: ({ talent }, dmg) => dmg(talent.q['泡影破裂伤害'], 'q')
-}]
+},{
+  title: ({ cons }) => `${getTeamtitle(cons, ['茜特菈莉', '希诺宁','玛薇卡'], '莫娜')}开Q重击`,
+  params: ({cons}) => ({
+    ...TeammateConfig(cons, ['茜特菈莉', '希诺宁','玛薇卡']), 
+    q: true
+  }),
+  dmg: ({ talent }, dmg) => dmg(talent.a['重击伤害'], 'a2'),
+},{
+  title: ({ cons }) => `${getTeamtitle(cons, ['茜特菈莉', '希诺宁','玛薇卡'], '莫娜')}开Q重击蒸发`,
+  params: ({cons}) => ({
+    ...TeammateConfig(cons, ['茜特菈莉', '希诺宁','玛薇卡']), 
+    q: true
+  }),
+  dmg: ({ talent }, dmg) => dmg(talent.a['重击伤害'], 'a2', 'vaporize'),
+},{
+title: '当前圣遗物套装',
+dmg: ({ artis }) => {
+  return {
+    avg: artis ,
+    type: 'text'
+  }
+}}
+]
   
 export const defParams = { Hexenzirkel: true } // 魔女会成员
 export const defDmgIdx = 3
 export const mainAttr = 'atk,cpct,cdmg,recharge'
 
-export const buffs = [{
+export const buffs = [
   ...TeamBuff,
+  {
   check: ({ params }) => params.q === true,
   title: '莫娜元素爆发：开Q获得[dmg]%伤害加成',
   data: {
@@ -66,5 +91,4 @@ export const buffs = [{
   data: {
     a2Multi: 200
   }
-}, 'vaporize']
-  
+}]

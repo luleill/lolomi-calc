@@ -1,4 +1,5 @@
 import { TeamBuff } from '../teambuffs.js'
+import { TeammateConfig, getTeamtitle } from '../util.js'
 export const details = [
   {
     title: '单人触发满特效后生命值',
@@ -90,25 +91,12 @@ export const details = [
       return basic(lunarCrystallizeDamage, '', 'lunarCrystallize');
     }
   },{
-    params: ({cons}) => {
-      const [isLow, isMid, isBest] = [cons < 2, cons >= 2 && cons < 6, cons >= 6]; 
-      return {
-        q: true, gravity: true, is_luna: true, Charged: true, hydro_two: true,
-        Nilou_best: isBest, Nilou_mid: isMid, Nilou_low: isLow,
-        Ineffa_best: isBest, Ineffa_mid: isMid, Ineffa_low: isLow,
-        Xilonen_best: isBest, Xilonen_mid: isMid, Xilonen_low: isLow,
-        Xilonen_hydro: isMid, Xilonen_hydro: isBest,
-      };
-    },
-    title: ({ cons }) => {
-      if (cons >= 6) {
-        return '高配哥伊妮希「引力干涉」月感电伤害';
-      } else if (cons >= 2) {
-        return '中配哥伊妮希「引力干涉」月感电伤害';
-      } else {
-        return '低配哥伊爱希「引力干涉」月感电伤害';
-      }
-    },
+    title: ({ cons }) => `${getTeamtitle(cons, ['伊涅芙','妮露','希诺宁'], '哥伦比娅')}「引力干涉」月感电伤害`,
+    params: ({cons}) => ({
+      ...TeammateConfig(cons, ['伊涅芙','妮露','希诺宁']), 
+      q: true, gravity: true, is_luna: true, Charged: true, hydro_two: true,
+      Xilonen_hydro: isMid, Xilonen_hydro: isBest,
+    }),
     dmg: ({ attr, calc, talent, params }, { basic }) => {
       let lunarChargedDamage = calc(attr.hp) * talent.e['引力干涉·月感电伤害'] / 100;
       if (params.cons >= 4) {
@@ -117,16 +105,6 @@ export const details = [
       return basic(lunarChargedDamage, '', 'lunarCharged');
     }
   },{
-    params: ({cons}) => {
-      const [isLow, isMid, isBest] = [cons < 2, cons >= 2 && cons < 6, cons >= 6]; 
-      return {
-        q: true, gravity: true, is_luna: true, Charged: true, hydro_two: true,
-        Nilou_best: isBest, Nilou_mid: isMid, Nilou_low: false,
-        Lauma_best: isBest, Lauma_mid: isMid, Lauma_low: isLow,
-        Nahida_best: isBest, Nahida_mid: isMid, Nahida_low: isLow,
-        Aino_best: false, Aino_mid: false, Aino_low: isLow
-      };
-    },
     title: ({ cons }) => {
       if (cons >= 6) {
         return '高配哥菈妮草「月露涤荡」重击伤害';
@@ -136,14 +114,6 @@ export const details = [
         return '低配哥菈爱草「月露涤荡」重击伤害';
       }
     },
-    dmg: ({ attr, calc, talent, params }, { basic }) => {
-      let lunarBloomDamage = calc(attr.hp) * talent.a['月露涤荡伤害'] / 100;
-      if (params.cons >= 4) {
-        lunarBloomDamage += calc(attr.hp) * 12.5 / 100;
-      }
-      return basic(lunarBloomDamage, '', 'lunarBloom');
-    }
-  },{
     params: ({cons}) => {
       const [isLow, isMid, isBest] = [cons < 2, cons >= 2 && cons < 6, cons >= 6]; 
       return {
@@ -154,6 +124,14 @@ export const details = [
         Aino_best: false, Aino_mid: false, Aino_low: isLow
       };
     },
+    dmg: ({ attr, calc, talent, params }, { basic }) => {
+      let lunarBloomDamage = calc(attr.hp) * talent.a['月露涤荡伤害'] / 100;
+      if (params.cons >= 4) {
+        lunarBloomDamage += calc(attr.hp) * 12.5 / 100;
+      }
+      return basic(lunarBloomDamage, '', 'lunarBloom');
+    }
+  },{
     title: ({ cons }) => {
       if (cons >= 6) {
         return '高配哥菈妮草「引力干涉」月绽放伤害';
@@ -162,6 +140,16 @@ export const details = [
       } else {
         return '低配哥菈爱草「引力干涉」月绽放伤害';
       }
+    },
+    params: ({cons}) => {
+      const [isLow, isMid, isBest] = [cons < 2, cons >= 2 && cons < 6, cons >= 6]; 
+      return {
+        q: true, gravity: true, is_luna: true, Charged: true, hydro_two: true,
+        Nilou_best: isBest, Nilou_mid: isMid, Nilou_low: false,
+        Lauma_best: isBest, Lauma_mid: isMid, Lauma_low: isLow,
+        Nahida_best: isBest, Nahida_mid: isMid, Nahida_low: isLow,
+        Aino_best: false, Aino_mid: false, Aino_low: isLow
+      };
     },
     dmg: ({ attr, calc, talent, params }, { basic }) => {
       let lunarBloomDamage = calc(attr.hp) * talent.e['引力干涉·月绽放伤害'] / 100;
@@ -270,6 +258,4 @@ export const buffs = [
       cdmg: 80
     }
   }
-];
-
-export const createdBy = 'lolomi-calc';
+]
