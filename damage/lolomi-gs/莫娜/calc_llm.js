@@ -1,12 +1,16 @@
 import { TeamBuff } from '../teambuffs.js'
-import { teamConfig } from '../util.js'
+import { teamConfig, withStdTeam } from '../util.js'
+import { Config } from '#lolomi'
 
 const mainCharName = '莫娜'
 
 const team = ['茜特菈莉','枫原万叶','玛薇卡']
 const artifact_normal = ['烬城', '风套', '千岩']
 
-export const details = [
+const config = Config.getConfig('user', 'config');
+const applyStandardTeam = withStdTeam(mainCharName, team, artifact_normal, config)
+
+export const details = applyStandardTeam([
 {
   title: '开Q重击伤害',
   params: { q: true },
@@ -46,7 +50,7 @@ dmg: ({ artis }) => {
     type: 'text'
   }
 }}
-]
+])
   
 export const defParams = { Hexenzirkel: true } // 魔女会成员
 export const defDmgIdx = 3

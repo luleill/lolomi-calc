@@ -15,36 +15,56 @@ export class feedback extends plugin {
       rule: [
         {
           reg: '^#(停用|关闭)(洛洛米|lolomi)计算$',
-          fnc: 'stoplolomi',
+          fnc: 'toggleLolomi',
           permission: 'master'
         }, {
           reg: '^#(启用|开启)(洛洛米|lolomi)计算$',
-          fnc: 'startlolomi',
+          fnc: 'toggleLolomi',
+          permission: 'master'
+        },
+        {
+          reg: '^#(停用|关闭)标配计算$',
+          fnc: 'toggleTemplaterTeam',
+          permission: 'master'
+        }, {
+          reg: '^#(启用|开启)标配计算$',
+          fnc: 'toggleTemplaterTeam',
           permission: 'master'
         }
       ]
     })
   }
 
-  async startlolomi () {
+  async toggleLolomi() {
     try {
       const configData = fs.readFileSync(configPath, 'utf8')
       const config = YAML.parse(configData)
-      config.lolomicalc = true
+      
+      const enable = this.e.msg.includes('启用') || this.e.msg.includes('开启')
+      config.lolomicalc = enable
+      
       fs.writeFileSync(configPath, YAML.stringify(config), 'utf8')
-      this.e.reply('已启用lolomi-calc~重启后生效~')
+      
+      const statusText = enable ? '启用' : '停用'
+      this.e.reply(`已${statusText}lolomi-calc~重启后生效~`)
     } catch (error) {
       logger.error('保存配置失败:', error)
     }
     return true
   }
-  async stoplolomi () {
+  
+  async toggleTemplaterTeam() {
     try {
       const configData = fs.readFileSync(configPath, 'utf8')
       const config = YAML.parse(configData)
-      config.lolomicalc = false
+      
+      const enable = this.e.msg.includes('启用') || this.e.msg.includes('开启')
+      config.templateteam = enable
+      
       fs.writeFileSync(configPath, YAML.stringify(config), 'utf8')
-      this.e.reply('已停用lolomi-calc~重启后生效~')
+      
+      const statusText = enable ? '启用' : '停用'
+      this.e.reply(`已${statusText}lolomi-calc标配队友计算~重启后生效~`)
     } catch (error) {
       logger.error('保存配置失败:', error)
     }

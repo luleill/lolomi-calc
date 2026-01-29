@@ -1,5 +1,6 @@
 import { TeamBuff } from '../teambuffs.js'
-import { teamConfig, teamDefined } from '../util.js'
+import { teamConfig, teamDefined , withStdTeam } from '../util.js'
+import { Config } from '#lolomi'
 
 const mainCharName = '哥伦比娅'
 
@@ -7,14 +8,17 @@ const team = ['伊涅芙','希诺宁','妮露']
 
 const artifact_normal = ['夜歌']
 
-const config =
+const definedconfig =
   {
     best: ['菈乌玛','妮露','纳西妲'],  
     mid: ['菈乌玛','妮露','纳西妲'],  
     low: ['菈乌玛','爱诺','纳西妲'] 
   }
 
-export const details = [
+const config = Config.getConfig('user', 'config');
+const applyStandardTeam = withStdTeam(mainCharName, team, artifact_normal, config)
+
+export const details = applyStandardTeam([
   {
     title: '单人触发满特效后生命值',
     dmg: ({ attr, calc }) => {
@@ -105,7 +109,32 @@ export const details = [
       return basic(lunarCrystallizeDamage, '', 'lunarCrystallize');
     }
   },{
-    // 队伍伤害
+    title: ({cons}) =>  `${(teamDefined(cons,definedconfig,artifact_normal,mainCharName)).title}「月露涤荡」重击伤害`,
+    params: ({cons}) => ({
+      ...(teamDefined(cons,definedconfig,artifact_normal,mainCharName)).params,
+      q: true, gravity: true, is_luna: true, Bloom: true, hydro_two: true
+    }),
+    dmg: ({ attr, calc, talent, params }, { basic }) => {
+      let lunarBloomDamage = calc(attr.hp) * talent.a['月露涤荡伤害'] / 100;
+      if (params.cons >= 4) {
+        lunarBloomDamage += calc(attr.hp) * 12.5 / 100;
+      }
+      return basic(lunarBloomDamage, '', 'lunarBloom');
+    }
+  },{
+    title: ({cons}) =>  `${(teamDefined(cons,definedconfig,artifact_normal,mainCharName)).title}「引力干涉」月绽放伤害`,
+    params: ({cons}) => ({
+      ...(teamDefined(cons,definedconfig,artifact_normal,mainCharName)).params,
+      q: true, gravity: true, is_luna: true, Bloom: true, hydro_two: true
+    }),
+    dmg: ({ attr, calc, talent, params }, { basic }) => {
+      let lunarBloomDamage = calc(attr.hp) * talent.e['引力干涉·月绽放伤害'] / 100;
+      if (params.cons >= 4) {
+        lunarBloomDamage += calc(attr.hp) * 12.5 / 100;
+      }
+      return basic(lunarBloomDamage, '', 'lunarBloom');
+    }
+  },{
     title: ({ cons }) => `${teamConfig(cons, team, artifact_normal, mainCharName).title}「引力干涉」月感电伤害`,
     params: ({cons}) => ({
       ...teamConfig(cons, team, artifact_normal).params, 
@@ -120,32 +149,6 @@ export const details = [
       return basic(lunarChargedDamage, '', 'lunarCharged');
     }
   },{
-    title: ({cons}) =>  `${(teamDefined(cons,config,artifact_normal,mainCharName)).title}「月露涤荡」重击伤害`,
-    params: ({cons}) => ({
-      ...(teamDefined(cons,config,artifact_normal,mainCharName)).params,
-      q: true, gravity: true, is_luna: true, Bloom: true, hydro_two: true
-    }),
-    dmg: ({ attr, calc, talent, params }, { basic }) => {
-      let lunarBloomDamage = calc(attr.hp) * talent.a['月露涤荡伤害'] / 100;
-      if (params.cons >= 4) {
-        lunarBloomDamage += calc(attr.hp) * 12.5 / 100;
-      }
-      return basic(lunarBloomDamage, '', 'lunarBloom');
-    }
-  },{
-    title: ({cons}) =>  `${(teamDefined(cons,config,artifact_normal,mainCharName)).title}「引力干涉」月绽放伤害`,
-    params: ({cons}) => ({
-      ...(teamDefined(cons,config,artifact_normal,mainCharName)).params,
-      q: true, gravity: true, is_luna: true, Bloom: true, hydro_two: true
-    }),
-    dmg: ({ attr, calc, talent, params }, { basic }) => {
-      let lunarBloomDamage = calc(attr.hp) * talent.e['引力干涉·月绽放伤害'] / 100;
-      if (params.cons >= 4) {
-        lunarBloomDamage += calc(attr.hp) * 12.5 / 100;
-      }
-      return basic(lunarBloomDamage, '', 'lunarBloom');
-    }
-  },{
   title: '当前圣遗物套装',
   dmg: ({ artis }) => {
     return {
@@ -153,7 +156,7 @@ export const details = [
       type: 'text'
     }
   }}
-];
+]);
 
 export const defDmgIdx = 4;
 export const mainAttr = 'hp,cpct,cdmg,mastery';

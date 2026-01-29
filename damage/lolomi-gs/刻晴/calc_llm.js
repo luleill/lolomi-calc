@@ -1,12 +1,16 @@
 import { TeamBuff } from '../teambuffs.js'
-import { teamConfig } from '../util.js'
+import { teamConfig, withStdTeam } from '../util.js'
+import { Config } from '#lolomi'
 
 const mainCharName = '刻晴'
-
 const team = ['九条裟罗','枫原万叶','纳西妲']
 const artifact_normal = ['宗室','风套']
 
-export const details = [{
+const config = Config.getConfig('user', 'config');
+const applyStandardTeam = withStdTeam(mainCharName, team, artifact_normal, config)
+
+export const details = applyStandardTeam([
+  {
     title: '重击雷伤',
   dmg: ({ talent }, dmg) => dmg(talent.a['重击伤害'], 'a2')
   }, {
@@ -30,19 +34,18 @@ export const details = [{
       ...teamConfig(cons, team, artifact_normal).params, 
     }),
     dmg: ({ talent }, dmg) => dmg(talent.q['最后一击伤害'], 'q', 'aggravate')
-  },
-  {
-  title: '当前圣遗物套装',
-  dmg: ({ artis }) => {
-    return {
-      avg: artis ,
-      type: 'text'
-    }
-  }}
-  ]
+  }, {
+    title: '当前圣遗物套装',
+    dmg: ({ artis }) => {
+      return {
+        avg: artis ,
+        type: 'text'
+      }
+    }}
+  ])
 
 export const defDmgIdx = 3
-export const mainAttr = 'atk,cpct,cdmg,mastery'
+export const mainAttr = 'atk,cpct,cdmg'
 
 export const buffs = [
   ...TeamBuff,
@@ -64,5 +67,3 @@ export const buffs = [
     dmg: 24
   }
 }]
-
-  

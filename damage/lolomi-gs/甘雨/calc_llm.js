@@ -1,16 +1,19 @@
 import { TeamBuff } from '../teambuffs.js'
-import { teamConfig } from '../util.js'
+import { teamConfig, withStdTeam } from '../util.js'
+import { Config } from '#lolomi'
 
 const mainCharName = '甘雨'
 
-const team_ghwb = ['申鹤','枫原万叶','班尼特']
-const artifact_reaction = ['宗室', '风套']
+const team = ['申鹤','枫原万叶','班尼特']
+const artifact_normal = ['宗室', '风套']
 
-const team_ghaf = ['申鹤','爱可菲','芙宁娜']
-const artifact_normal = ['千岩', '宗室']
+const team_B = ['申鹤','爱可菲','芙宁娜']
+const artifact_B = ['千岩', '宗室']
 
+const config = Config.getConfig('user', 'config');
+const applyStandardTeam = withStdTeam(mainCharName, team, artifact_normal, config)
 
-export const details = [
+export const details = applyStandardTeam([
   {
     title: '单人触发满特效后攻击力',
     dmg: ({ attr, calc }) => {
@@ -47,16 +50,16 @@ export const details = [
     dmg: ({ talent }, dmg) => dmg(talent.q['冰棱伤害'], 'q')
   },{
     // 队伍伤害
-    title: ({ cons }) => `${teamConfig(cons, team_ghaf, artifact_normal, mainCharName).title}霜华矢一箭总伤`,
+    title: ({ cons }) => `${teamConfig(cons, team_B, artifact_normal, mainCharName).title}霜华矢一箭总伤`,
     params: ({cons}) => ({
-      ...teamConfig(cons, team_ghaf, artifact_normal).params, 
+      ...teamConfig(cons, team_B, artifact_normal).params, 
       q: true
     }),
     dmg: ({ talent }, dmg) => dmg(talent.a['霜华矢·霜华绽发伤害'] + talent.a['霜华矢命中伤害'], 'a2'),
   },{
-    title: ({ cons }) => `${teamConfig(cons, team_ghwb, artifact_reaction, mainCharName).title}霜华矢绽发融化伤害`,
+    title: ({ cons }) => `${teamConfig(cons, team, artifact_B, mainCharName).title}霜华矢绽发融化伤害`,
     params: ({cons}) => ({
-      ...teamConfig(cons, team_ghwb, artifact_reaction).params, 
+      ...teamConfig(cons, team, artifact_B).params, 
       q: true
     }),
     dmg: ({ talent }, dmg) => dmg(talent.a['霜华矢·霜华绽发伤害'], 'a2', 'melt')
@@ -76,7 +79,7 @@ export const details = [
       type: 'text'
     }
   }}
-  ]
+  ])
   
   export const defDmgIdx = 1
   export const mainAttr = 'atk,cpct,cdmg,mastery'

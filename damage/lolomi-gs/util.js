@@ -312,6 +312,102 @@ const teamConfig = (cons, teammateNames = [], artifactNames = [], mainCharName =
   };
 };
 
+/**
+ * 末尾插入标配和满配队友
+ * @param {Array} details - 原始calc数据
+ * @param {string} mainCharName - 主角色名称
+ * @param {Array} team - 队友
+ * @param {Array} artifact_normal - 圣遗物配置
+ * @param {boolean} showTemplateTeam - 是否显示模板队伍
+ * @returns {Array}
+ */
+function insertStdTeamAtPosSync(details, mainCharName, team, artifact_normal, showTemplateTeam) {
+  if (!showTemplateTeam) {
+    return details;
+  }
+
+  const penultimateIndex = details.length - 2;
+  if (penultimateIndex < 0) {
+    return details;
+  }
+  
+  const penultimateItem = details[penultimateIndex];
+  
+  let originalTitle = typeof penultimateItem.title === 'function' 
+    ? penultimateItem.title({cons: 2}) 
+    : penultimateItem.title;
+  
+  const stdTitle = originalTitle
+    .replace(/^(高配|中配|低配)/, '标配');
+  
+  const standardTeamItem = {
+    title: stdTitle,
+    params: {
+      ...teamConfig(2, team, artifact_normal).params,
+    },
+    dmg: penultimateItem.dmg
+  };
+  
+  const maxTitle = originalTitle
+    .replace(/^(高配|中配|低配)/, '满配');
+  
+  const maxTeamItem = {
+    title: maxTitle,
+    params: {
+      ...teamConfig(6, team, artifact_normal).params,
+    },
+    dmg: penultimateItem.dmg
+  };
+  
+  const newDetails = [...details];
+  newDetails.splice(penultimateIndex + 1, 0, standardTeamItem, maxTeamItem);
+  
+  return newDetails;
+}
+function checkConfig() {
+  let templateteam = false;
+  let hasConfig = false;
+  
+  try {
+    const configModule = global.Config || (global.Yunzai && global.Yunzai.Config);
+    if (configModule && typeof configModule.getConfig === 'function') {
+      const config = configModule.getConfig('user', 'config');
+      templateteam = config?.templateteam || false;
+      hasConfig = true;
+    } else {
+      hasConfig = false;
+      templateteam = false;
+    }
+  } catch (e) {
+    hasConfig = false;
+    templateteam = false;
+  }
+
+  return {
+    hasConfig,
+    templateteam,
+    message: hasConfig ? 
+      `配置读取: ${templateteam}` : 
+      '配置读取失败，请检查全局配置'
+  };
+}
+
+function withStdTeam(mainCharName, team = [], artifact_normal = [], config = null) {
+  return function(originalDetails) {
+    const templateteam = config ? config.templateteam : false;
+    if (!templateteam) {
+      return originalDetails;
+    }
+    return insertStdTeamAtPosSync(
+      originalDetails, 
+      mainCharName, 
+      team, 
+      artifact_normal, 
+      templateteam
+    );
+  };
+}
+
 export { 
   teammateConfig, 
   getTeamtitle, 
@@ -319,5 +415,7 @@ export {
   teamConfig, 
   teamDefined,
   nameAbbr,
-  getEngName
+  getEngName,
+  withStdTeam,
+  checkConfig
 };

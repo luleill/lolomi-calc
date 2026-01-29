@@ -1,5 +1,6 @@
 import { TeamBuff } from '../teambuffs.js'
-import { teamConfig } from '../util.js'
+import { teamConfig, withStdTeam } from '../util.js'
+import { Config } from '#lolomi'
 
 const mainCharName = '申鹤'
 
@@ -12,7 +13,10 @@ const artifact_reaction = ['烬城', '风套','宗室']
 const team_C = ['闲云','芙宁娜','班尼特']
 const artifact_C = ['宗室', '千岩']
 
-export const details = [
+const config = Config.getConfig('user', 'config');
+const applyStandardTeam = withStdTeam(mainCharName, team_C, artifact_C, config)
+
+export const details = applyStandardTeam([
   {
     title: '单人触发满特效后攻击力',
     dmg: ({ attr, calc }) => {
@@ -83,7 +87,7 @@ export const details = [
       type: 'text'
     }
   }}
-]
+])
 
   export const mainAttr = 'atk,cpct,cdmg'
   export const buffs = [
