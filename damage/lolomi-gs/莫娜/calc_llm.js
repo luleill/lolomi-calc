@@ -1,5 +1,5 @@
 import { TeamBuff } from '../teambuffs.js'
-import { TeamConfig } from '../util.js'
+import { teamConfig } from '../util.js'
 
 const mainCharName = '莫娜'
 
@@ -25,16 +25,16 @@ export const details = [
   dmg: ({ talent }, dmg) => dmg(talent.q['泡影破裂伤害'], 'q')
 },{
   // 队伍伤害
-  title: ({ cons }) => `${TeamConfig(cons, team, artifact_normal, mainCharName).title}开Q重击`,
+  title: ({ cons }) => `${teamConfig(cons, team, artifact_normal, mainCharName).title}开Q重击`,
   params: ({cons}) => ({
-    ...TeamConfig(cons, team, artifact_normal).params, 
+    ...teamConfig(cons, team, artifact_normal).params, 
     q: true
   }),
   dmg: ({ talent }, dmg) => dmg(talent.a['重击伤害'], 'a2'),
 },{
-  title: ({ cons }) => `${TeamConfig(cons, team, artifact_normal, mainCharName).title}开Q重击蒸发`,
+  title: ({ cons }) => `${teamConfig(cons, team, artifact_normal, mainCharName).title}开Q重击蒸发`,
   params: ({cons}) => ({
-    ...TeamConfig(cons, team, artifact_normal).params, 
+    ...teamConfig(cons, team, artifact_normal).params, 
     q: true
   }),
   dmg: ({ talent }, dmg) => dmg(talent.a['重击伤害'], 'a2', 'vaporize'),

@@ -1,5 +1,5 @@
 import { TeamBuff } from '../teambuffs.js'
-import { TeamConfig } from '../util.js'
+import { teamConfig } from '../util.js'
 
 const mainCharName = '刻晴'
 
@@ -19,15 +19,15 @@ export const details = [{
     title: '「天街巡游」尾刀激化伤害',
     dmg: ({ talent }, dmg) => dmg(talent.q['最后一击伤害'], 'q', 'aggravate')
   }, {
-    title: ({ cons }) => `${TeamConfig(cons, team, artifact_normal, mainCharName).title}重击激化伤害`,
+    title: ({ cons }) => `${teamConfig(cons, team, artifact_normal, mainCharName).title}重击激化伤害`,
     params: ({cons}) => ({
-      ...TeamConfig(cons, team, artifact_normal).params, 
+      ...teamConfig(cons, team, artifact_normal).params, 
     }),
     dmg: ({ talent }, dmg) => dmg(talent.a['重击伤害'], 'a2', 'aggravate')
   }, {
-    title: ({ cons }) => `${TeamConfig(cons, team, artifact_normal, mainCharName).title}「天街巡游」尾刀激化伤害`,
+    title: ({ cons }) => `${teamConfig(cons, team, artifact_normal, mainCharName).title}「天街巡游」尾刀激化伤害`,
     params: ({cons}) => ({
-      ...TeamConfig(cons, team, artifact_normal).params, 
+      ...teamConfig(cons, team, artifact_normal).params, 
     }),
     dmg: ({ talent }, dmg) => dmg(talent.q['最后一击伤害'], 'q', 'aggravate')
   },

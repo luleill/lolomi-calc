@@ -1,5 +1,5 @@
 import { TeamBuff } from '../teambuffs.js'
-import { TeamConfig } from '../util.js'
+import { teamConfig } from '../util.js'
 
 const mainCharName = '甘雨'
 
@@ -47,16 +47,16 @@ export const details = [
     dmg: ({ talent }, dmg) => dmg(talent.q['冰棱伤害'], 'q')
   },{
     // 队伍伤害
-    title: ({ cons }) => `${TeamConfig(cons, team_ghaf, artifact_normal, mainCharName).title}霜华矢一箭总伤`,
+    title: ({ cons }) => `${teamConfig(cons, team_ghaf, artifact_normal, mainCharName).title}霜华矢一箭总伤`,
     params: ({cons}) => ({
-      ...TeamConfig(cons, team_ghaf, artifact_normal).params, 
+      ...teamConfig(cons, team_ghaf, artifact_normal).params, 
       q: true
     }),
     dmg: ({ talent }, dmg) => dmg(talent.a['霜华矢·霜华绽发伤害'] + talent.a['霜华矢命中伤害'], 'a2'),
   },{
-    title: ({ cons }) => `${TeamConfig(cons, team_ghwb, artifact_reaction, mainCharName).title}霜华矢绽发融化伤害`,
+    title: ({ cons }) => `${teamConfig(cons, team_ghwb, artifact_reaction, mainCharName).title}霜华矢绽发融化伤害`,
     params: ({cons}) => ({
-      ...TeamConfig(cons, team_ghwb, artifact_reaction).params, 
+      ...teamConfig(cons, team_ghwb, artifact_reaction).params, 
       q: true
     }),
     dmg: ({ talent }, dmg) => dmg(talent.a['霜华矢·霜华绽发伤害'], 'a2', 'melt')

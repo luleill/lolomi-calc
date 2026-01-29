@@ -1,5 +1,5 @@
 import { TeamBuff } from '../teambuffs.js'
-import { TeamConfig, teamdefined } from '../util.js'
+import { teamConfig, teamDefined } from '../util.js'
 
 const mainCharName = '哥伦比娅'
 
@@ -106,9 +106,9 @@ export const details = [
     }
   },{
     // 队伍伤害
-    title: ({ cons }) => `${TeamConfig(cons, team, artifact_normal, mainCharName).title}「引力干涉」月感电伤害`,
+    title: ({ cons }) => `${teamConfig(cons, team, artifact_normal, mainCharName).title}「引力干涉」月感电伤害`,
     params: ({cons}) => ({
-      ...TeamConfig(cons, team, artifact_normal).params, 
+      ...teamConfig(cons, team, artifact_normal).params, 
       q: true, gravity: true, is_luna: true, Charged: true, hydro_two: true,
       ...(cons >= 2 && { Xilonen_hydro: true }),
     }),
@@ -120,9 +120,9 @@ export const details = [
       return basic(lunarChargedDamage, '', 'lunarCharged');
     }
   },{
-    title: ({cons}) =>  `${(teamdefined(cons,config,artifact_normal,mainCharName)).title}「月露涤荡」重击伤害`,
+    title: ({cons}) =>  `${(teamDefined(cons,config,artifact_normal,mainCharName)).title}「月露涤荡」重击伤害`,
     params: ({cons}) => ({
-      ...(teamdefined(cons,config,artifact_normal,mainCharName)).params,
+      ...(teamDefined(cons,config,artifact_normal,mainCharName)).params,
       q: true, gravity: true, is_luna: true, Bloom: true, hydro_two: true
     }),
     dmg: ({ attr, calc, talent, params }, { basic }) => {
@@ -133,9 +133,9 @@ export const details = [
       return basic(lunarBloomDamage, '', 'lunarBloom');
     }
   },{
-    title: ({cons}) =>  `${(teamdefined(cons,config,artifact_normal,mainCharName)).title}「引力干涉」月绽放伤害`,
+    title: ({cons}) =>  `${(teamDefined(cons,config,artifact_normal,mainCharName)).title}「引力干涉」月绽放伤害`,
     params: ({cons}) => ({
-      ...(teamdefined(cons,config,artifact_normal,mainCharName)).params,
+      ...(teamDefined(cons,config,artifact_normal,mainCharName)).params,
       q: true, gravity: true, is_luna: true, Bloom: true, hydro_two: true
     }),
     dmg: ({ attr, calc, talent, params }, { basic }) => {

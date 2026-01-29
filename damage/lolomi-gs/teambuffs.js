@@ -189,6 +189,14 @@ let TeamBuff = [
         params.Bennett_mid ? 139 * 756.2 / 100 : 
         params.Bennett_low ? 120.8 * 645.2 / 100 : 0
     },
+  },{
+    check: ({ params }) => params.ChongYun_low || params.ChongYun_mid || params.ChongYun_best,
+    title: '重云',
+    data: {
+      kx: ({ params , element }) => (
+        params.ChongYun_best || params.ChongYun_mid || params.ChongYun_low 
+        && element === '冰') ? 10 : 0
+    },
   },{ 
     check: ({ params }) => params.Furina_low || params.Furina_mid || params.Furina_best,
     title: '芙宁娜',
@@ -305,6 +313,17 @@ let TeamBuff = [
       aDmg: 15,
       a2Dmg: 15,
       a3Dmg: 15
+    } 
+  },
+  {
+    check: ({ params }) => params.XianYun_low || params.XianYun_mid || params.XianYun_best,
+    title: '闲云',  
+    // 高配2+5 默认4500攻击 中配2+1 4500攻击 低配0+0 3500攻击
+    // 天赋默认吃满+10暴击
+    data: { 
+      a3Plus: ({ params }) => (params.XianYun_best || params.XianYun_mid) ? 18000 : params.XianYun_low ? 7000 : 0,
+      cdmg : 10,
+      a3Dmg: ({ params }) => params.XianYun_best ? 80 : params.XianYun_mid ? 28 :0,
     } 
   },
   {
