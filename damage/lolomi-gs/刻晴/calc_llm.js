@@ -1,5 +1,11 @@
 import { TeamBuff } from '../teambuffs.js'
-import { TeammateConfig, getTeamtitle } from '../util.js'
+import { TeamConfig } from '../util.js'
+
+const mainCharName = '刻晴'
+
+const team = ['九条裟罗','枫原万叶','纳西妲']
+const artifact_normal = ['宗室','风套']
+
 export const details = [{
     title: '重击雷伤',
   dmg: ({ talent }, dmg) => dmg(talent.a['重击伤害'], 'a2')
@@ -13,17 +19,15 @@ export const details = [{
     title: '「天街巡游」尾刀激化伤害',
     dmg: ({ talent }, dmg) => dmg(talent.q['最后一击伤害'], 'q', 'aggravate')
   }, {
-    title: ({ cons }) => `${getTeamtitle(cons, ['九条裟罗','希诺宁','纳西妲'], '刻晴')}重击激化伤害`,
+    title: ({ cons }) => `${TeamConfig(cons, team, artifact_normal, mainCharName).title}重击激化伤害`,
     params: ({cons}) => ({
-      ...TeammateConfig(cons, ['九条裟罗','希诺宁','纳西妲']), 
-      jincheng: true,
+      ...TeamConfig(cons, team, artifact_normal).params, 
     }),
     dmg: ({ talent }, dmg) => dmg(talent.a['重击伤害'], 'a2', 'aggravate')
   }, {
-    title: ({ cons }) => `${getTeamtitle(cons, ['九条裟罗','希诺宁','纳西妲'], '刻晴')}「天街巡游」尾刀激化伤害`,
+    title: ({ cons }) => `${TeamConfig(cons, team, artifact_normal, mainCharName).title}「天街巡游」尾刀激化伤害`,
     params: ({cons}) => ({
-      ...TeammateConfig(cons, ['九条裟罗','希诺宁','纳西妲']), 
-      jincheng: true,
+      ...TeamConfig(cons, team, artifact_normal).params, 
     }),
     dmg: ({ talent }, dmg) => dmg(talent.q['最后一击伤害'], 'q', 'aggravate')
   },

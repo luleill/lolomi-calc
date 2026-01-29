@@ -1,13 +1,28 @@
 // 圣遗物映射
 const artifactMap = {
-  'jincheng': '烬城',
-  'yege': '夜歌',
+  'jincheng': '烬城勇者绘卷',
+  'yege': '纺月的夜歌',
   'jiaoguan': '教官',
-  'fengtao': '风套',
-  'caotao': '草套',
-  'qianyan': '千岩',
-  'panyan': '磐岩',
-  'zongshi': '宗室'
+  'fengtao': '翠绿之影',
+  'caotao': '深林的记忆',
+  'qianyan': '千岩牢固',
+  'panyan': '悠古的磐岩',
+  'zongshi': '昔日宗室之仪'
+};
+
+// 圣遗物别名
+const artifactAliases = {
+  '烬城': 'jincheng',
+  '夜歌': 'yege',
+  '纺月': 'yege',
+  '教官': 'jiaoguan',
+  '风套': 'fengtao',
+  '翠绿': 'fengtao',
+  '草套': 'caotao',
+  '深林': 'caotao',
+  '千岩': 'qianyan',
+  '磐岩': 'panyan',
+  '宗室': 'zongshi',
 };
 
 // 角色映射
@@ -113,27 +128,58 @@ const characterMap = {
   'Dahlia': '塔利雅',
   'Skirk': '丝柯克',
   'Ineffa': '伊涅芙',
+  'Aino': '爱诺',
   'Lauma': '菈乌玛',
   'Flins': '菲林斯',
   'Nefer': '奈芙尔',
   'Jahoda': '雅珂达',
   'Durin': '杜林',
-  'Columbina': 'Columbina'
+  'Columbina': '哥伦比娅'
+};
+
+// 角色简称 - 常用辅助
+const charactAliases = {
+  '绫华': 'KamisatoAyaka',
+  '万叶': 'Kazuha',
+  '雷神': 'RaidenShogun',
+  '心海': 'Kokomi',
+  '奶奶': 'Citlali',
+  '九条': 'Sara',
+  '少女': 'Columbina',
+};
+
+const nameabbr = (characterName) => {
+  // 个别角色使用常规叫法
+  const specials = {
+    '枫原万叶': '万',
+    '申鹤': '鹤',
+    '珊瑚宫心海': '心',
+    '鹿野院平藏': '平',
+    '流浪者': '散',
+    '纳西妲': '草',
+    '哥伦比娅': '月',
+  };
+  
+  return specials[characterName] || characterName.charAt(0);
 };
 
 /**
- * @param {...string} artifactNames - 队友圣遗物
+ * 队友圣遗物配置
+ * @param {...string} artifactNames - 圣遗物名称列表
  * @returns {Object}
  */
 const ArtifactConfig = (...artifactNames) => {
   let params = {};
   
   artifactNames.forEach(artifactName => {
-    if (artifactMap[artifactName]) {
+    if (artifactAliases[artifactName]) {
+      const englishKeyName = artifactAliases[artifactName];
+      params[englishKeyName] = true;
+    } else if (artifactMap[artifactName]) {
       params[artifactName] = true;
     } else {
-        params[artifactName] = true;
-      }
+      params[artifactName] = true;
+    }
   });
   
   return params;
@@ -141,7 +187,8 @@ const ArtifactConfig = (...artifactNames) => {
 
 /**
  * @param {number} cons
- * @param {string[]} teammateNames - 队友名称，calc里严格按照characterMap里定义的名称写
+ * - 队友名称，calc里尽量按照官方定义的角色名称写
+ * @param {string[]} teammateNames
  * @returns {Object}
  */
 const TeammateConfig = (cons, teammateNames = []) => {
@@ -150,33 +197,24 @@ const TeammateConfig = (cons, teammateNames = []) => {
   let params = {};
   
   teammateNames.forEach(teammate => {
-    // 中文名称转换为英文名称
-    let englishName = teammate;
-    for (const [eng, chs] of Object.entries(characterMap)) {
-      if (chs === teammate) {
-        englishName = eng;
-        break;
+    let Name = teammate;
+    if (charactAliases[teammate]) {
+      Name = charactAliases[teammate];
+    } 
+    else {
+      for (const [eng, chs] of Object.entries(characterMap)) {
+        if (chs === teammate) {
+          Name = eng;
+          break;
+        }
       }
     }
-    params[`${englishName}_best`] = isBest;
-    params[`${englishName}_mid`] = isMid;
-    params[`${englishName}_low`] = isLow;
+    params[`${Name}_best`] = isBest;
+    params[`${Name}_mid`] = isMid;
+    params[`${Name}_low`] = isLow;
   });
   
   return params;
-};
-
-const getCharacterInitial = (characterName) => {
-  // 个别角色使用常规叫法
-  const specialInitials = {
-    '枫原万叶': '万',
-    '申鹤': '鹤',
-    '珊瑚宫心海': '心',
-    '鹿野院平藏': '平',
-    '流浪者': '散'
-  };
-  
-  return specialInitials[characterName] || characterName.charAt(0);
 };
 
 /**
@@ -184,7 +222,7 @@ const getCharacterInitial = (characterName) => {
  * @param {number} cons
  * @param {string[]} teammateNames - 队友
  * @param {string} mainCharName - 主角色名称
- * @returns {string} 标题前缀
+ * @returns {string}
  */
 const getTeamtitle = (cons, teammateNames, mainCharName = null) => {
   let configLevel;
@@ -198,16 +236,30 @@ const getTeamtitle = (cons, teammateNames, mainCharName = null) => {
 
   const primaryChar = mainCharName || (teammateNames.length > 0 ? teammateNames[0] : '');
   
-  let primaryCharFirstLetter = primaryChar.charAt(0);
-  if (characterMap[primaryChar]) {
-    primaryCharFirstLetter = getCharacterInitial(characterMap[primaryChar]);
+  let primaryCharName = primaryChar;
+  if (!characterMap[primaryChar]) {
+    for (const [eng, chs] of Object.entries(characterMap)) {
+      if (chs === primaryChar) {
+        primaryCharName = chs;
+        break;
+      }
+    }
+  } else {
+    for (const [eng, chs] of Object.entries(characterMap)) {
+      if (eng === primaryChar) {
+        primaryCharName = chs;
+        break;
+      }
+    }
   }
+
+  let primaryCharFirstLetter = nameabbr(primaryCharName);
 
   const teammateInitials = teammateNames.map(name => {
     if (characterMap[name]) {
-      return getCharacterInitial(characterMap[name]);
+      return nameabbr(characterMap[name]);
     }
-    return getCharacterInitial(name);
+    return nameabbr(name);
   });
 
   const uniqueInitials = [...new Set([primaryCharFirstLetter, ...teammateInitials])];
@@ -219,7 +271,7 @@ const getTeamtitle = (cons, teammateNames, mainCharName = null) => {
 /**
  * @param {number} cons
  * @param {string[]} teammateNames - 队友
- * @param {string[]} artifactNames - 队友圣遗物
+ * @param {string[]} artifactNames - 队友配带圣遗物
  * @param {string} mainCharName - 主角色
  * @returns {Object}
  */
@@ -233,4 +285,81 @@ const TeamConfig = (cons, teammateNames = [], artifactNames = [], mainCharName =
   };
 };
 
-export { TeammateConfig, getTeamtitle, ArtifactConfig, TeamConfig };
+/**
+ * 自适应高中低队友配置
+ * 主角色命座不一样使用不同队友的情况下使用
+ * @param {number} cons
+ * @param {Object} adaptiveconfig  - 自定义配置
+ * @param {string[]} artifactNames - 队友配带圣遗物
+ * @param {string} mainCharName - 主角色名称
+ * @returns {Object}
+ */
+const teamdefined = (cons, adaptiveconfig, artifactNames = [], mainCharName = null) => {
+  let selectedTeammates = [];
+  let configLevel = '';
+  
+  if (cons >= 6) {
+    selectedTeammates = adaptiveconfig.best || [];
+    configLevel = '高配';
+  } else if (cons >= 2) {
+    selectedTeammates = adaptiveconfig.mid || [];
+    configLevel = '中配';
+  } else {
+    selectedTeammates = adaptiveconfig.low || [];
+    configLevel = '低配';
+  }
+  
+  // params
+  const params = {
+    ...TeammateConfig(cons, selectedTeammates),
+    ...ArtifactConfig(...artifactNames)
+  };
+  
+  // title
+  const primaryChar = mainCharName || (selectedTeammates.length > 0 ? selectedTeammates[0] : '');
+  
+  // 主角色
+  let primaryCharName = primaryChar;
+  if (!characterMap[primaryChar]) {
+    for (const [eng, chs] of Object.entries(characterMap)) {
+      if (chs === primaryChar) {
+        primaryCharName = chs;
+        break;
+      }
+    }
+  } else {
+    for (const [eng, chs] of Object.entries(characterMap)) {
+      if (eng === primaryChar) {
+        primaryCharName = chs;
+        break;
+      }
+    }
+  }
+
+  let primaryCharFirstLetter = nameabbr(primaryCharName);
+
+  const teammateInitials = selectedTeammates.map(name => {
+    if (characterMap[name]) {
+      return nameabbr(characterMap[name]);
+    }
+    return nameabbr(name);
+  });
+
+  const uniqueInitials = [...new Set([primaryCharFirstLetter, ...teammateInitials])];
+  const teamName = uniqueInitials.join('');
+  
+  const title = `${configLevel} ${teamName}`;
+  
+  return {
+    params,
+    title
+  };
+};
+
+export { 
+  TeammateConfig, 
+  getTeamtitle, 
+  ArtifactConfig, 
+  TeamConfig, 
+  teamdefined 
+};

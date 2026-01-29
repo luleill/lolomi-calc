@@ -3,10 +3,8 @@ import { TeamConfig } from '../util.js'
 
 const mainCharName = '莫娜'
 
-const team = ['茜特菈莉','希诺宁','玛薇卡']
-
-const artifact_normal = ['烬城', '千岩']
-const artifact_reaction = ['烬城', '教官', '千岩']
+const team = ['茜特菈莉','枫原万叶','玛薇卡']
+const artifact_normal = ['烬城', '风套', '千岩']
 
 export const details = [
 {
@@ -34,9 +32,9 @@ export const details = [
   }),
   dmg: ({ talent }, dmg) => dmg(talent.a['重击伤害'], 'a2'),
 },{
-  title: ({ cons }) => `${TeamConfig(cons, team, artifact_reaction, mainCharName).title}开Q重击蒸发`,
+  title: ({ cons }) => `${TeamConfig(cons, team, artifact_normal, mainCharName).title}开Q重击蒸发`,
   params: ({cons}) => ({
-    ...TeamConfig(cons, team, artifact_reaction).params, 
+    ...TeamConfig(cons, team, artifact_normal).params, 
     q: true
   }),
   dmg: ({ talent }, dmg) => dmg(talent.a['重击伤害'], 'a2', 'vaporize'),

@@ -1,5 +1,15 @@
 import { TeamBuff } from '../teambuffs.js'
-import { TeammateConfig, getTeamtitle } from '../util.js'
+import { TeamConfig } from '../util.js'
+
+const mainCharName = '甘雨'
+
+const team_ghwb = ['申鹤','枫原万叶','班尼特']
+const artifact_reaction = ['宗室', '风套']
+
+const team_ghaf = ['申鹤','爱可菲','芙宁娜']
+const artifact_normal = ['千岩', '宗室']
+
+
 export const details = [
   {
     title: '单人触发满特效后攻击力',
@@ -36,19 +46,20 @@ export const details = [
     title: '「降众天华」冰凌伤害',
     dmg: ({ talent }, dmg) => dmg(talent.q['冰棱伤害'], 'q')
   },{
-    title: ({ cons }) => `${getTeamtitle(cons, ['申鹤', '枫原万叶','班尼特'], '甘雨')}霜华矢绽发融化伤害`,
+    // 队伍伤害
+    title: ({ cons }) => `${TeamConfig(cons, team_ghaf, artifact_normal, mainCharName).title}霜华矢一箭总伤`,
     params: ({cons}) => ({
-      ...TeammateConfig(cons, ['申鹤', '枫原万叶','班尼特']), 
-      zongshi: true, fengtao: true,
-    }),
-    dmg: ({ talent }, dmg) => dmg(talent.a['霜华矢·霜华绽发伤害'], 'a2', 'melt')
-  },{
-    title: ({ cons }) => `${getTeamtitle(cons, ['申鹤','爱可菲','芙宁娜'], '甘雨')}霜华矢一箭总伤`,
-    params: ({cons}) => ({
-      ...TeammateConfig(cons, ['申鹤','爱可菲','芙宁娜']), 
-      qianyan: true,
+      ...TeamConfig(cons, team_ghaf, artifact_normal).params, 
+      q: true
     }),
     dmg: ({ talent }, dmg) => dmg(talent.a['霜华矢·霜华绽发伤害'] + talent.a['霜华矢命中伤害'], 'a2'),
+  },{
+    title: ({ cons }) => `${TeamConfig(cons, team_ghwb, artifact_reaction, mainCharName).title}霜华矢绽发融化伤害`,
+    params: ({cons}) => ({
+      ...TeamConfig(cons, team_ghwb, artifact_reaction).params, 
+      q: true
+    }),
+    dmg: ({ talent }, dmg) => dmg(talent.a['霜华矢·霜华绽发伤害'], 'a2', 'melt')
   },{
     params: { 
       zongshi: true, fengtao: true, legend_max: true,
