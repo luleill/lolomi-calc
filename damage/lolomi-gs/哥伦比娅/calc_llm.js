@@ -16,7 +16,10 @@ const definedconfig =
   }
 
 const config = Config.getConfig('user', 'config');
-const applyStandardTeam = withStdTeam(mainCharName, team, artifact_normal, config)
+const applyStandardTeam = withStdTeam(mainCharName, team, artifact_normal, config, {
+  q: true, gravity: true, is_luna: true, Charged: true, hydro_two: true,
+  Xilonen_hydro: true 
+})
 
 export const details = applyStandardTeam([
   {

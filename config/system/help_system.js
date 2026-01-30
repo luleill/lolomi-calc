@@ -59,22 +59,22 @@ export const helpList = [
       },
       {
         icon: 81,
-        title: '#启用标配计算',
+        title: '#标配计算停用',
         desc: '首次安装默认启用'
       },
       {
         icon: 81,
-        title: '#关闭标配计算',
+        title: '#标配计算关闭',
         desc: '计算面板展示2+1和6+5队友'
       },
       {
         icon: 81,
-        title: '#启用洛洛米计算',
-        desc: '首次安装默认启用'
+        title: '#洛洛米计算启用',
+        desc: '首次安装默认停用'
       },
       {
         icon: 81,
-        title: '#禁用洛洛米计算',
+        title: '#洛洛米计算停用',
         desc: '禁用插件'
       }
     ]

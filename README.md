@@ -5,8 +5,8 @@ git clone --depth=1 https://gitee.com/land-route_lu/lolomi-calc.git ./plugins/lo
 复用liangshi-calc框架
 源地址 https://gitee.com/liangshi233/liangshi-calc/tree/master
 # 相关依赖
-Miao-Yunzai   https://github.com/yoimiya-kokomi/Miao-Yunzai
-miao-plugin   https://github.com/yoimiya-kokomi/miao-plugin
+* Miao-Yunzai   https://github.com/yoimiya-kokomi/Miao-Yunzai
+* miao-plugin   https://github.com/yoimiya-kokomi/miao-plugin
 # 插件说明
 * 移除其他不必要功能，仅保留原神角色伤害计算和极限/核爆/辅助面板
 * 基础重构阶段，角色更新会很慢，有需要先写的角色可提

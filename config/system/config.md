@@ -3,5 +3,7 @@
 lolomicalc: true
 # 启用lolomi评分规则
 lolomiartis: true
+# 标配队友预设
+templateteam: false
 # 极限预设面板
 panelmodel: 1

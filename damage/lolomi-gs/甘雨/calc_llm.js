@@ -11,7 +11,7 @@ const team_B = ['申鹤','爱可菲','芙宁娜']
 const artifact_B = ['千岩', '宗室']
 
 const config = Config.getConfig('user', 'config');
-const applyStandardTeam = withStdTeam(mainCharName, team, artifact_normal, config)
+const applyStandardTeam = withStdTeam(mainCharName, team, artifact_normal, config,{q:true},-3)
 
 export const details = applyStandardTeam([
   {
@@ -50,17 +50,16 @@ export const details = applyStandardTeam([
     dmg: ({ talent }, dmg) => dmg(talent.q['冰棱伤害'], 'q')
   },{
     // 队伍伤害
-    title: ({ cons }) => `${teamConfig(cons, team_B, artifact_normal, mainCharName).title}霜华矢一箭总伤`,
+    title: ({ cons }) => `${teamConfig(cons, team_B, artifact_B, mainCharName).title}霜华矢一箭总伤`,
     params: ({cons}) => ({
-      ...teamConfig(cons, team_B, artifact_normal).params, 
+      ...teamConfig(cons, team_B, artifact_B).params, 
       q: true
     }),
     dmg: ({ talent }, dmg) => dmg(talent.a['霜华矢·霜华绽发伤害'] + talent.a['霜华矢命中伤害'], 'a2'),
   },{
-    title: ({ cons }) => `${teamConfig(cons, team, artifact_B, mainCharName).title}霜华矢绽发融化伤害`,
+    title: ({ cons }) => `${teamConfig(cons, team, artifact_normal, mainCharName).title}霜华矢绽发融化伤害`,
     params: ({cons}) => ({
-      ...teamConfig(cons, team, artifact_B).params, 
-      q: true
+      ...teamConfig(cons, team, artifact_normal).params
     }),
     dmg: ({ talent }, dmg) => dmg(talent.a['霜华矢·霜华绽发伤害'], 'a2', 'melt')
   },{
@@ -70,8 +69,7 @@ export const details = applyStandardTeam([
      },
     title: '双药地方传奇满配甘鹤万班绽放核爆',
     dmg: ({ talent }, dmg) => dmg(talent.a['霜华矢·霜华绽发伤害'], 'a2', 'melt')
-  },
-  {
+  },{
   title: '当前圣遗物套装',
   dmg: ({ artis }) => {
     return {

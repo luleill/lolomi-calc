@@ -137,12 +137,12 @@ let TeamBuff = [
       enemyDef:15
       }
   },{
-    check: ({ params }) => params.Venti_best || params.Venti_mid || params.Venti_low || params.Hexenzirkel_Venti,
+    check: ({ params }) => params.Venti_best || params.Venti_mid || params.Venti_low || params.Hexenzirkel,
     title: '温迪',
     // Hexenzirkel 魔导·秘仪队伍
     data: {
       dmg: ({ params , element}) => {
-        if (params.Hexenzirkel_Venti && element !== '风') {
+        if (params.Hexenzirkel && element !== '风') {
           return 50
         } else if ( params.Venti_best && element === '风') {
           return 25
@@ -159,7 +159,7 @@ let TeamBuff = [
       }
     }
   },{
-    check: ({ params }) => params.Klee_best || params.Klee_mid || params.Hexenzirkel_Klee,
+    check: ({ params }) => params.Klee_best || params.Klee_mid || params.Hexenzirkel,
     title: '可莉',
     // Hexenzirkel 魔导·秘仪队伍
     data: {
@@ -167,7 +167,7 @@ let TeamBuff = [
       dmg: ({ params , element }) => (params.Klee_best && element === '火' ) ? 10 : 0,
     }
   },{
-    check: ({ params }) => params.ZhongLi_mark,
+    check: ({ params }) => params.ZhongLi_low || params.ZhongLi_mid || params.ZhongLi_best,
     title: '钟离',
     data: {
       kx: 20
@@ -245,7 +245,7 @@ let TeamBuff = [
     }
   },
   {
-    check: ({ params }) => params.Mona_low || params.Mona_mid || params.Mona_best || params.Hexenzirkel_Mona,
+    check: ({ params }) => params.Mona_low || params.Mona_mid || params.Mona_best || params.Hexenzirkel,
     title: '莫娜',
     // Hexenzirkel 魔导·秘仪队伍
     data: {
@@ -255,7 +255,7 @@ let TeamBuff = [
       lunarCharged: ({params}) => params.Mona_best || params.Mona_mid ? 15 : 0,
       vaporize: ({params}) => {
         const isMonaC1 = params.Mona_best || params.Mona_mid;
-        const isHexenzirkel = params.Hexenzirkel_Mona;
+        const isHexenzirkel = params.Hexenzirkel;
         return (isMonaC1 && isHexenzirkel) ? 30 : (isMonaC1 || isHexenzirkel) ? 15 : 0;
       },
       mastery: ({ params }) => params.Mona_best || params.Mona_mid ? 80 : 0,

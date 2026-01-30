@@ -247,8 +247,7 @@
     return nameAbbr(charName);
   });
 
-  const uniqueInitials = [...new Set([primaryCharFirstLetter, ...teammateInitials])];
-  const teamName = uniqueInitials.join('');
+  const teamName = [primaryCharFirstLetter, ...teammateInitials].join('');
   
   return `${configLevel} ${teamName}`;
 };
@@ -301,8 +300,7 @@ const teamConfig = (cons, teammateNames = [], artifactNames = [], mainCharName =
     return nameAbbr(charName);
   });
 
-  const uniqueInitials = [...new Set([primaryCharFirstLetter, ...teammateInitials])];
-  const teamName = uniqueInitials.join('');
+  const teamName = [primaryCharFirstLetter, ...teammateInitials].join('');
   
   const title = `${configLevel} ${teamName}`;
   
@@ -313,29 +311,38 @@ const teamConfig = (cons, teammateNames = [], artifactNames = [], mainCharName =
 };
 
 /**
- * 末尾插入标配和满配队友
  * @param {Array} details - 原始calc数据
  * @param {string} mainCharName - 主角色名称
  * @param {Array} team - 队友
- * @param {Array} artifact_normal - 圣遗物配置
- * @param {boolean} showTemplateTeam - 是否显示模板队伍
+ * @param {Array} artifact_normal - 圣遗物
+ * @param {boolean} showTemplateTeam - 标配
+ * @param {Object} extraParams - 额外buff
+ * @param {number} insertionIndex - 插入位置，默认为倒数第二位
  * @returns {Array}
  */
-function insertStdTeamAtPosSync(details, mainCharName, team, artifact_normal, showTemplateTeam) {
+function insertStdTeamAtPosSync(details, mainCharName, team, artifact_normal, showTemplateTeam, extraParams = {}, insertionIndex = null) {
   if (!showTemplateTeam) {
     return details;
   }
 
-  const penultimateIndex = details.length - 2;
-  if (penultimateIndex < 0) {
+  let targetIndex;
+  if (insertionIndex === null || insertionIndex === undefined) {
+    targetIndex = details.length - 2; 
+  } else if (insertionIndex < 0) {
+    targetIndex = details.length + insertionIndex;
+  } else {
+    targetIndex = insertionIndex;
+  }
+
+  if (targetIndex < 0 || targetIndex >= details.length) {
     return details;
   }
   
-  const penultimateItem = details[penultimateIndex];
+  const targetItem = details[targetIndex];
   
-  let originalTitle = typeof penultimateItem.title === 'function' 
-    ? penultimateItem.title({cons: 2}) 
-    : penultimateItem.title;
+  let originalTitle = typeof targetItem.title === 'function' 
+    ? targetItem.title({cons: 2}) 
+    : targetItem.title;
   
   const stdTitle = originalTitle
     .replace(/^(高配|中配|低配)/, '标配');
@@ -344,8 +351,9 @@ function insertStdTeamAtPosSync(details, mainCharName, team, artifact_normal, sh
     title: stdTitle,
     params: {
       ...teamConfig(2, team, artifact_normal).params,
+      ...extraParams
     },
-    dmg: penultimateItem.dmg
+    dmg: targetItem.dmg
   };
   
   const maxTitle = originalTitle
@@ -355,15 +363,17 @@ function insertStdTeamAtPosSync(details, mainCharName, team, artifact_normal, sh
     title: maxTitle,
     params: {
       ...teamConfig(6, team, artifact_normal).params,
+      ...extraParams
     },
-    dmg: penultimateItem.dmg
+    dmg: targetItem.dmg
   };
   
   const newDetails = [...details];
-  newDetails.splice(penultimateIndex + 1, 0, standardTeamItem, maxTeamItem);
+  newDetails.splice(targetIndex + 1, 0, standardTeamItem, maxTeamItem);
   
   return newDetails;
 }
+
 function checkConfig() {
   let templateteam = false;
   let hasConfig = false;
@@ -392,7 +402,7 @@ function checkConfig() {
   };
 }
 
-function withStdTeam(mainCharName, team = [], artifact_normal = [], config = null) {
+function withStdTeam(mainCharName, team = [], artifact_normal = [], config = null, extraParams = {}, insertionIndex = null) {
   return function(originalDetails) {
     const templateteam = config ? config.templateteam : false;
     if (!templateteam) {
@@ -403,7 +413,9 @@ function withStdTeam(mainCharName, team = [], artifact_normal = [], config = nul
       mainCharName, 
       team, 
       artifact_normal, 
-      templateteam
+      templateteam,
+      extraParams,
+      insertionIndex
     );
   };
 }
