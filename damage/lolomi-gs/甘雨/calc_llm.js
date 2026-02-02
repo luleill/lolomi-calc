@@ -22,10 +22,10 @@ export const details = applyStandardTeam([
       }
     }
   },{
-    title: '霜华矢两段总伤',
+    title: '霜华矢一箭总伤',
     dmg: ({ talent }, dmg) => dmg(talent.a['霜华矢·霜华绽发伤害'] + talent.a['霜华矢命中伤害'], 'a2') 
   },{
-    title: '6命2E三箭爆发总伤害',
+    title: '6命2E三箭爆发总伤',
     check: ({ cons }) => cons >= 6,
     dmg: ({ talent }, dmg) =>{
       let e = dmg(talent.e['技能伤害'], 'e')
@@ -55,13 +55,27 @@ export const details = applyStandardTeam([
       ...teamConfig(cons, team_B, artifact_B).params, 
       q: true
     }),
-    dmg: ({ talent }, dmg) => dmg(talent.a['霜华矢·霜华绽发伤害'] + talent.a['霜华矢命中伤害'], 'a2'),
+    dmg: ({ talent }, dmg ) =>{
+      let a_1 = dmg(talent.a['霜华矢命中伤害'], 'a2')
+      let a_2 = dmg(talent.a['霜华矢·霜华绽发伤害'], 'a2') 
+      return {
+      dmg: a_1.dmg + a_2.dmg,
+      avg: a_1.avg + a_2.avg,
+      }
+    }
   },{
-    title: ({ cons }) => `${teamConfig(cons, team, artifact_normal, mainCharName).title}霜华矢绽发融化伤害`,
+    title: ({ cons }) => `${teamConfig(cons, team, artifact_normal, mainCharName).title}霜华矢一箭融化总伤`,
     params: ({cons}) => ({
       ...teamConfig(cons, team, artifact_normal).params
     }),
-    dmg: ({ talent }, dmg) => dmg(talent.a['霜华矢·霜华绽发伤害'], 'a2', 'melt')
+    dmg: ({ talent }, dmg ) =>{
+    let a_1 = dmg(talent.a['霜华矢命中伤害'], 'a2','melt')
+    let a_2 = dmg(talent.a['霜华矢·霜华绽发伤害'], 'a2', 'melt') 
+    return {
+    dmg: a_1.dmg + a_2.dmg,
+    avg: a_1.avg + a_2.avg,
+    }
+    }
   },{
     params: { 
       zongshi: true, fengtao: true, legend_max: true,

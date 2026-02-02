@@ -8,7 +8,7 @@ const team = ['茜特菈莉','希诺宁','玛薇卡']
 const artifact_normal = ['烬城', '教官', '千岩']
 
 const config = Config.getConfig('user', 'config');
-const applyStandardTeam = withStdTeam(mainCharName, team, artifact_normal, config,        {Xilonen_hydro: true })
+const applyStandardTeam = withStdTeam(mainCharName, team, artifact_normal, config,{Xilonen_hydro: true})
 
 export const details = applyStandardTeam([
   {
@@ -42,8 +42,8 @@ export const details = applyStandardTeam([
   // 队伍伤害
     title: ({ cons }) => `${teamConfig(cons, team, artifact_normal, mainCharName).title}巨浪鲨鲨撕咬蒸发`,
     params: ({cons}) => ({
-      ...teamConfig(cons, team, artifact_normal).params, 
-      q: true
+      ...teamConfig(cons, team, artifact_normal).params,
+      Xilonen_hydro: true
     }),
     dmg: ({ talent, calc, attr }, { basic }) => basic(calc(attr.hp) * ( talent.e['鲨鲨撕咬基础伤害'] + talent.e['巨浪鲨鲨撕咬伤害额外提升'] ) / 100, 'a', 'vaporize')
   }, {

@@ -357,7 +357,7 @@ function insertStdTeamAtPosSync(details, mainCharName, team, artifact_normal, sh
   };
   
   const maxTitle = originalTitle
-    .replace(/^(高配|中配|低配)/, '满配');
+    .replace(/^(高配|中配|低配)/, '高配');
   
   const maxTeamItem = {
     title: maxTitle,

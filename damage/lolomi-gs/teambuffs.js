@@ -377,6 +377,24 @@ let TeamBuff = [
     }
   },
   {
+    check: ({ params }) => params.YeLan_low || params.YeLan_mid || params.YeLan_best,
+    title: '夜兰',
+    // 高6+5终末 中2+1终末 低1+0西风 天赋开Q默认吃15%增伤
+    data: {
+      hpPct: ({ params }) => params.YeLan_best ? 40 : 0,
+      mastery: ({ params }) => params.YeLan_best ? 200 : params.YeLan_mid ? 100 : 0,
+      atkPct: ({ params }) => params.YeLan_best ? 40 : params.YeLan_mid ? 20 : 0,
+      dmg: 15
+    }
+  },
+  {
+    check: ({ params }) => params.XingQiu_low || params.XingQiu_mid || params.XingQiu_best,
+    title: '行秋',
+    data: {
+      kx: ({ params, element }) => (params.XingQiu_best || params.XingQiu_mid && element === '水') ? 15 : 0,
+    }
+  },
+  {
     check: ({ params }) => params.Nahida_low || params.Nahida_mid || params.Nahida_best,
     title: '纳西妲',
     data: {
@@ -385,6 +403,43 @@ let TeamBuff = [
         if (params.Nahida_mid) return 290;
         return 0;
       }
+    }
+  },
+  {
+    check: ({ params }) => params.Faruzan_low || params.Faruzan_mid || params.Faruzan_best,
+    title: '珐露珊',
+    // 高配6+5终末 中6+1终末，低2+0西风
+    data: {
+      aPlus: ({ params }) => (params.Faruzan_best || params.Faruzan_mid) ? 258 : params.Faruzan_low ? 209 : 0,
+      a2Plus: ({ params }) => (params.Faruzan_best || params.Faruzan_mid) ? 258 : params.Faruzan_low ? 209 : 0,
+      a3Plus: ({ params }) => (params.Faruzan_best || params.Faruzan_mid) ? 258 : params.Faruzan_low ? 209 : 0,
+      ePlus: ({ params }) => (params.Faruzan_best || params.Faruzan_mid) ? 258 : params.Faruzan_low ? 209 : 0,
+      qPlus: ({ params }) => (params.Faruzan_best || params.Faruzan_mid) ? 258 : params.Faruzan_low ? 209 : 0,
+      cdmg: ({ params , element}) => (params.Faruzan_best && element === '风') ? 40 : 0,
+      kx: ({element}) => (element === '风') ? 30 : 0,
+      dmg: ({params ,element}) => (params.Faruzan_best || params.Faruzan_mid && element === '风') ? 38.25 : (params.Faruzan_low && element === '风') ? 32.4 : 0,
+      mastery: ({ params }) => params.Faruzan_best ? 200 : params.Faruzan_mid ? 100 : 0,
+      atkPct: ({ params }) => params.Faruzan_best ? 40 : params.Faruzan_mid ? 20 : 0,
+    }
+  },
+  {
+    check: ({ params }) => params.Iansan_low || params.Iansan_mid || params.Iansan_best,
+    title: '伊安珊',
+    // 高6+5香韵 中6+1香韵 低 2+0西风
+    data: {
+      atkPlus: ({ params }) => (params.Iansan_best || params.Iansan_mid) ? 810 : 690,
+      atkPct: ({ params }) => params.Iansan_best ? 94 : params.Iansan_mid ? 62 : params.Iansan_low ? 30 : 0,
+      dmg: ({ params }) => (params.Iansan_best || params.Iansan_mid) ? 25 : 0,
+    }
+  },
+  {
+    check: ({ params }) => params.Chevreuse_low || params.Chevreuse_mid || params.Chevreuse_best,
+    title: '夏沃蕾',
+    // 高6+5香韵 中6+1香韵 低 2+0西风
+    data: {
+      kx: 40,
+      atkPct: ({ params }) => params.Iansan_best ? 104 : params.Iansan_mid ? 72 : params.Iansan_low ? 40 : 0,
+      dmg: ({ params , element }) => (params.Iansan_best && element === '火' || element === '雷') ? 60 : 0,
     }
   },
   {
