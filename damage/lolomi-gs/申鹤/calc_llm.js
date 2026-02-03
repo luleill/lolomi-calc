@@ -8,7 +8,7 @@ const team = ['重云','爱可菲','芙宁娜']
 const artifact_normal = ['宗室', '千岩']
 
 const team_B = ['希诺宁','枫原万叶','班尼特']
-const artifact_reaction = ['烬城', '风套','宗室']
+const artifact_B = ['烬城', '风套','宗室']
 
 const team_C = ['闲云','芙宁娜','班尼特']
 const artifact_C = ['宗室', '千岩']
@@ -61,9 +61,9 @@ export const details = applyStandardTeam([
         }
     }
   }, {
-    title: ({ cons }) => `${teamConfig(cons, team_B, artifact_reaction, mainCharName).title}长E融化伤害`,
+    title: ({ cons }) => `${teamConfig(cons, team_B, artifact_B, mainCharName).title}长E融化伤害`,
     params: ({cons}) => ({
-      ...teamConfig(cons, team_B, artifact_reaction).params,
+      ...teamConfig(cons, team_B, artifact_B).params,
       q: true,
     }),
     dmg: ({ talent }, dmg) => dmg(talent.e['长按技能伤害'], 'e', 'melt')

@@ -4,6 +4,7 @@ git clone --depth=1 https://gitee.com/land-route_lu/lolomi-calc.git ./plugins/lo
 # 声明
 复用liangshi-calc框架
 源地址 https://gitee.com/liangshi233/liangshi-calc/tree/master
+* 现在应该和梁氏计算会有冲突，所以先别装我的
 # 相关依赖
 * Miao-Yunzai   https://github.com/yoimiya-kokomi/Miao-Yunzai
 * miao-plugin   https://github.com/yoimiya-kokomi/miao-plugin

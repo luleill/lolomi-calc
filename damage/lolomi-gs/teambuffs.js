@@ -116,21 +116,21 @@ let TeamBuff = [
   // - [角色英文名]_mid: 启用中配置参数
   // - [角色英文名]_best: 启用高配置参数
   {
-    check: ({ params }) => params.KamisatoAyaka_best,
+    check: ({ params }) => params.KamisatoAyaka_best || params.KamisatoAyaka_mid || params.KamisatoAyaka_low,
     title: '神里绫华',
     // 四命减防30%
     data: {
-      enemyDef:30
+      enemyDef:(params) => params.KamisatoAyaka_best ? 30 : 0
       }
   },{
-    check: ({ params }) => params.Jean_best,
+    check: ({ params }) => params.Jean_best || params.Jean_mid || params.Jean_low,
     title: '琴',
     // 四命减风抗40%
     data: {
-      kx:({ params , element}) => params.Jean_best && element === '风' ? 40 : 0
+      kx:({ params , element}) => (params.Jean_best && element === '风') ? 40 : 0
       }
   },{
-    check: ({ params }) => params.Lisa_base,
+    check: ({ params }) => params.Lisa_best || params.Lisa_mid || params.Lisa_best_low,
     title: '丽莎',
     // 被动减防15%
     data: {
@@ -159,6 +159,25 @@ let TeamBuff = [
       }
     }
   },{
+    check: ({ params }) => params.Durin_best || params.Durin_mid || params.Durin_low ||params.Hexenzirkel,
+    title: '杜林',
+    // Hexenzirkel 魔导·秘仪队伍
+    data: {
+      aPlus: ({ params }) => (params.Durin_best || params.Durin_mid) ? 1800: 0,
+      dmg: ({ params }) => (params.Durin_best && params.Durin_mid) ? 50 : 0,
+      enemyDef: ({ params }) => params.Durin_best ? 30 : 0,
+      kx: ({ params, element }) => {
+        if ((params.Durin_best || params.Durin_mid || params.Durin_low) && params.Hexenzirkel && (element !== '水' || element !== '冰')) return 35
+        if ((params.Durin_best || params.Durin_mid || params.Durin_low) && (element !== '水' || element !== '冰')) return 20
+      },
+      atkPct: ({ params }) => {
+        if ((params.Durin_best && params.Hexenzirkel)) return 56
+        if (params.Durin_best) return 32
+        if (params.Durin_mid && params.Hexenzirkel) return 28
+        if (params.Durin_mid) return 16
+      },
+    }
+  },{
     check: ({ params }) => params.Klee_best || params.Klee_mid || params.Hexenzirkel,
     title: '可莉',
     // Hexenzirkel 魔导·秘仪队伍
@@ -173,11 +192,12 @@ let TeamBuff = [
       kx: 20
     }
   },{
-    check: ({ params }) => params.Hexenzirkel_Fischl_overloaded || params.Hexenzirkel_Fischl_charged,
+    check: ({ params }) =>  params.Fischl_best || params.Fischl_mid || params.Fischl_low ||   params.Hexenzirkel,
+    // 触发超载，全队加攻，触发感电，全队加精通，默认魔导队攻击和精通都吃
     title: '菲谢尔',
     data: {
-      atkPct: ({ params }) => params.Hexenzirkel_Fischl_overloaded ? 22.5 : 0,
-      mastery: ({ params }) => params.Hexenzirkel_Fischl_charged ? 90 : 0,
+      atkPct: ({ params }) => (params.Fischl_best || params.Fischl_mid || params.Fischl_low && params.Hexenzirkel) ? 22.5 : 0,
+      mastery: ({ params }) => (params.Fischl_best || params.Fischl_mid || params.Fischl_low && params.Hexenzirkel) ? 90 : 0,
     }
   },{
     check: ({ params }) => params.Bennett_low || params.Bennett_mid || params.Bennett_best,
@@ -218,11 +238,11 @@ let TeamBuff = [
       kx: 55,
       cdmg : ({ params, element }) => (params.Escoffier_best || params.Escoffier_mid && element === '冰') ? 60 : 0,
       _getValue: (params, element) => (params.Escoffier_best && element === '冰') ? 9600 : (params.Escoffier_mid && element === '冰') ? 8400 : 0,
-      aplus: ({ params, element }) => (params.Escoffier_best && element === '冰') ? 9600 : (params.Escoffier_mid && element === '冰') ? 8400 : 0,
-      a2plus: ({ params, element }) => (params.Escoffier_best && element === '冰') ? 9600 : (params.Escoffier_mid && element === '冰') ? 8400 : 0,
-      a3plus: ({ params, element }) => (params.Escoffier_best && element === '冰') ? 9600 : (params.Escoffier_mid && element === '冰') ? 8400 : 0,
-      eplus: ({ params, element }) => (params.Escoffier_best && element === '冰') ? 9600 : (params.Escoffier_mid && element === '冰') ? 8400 : 0,
-      qplus: ({ params, element }) => (params.Escoffier_best && element === '冰') ? 9600 : (params.Escoffier_mid && element === '冰') ? 8400 : 0,
+      aPlus: ({ params, element }) => (params.Escoffier_best && element === '冰') ? 9600 : (params.Escoffier_mid && element === '冰') ? 8400 : 0,
+      a2Plus: ({ params, element }) => (params.Escoffier_best && element === '冰') ? 9600 : (params.Escoffier_mid && element === '冰') ? 8400 : 0,
+      a3Plus: ({ params, element }) => (params.Escoffier_best && element === '冰') ? 9600 : (params.Escoffier_mid && element === '冰') ? 8400 : 0,
+      ePlus: ({ params, element }) => (params.Escoffier_best && element === '冰') ? 9600 : (params.Escoffier_mid && element === '冰') ? 8400 : 0,
+      qPlus: ({ params, element }) => (params.Escoffier_best && element === '冰') ? 9600 : (params.Escoffier_mid && element === '冰') ? 8400 : 0,
       atkPct: ({ params}) => params.Escoffier_best ? 64 : params.Escoffier_mid ? 32 : 0
     }
   },{
@@ -268,11 +288,11 @@ let TeamBuff = [
     title: '茜特菈莉',
     // 高配默认1500精通，中配1300精通
     data: {
-      aplus: ({ params }) => params.Citlali_best ? 3000 : params.Citlali_mid ? 2600 : 0,
-      a2plus: ({ params }) => params.Citlali_best ? 3000 : params.Citlali_mid ? 2600 : 0,
-      a3plus: ({ params }) => params.Citlali_best ? 3000 : params.Citlali_mid ? 2600 : 0,
-      eplus: ({ params }) => params.Citlali_best ? 3000 : params.Citlali_mid ? 2600 : 0,
-      qplus: ({ params }) => params.Citlali_best ? 3000 : params.Citlali_mid ? 2600 : 0,
+      aPlus: ({ params }) => params.Citlali_best ? 3000 : params.Citlali_mid ? 2600 : 0,
+      a2Plus: ({ params }) => params.Citlali_best ? 3000 : params.Citlali_mid ? 2600 : 0,
+      a3Plus: ({ params }) => params.Citlali_best ? 3000 : params.Citlali_mid ? 2600 : 0,
+      ePlus: ({ params }) => params.Citlali_best ? 3000 : params.Citlali_mid ? 2600 : 0,
+      qPlus: ({ params }) => params.Citlali_best ? 3000 : params.Citlali_mid ? 2600 : 0,
       mastery: ({ params }) => (params.Citlali_best || params.Citlali_mid) ? 250 : 0,
       kx: ({ params, element }) => {
         const isHydroOrPyro = element === '火' || element === '水';
@@ -363,9 +383,9 @@ let TeamBuff = [
       atkPct: ({ params}) => params.Xilonen_pyro ? 45 : 0,
       dmg: ({ params}) => params.Xilonen_geo ? 50 : 0,
       cdmg: ({ params}) => params.Xilonen_cryo ? 60 : 0,
-      aplus: ({ params}) => params.Xilonen_best ? 2600 : 0,
-      a2plus: ({ params}) => params.Xilonen_electro ? 2600 : 0,
-      a3plus: ({ params}) => params.Xilonen_anemo ? 2600 : 0,
+      aPlus: ({ params}) => params.Xilonen_best ? 2600 : 0,
+      a2Plus: ({ params}) => params.Xilonen_electro ? 2600 : 0,
+      a3Plus: ({ params}) => params.Xilonen_anemo ? 2600 : 0,
     }
   },
   {
@@ -456,7 +476,7 @@ let TeamBuff = [
     title: '菈乌玛',
     data: {
     kx: ({ params }) => params.Lauma_best ? 34 : (params.Lauma_mid || params.Lauma_low) ? 25 : 0,
-    fyplus: ({ params }) => (params.Lauma_best || params.Lauma_mid) ? 9000 : params.Lauma_low ? 4800 : 0,
+    fyPlus: ({ params }) => (params.Lauma_best || params.Lauma_mid) ? 9000 : params.Lauma_low ? 4800 : 0,
     lunarBloom: ({ params }) => {
       if (params.Lauma_best) return 120;
       if (params.Lauma_mid) return 80;
@@ -466,6 +486,21 @@ let TeamBuff = [
     cpct: 10,
     cdmg: 20,
     fypct: 14
+    }
+  },
+  {
+    check: ({ params }) => params.Columbina_low || params.Columbina_mid || params.Columbina_best,
+    title: '哥伦比娅',
+    data: {
+    lunarBloom: ({ params }) => params.Columbina_best ? 49 : (params.Columbina_mid|| params.Columbina_low) ? 40 : 0,
+    lunarCharged: ({ params }) => params.Columbina_best ? 49 : (params.Columbina_mid|| params.Columbina_low) ? 40 : 0,
+    lunarCrystallize: ({ params }) => params.Columbina_best ? 49 : (params.Columbina_mid|| params.Columbina_low) ? 40 : 0,
+    atkPlus: ({ params }) => params.Columbina_best || params.Columbina_mid ? 600 : 0,
+    defPlus: ({ params }) => params.Columbina_best || params.Columbina_mid ? 600 : 0,
+    mastery: ({ params }) => params.Columbina_best || params.Columbina_mid ? 200 : 0,
+    cdmg: ({ params }) => params.Columbina_best ? 80 : 0,
+    elevated: ({ params }) => params.Columbina_best ? 20 :  params.Columbina_mid ? 8.5 : 0,
+    fypct: 7,
     }
   }
 ]
