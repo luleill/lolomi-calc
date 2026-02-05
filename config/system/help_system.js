@@ -29,32 +29,32 @@ export const helpList = [
     list: [
       {
         icon: 58,
-        title: '极限刻晴',
+        title: 'jx刻晴',
         desc: '查看角色理论极限面板'
       },
       {
         icon: 59,
-        title: '核爆胡桃',
+        title: 'hb胡桃',
         desc: '查询角色核爆极限面板'
       },
       {
         icon: 60,
-        title: '辅助心海',
+        title: 'fz心海',
         desc: '查询角色辅助极限面板'
       },
       {
         icon: 6,
-        title: '极限面板',
+        title: 'jx面板',
         desc: '已定义的所有角色极限面板'
       },
       {
         icon: 7,
-        title: '核爆面板',
+        title: 'hb面板',
         desc: '已定义的所有角色核爆面板'
       },
       {
         icon: 8,
-        title: '辅助面板',
+        title: 'fz面板',
         desc: '已定义的所有角色辅助面板'
       },
       {

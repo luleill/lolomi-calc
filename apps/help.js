@@ -79,10 +79,27 @@ export class Help extends plugin {
   }
 
   async versionInfo (e) {
-    return await Common.render('help/version-info', {
-      currentVersion: Version.version,
-      changelogs: Version.changelogs,
-      elem: 'dendro'
-    }, { e, scale: 1.2 })
+    try {
+      
+      if (!Version.version) {
+        return false;
+      }
+      
+      if (!Version.changelogs || Version.changelogs.length === 0) {
+      }
+      
+      const renderResult = await Common.render('help/version-info', {
+        currentVersion: Version.version,
+        changelogs: Version.changelogs,
+        elem: 'dendro'
+      }, { e, scale: 1.2 });
+      
+      return renderResult;
+      
+    } catch (error) {
+      logger.error(`[lolomi-calc] versionInfo error: ${error.message}`);
+      logger.error(error.stack);
+      return false;
+    }
   }
 }

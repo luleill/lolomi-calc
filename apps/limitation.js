@@ -1,8 +1,8 @@
 import { Character } from '../../miao-plugin/models/index.js'
 const replace_list = [
-  '极限',
-  '核爆',
-  '辅助'
+  'jx',
+  'hb',
+  'fz'
 ]
 
 export class ysmb_input_replace extends plugin {
@@ -11,7 +11,7 @@ export class ysmb_input_replace extends plugin {
       name: '极限面板',
       dsc: '极限面板',
       event: 'message',
-      priority: -10000,
+      priority: -10001,
       rule: []
     })
   }

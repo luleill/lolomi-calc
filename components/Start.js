@@ -8,13 +8,12 @@ const pluginPath = `${basePath}/plugins/lolomi-calc`
 
 const Start = {
   init() {
-    logger.mark('[lolomi-calc] 开始初始化...')
+    logger.mark('[lolomi-calc] 初始化...')
     logger.mark('[lolomi-calc] 配置状态 - lolomicalc:', cfg.lolomicalc)
 
     this.originalDmgRulePath = ProfileDmg.dmgRulePath
     this.setupPrioritySystem()
     this.startMonitoring()
-    logger.mark('[lolomi-calc] 初始化完成')
   },
 
   /**
@@ -37,7 +36,7 @@ const Start = {
    * 洛洛米仅处理原神角色
    */
   handleGenshinCharacter(name, game, originalMethod) {
-    logger.mark(`[lolomi-calc] 处理原神角色: ${name}`)
+    logger.mark(`[lolomi-calc] 处理角色计算: ${name}`)
     
     if (!cfg.lolomicalc) {
       logger.debug('[lolomi-calc] 洛洛米计算未启用')
