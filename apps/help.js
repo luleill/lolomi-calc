@@ -15,11 +15,11 @@ export class Help extends plugin {
       priority: 40,
       rule: [
         {
-          reg: '^#lolomi-calc帮助$',
+          reg: '^#?(洛洛米|lolomi)帮助$',
           fnc: 'help'
         },
         {
-          reg: '^#lolomi-calc版本$',
+          reg: '^#?(洛洛米|lolomi)版本$',
           fnc: 'versionInfo'
         }
       ]

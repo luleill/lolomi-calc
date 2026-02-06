@@ -60,11 +60,11 @@ export const helpList = [
       {
         icon: 81,
         title: '#标配计算停用',
-        desc: '首次安装默认启用'
+        desc: '首次安装默认停用'
       },
       {
         icon: 81,
-        title: '#标配计算关闭',
+        title: '#标配计算启用',
         desc: '计算面板展示2+1和6+5队友'
       },
       {
@@ -76,6 +76,16 @@ export const helpList = [
         icon: 81,
         title: '#洛洛米计算停用',
         desc: '禁用插件'
+      },
+      {
+        icon: 81,
+        title: '#更新洛洛米',
+        desc: '标准更新'
+      },
+      {
+        icon: 81,
+        title: '#强制更新洛洛米',
+        desc: '强制更新'
       }
     ]
   }

@@ -67,8 +67,7 @@ const Start = {
   checkFallback(name, game, originalMethod) {
     const liangshiStatus = this.getLiangshiStatus()
     logger.mark(`[lolomi-calc] 梁氏状态: ${JSON.stringify(liangshiStatus)}`)
-    
-    if (liangshiStatus.dirExists && liangshiStatus.configExists && liangshiStatus.calcLiang) {
+    if (liangshiStatus.dirExists && liangshiStatus.configExists && liangshiStatus.calcLiang && liangshiStatus.gsEnabled) {
       const liangshiPath = this.findLiangshiFile(name, game)
       if (liangshiPath) {
         return { path: liangshiPath, createdBy: 'liangshi-calc' }
