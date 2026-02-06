@@ -35,7 +35,7 @@ export const details = applyStandardTeam([
     dmg: ({ talent }, dmg) => dmg(talent.q['技能伤害'], 'q')
   }, {
     // 队伍伤害
-    title: ({ cons }) => `${teamConfig(cons, team, artifact_normal, mainCharName).title}长E+六段普攻总伤`,
+    title: ({ cons }) => `${teamConfig(cons, team, artifact_normal, mainCharName).title}六段普攻总伤`,
     params: ({cons}) => ({
       ...teamConfig(cons, team, artifact_normal).params
     }),
@@ -46,10 +46,9 @@ export const details = applyStandardTeam([
         let a_4 = dmg(talent.a['四段伤害'], 'a')
         let a_5 = dmg(talent.a['五段伤害'], 'a')
         let a_6 = dmg(talent.a['六段伤害'], 'a')
-        let e = dmg(talent.e['长按技能伤害'], 'e')
         return {
-        dmg: a_1.dmg + a_2.dmg + a_3.dmg + a_4.dmg + a_5.dmg + a_6.dmg + e.dmg,
-        avg: a_1.avg + a_2.avg + a_3.avg + a_4.avg + a_5.avg + a_6.avg + e.avg,
+        dmg: a_1.dmg + a_2.dmg + a_3.dmg + a_4.dmg + a_5.dmg + a_6.dmg,
+        avg: a_1.avg + a_2.avg + a_3.avg + a_4.avg + a_5.avg + a_6.avg,
         }
     }
   }, {

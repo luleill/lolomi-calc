@@ -11,6 +11,12 @@ let TeamBuff = [
   },
   // 队伍增益 - 元素共鸣buff
   {
+    check: ({ params }) => params.superconductivity === true,
+    title: '元素反应：[超导] 降低受超导影响生物[kx]%的物理抗性',
+    data: {
+      kx: 25
+    }
+  },{
     check: ({ params }) => params.hydro_two === true,
     title: '元素共鸣：[愈疗之水] 生命值上限提升[hpPct]%',
     data: {
@@ -210,6 +216,23 @@ let TeamBuff = [
         params.Bennett_low ? 120.8 * 645.2 / 100 : 0
     },
   },{
+    check: ({ params }) => params.XiangLing_low || params.XiangLing_mid || params.XiangLing_best,
+    title: '香菱',
+    // 前台主c默认吃到锅巴辣椒加成
+    data: {
+      atkpct: 10,
+      dmg: ({ params, element }) => (params.XiangLing_best && element === '火') ? 15 : 0,
+      kx: ({ params, element }) => (params.XiangLing_best || params.XiangLing_mid) && element === '火' ? 15 : 0
+    }
+  },{
+    check: ({ params }) => params.Mika_low || params.Mika_mid || params.Mika_best,
+    title: '米卡',
+    // 6命必须，所有带米卡的物理队伍默认米卡满命
+    data: {
+      phy: 40,
+      cdmg: 60
+    }
+  },{
     check: ({ params }) => params.ChongYun_low || params.ChongYun_mid || params.ChongYun_best,
     title: '重云',
     data: {
@@ -224,8 +247,12 @@ let TeamBuff = [
       dmg: ({ params }) => 
         params.Furina_best ? 124: 
         params.Furina_mid ? 100 : 
-        params.Furina_low ? 75 : 0
-    }
+        params.Furina_low ? 75 : 0,
+      phy: ({ params }) => 
+        params.Furina_best ? 124 : 
+        params.Furina_mid ? 100 : 
+        params.Furina_low ? 75 : 0,
+      }
   },{
     _getEscoffierValue: (params, element, highValue, lowValue) => {
       if (params.Escoffier_best && element === '冰') return highValue;
