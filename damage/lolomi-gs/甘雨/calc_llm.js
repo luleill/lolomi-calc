@@ -21,10 +21,10 @@ export const details = applyStandardTeam([
         avg: Math.min(calc(attr.atk) * 1)
       }
     }
-  },{
+  }, {
     title: '霜华矢一箭总伤',
     dmg: ({ talent }, dmg) => dmg(talent.a['霜华矢·霜华绽发伤害'] + talent.a['霜华矢命中伤害'], 'a2') 
-  },{
+  }, {
     title: '6命2E三箭爆发总伤',
     check: ({ cons }) => cons >= 6,
     dmg: ({ talent }, dmg) =>{
@@ -35,7 +35,7 @@ export const details = applyStandardTeam([
        avg: e.avg * 2 + (a.avg * 3)
       }
      }
-  },{ 
+  }, { 
     title: '霜华矢绽发融化伤害',
     dmg: ({ talent }, dmg) => dmg(talent.a['霜华矢·霜华绽发伤害'], 'a2', 'melt')
   }, {
@@ -48,7 +48,7 @@ export const details = applyStandardTeam([
     params: {q: true },
     title: '「降众天华」冰凌伤害',
     dmg: ({ talent }, dmg) => dmg(talent.q['冰棱伤害'], 'q')
-  },{
+  }, {
     // 队伍伤害
     title: ({ cons }) => `${teamConfig(cons, team_B, artifact_B, mainCharName).title}霜华矢一箭总伤`,
     params: ({cons}) => ({
@@ -63,7 +63,7 @@ export const details = applyStandardTeam([
       avg: a_1.avg + a_2.avg,
       }
     }
-  },{
+  }, {
     title: ({ cons }) => `${teamConfig(cons, team, artifact_normal, mainCharName).title}霜华矢一箭融化总伤`,
     params: ({cons}) => ({
       ...teamConfig(cons, team, artifact_normal).params
@@ -76,21 +76,21 @@ export const details = applyStandardTeam([
     avg: a_1.avg + a_2.avg,
     }
     }
-  },{
+  }, {
     params: { 
       zongshi: true, fengtao: true, legend_max: true,
       ShenHe_best: true, Kazuha_best: true, Bennett_best : true,
      },
     title: '双药地方传奇满配甘鹤万班绽放核爆',
     dmg: ({ talent }, dmg) => dmg(talent.a['霜华矢·霜华绽发伤害'], 'a2', 'melt')
-  },{
+  }, {
   title: '当前圣遗物套装',
-  dmg: ({ artis }) => {
-    return {
-      avg: artis ,
-      type: 'text'
-    }
-  }}
+    dmg: ({ artis }) => {
+      return {
+        avg: artis ,
+        type: 'text'
+      }
+    }}
   ])
   
   export const defDmgIdx = 1

@@ -52,46 +52,42 @@ export const details = applyStandardTeam([
     }),
     dmg: ({ talent }, dmg) => dmg(talent.a['重击伤害'], 'a2', 'vaporize')
   }, {
-  title: '当前圣遗物套装',
-  dmg: ({ artis }) => {
-    return {
-      avg: artis ,
-      type: 'text'
+    title: '当前圣遗物套装',
+    dmg: ({ artis }) => {
+      return {
+        avg: artis ,
+        type: 'text'
+      }
+    }}
+  ])
+
+  export const defDmgIdx = 3
+  export const mainAttr = 'atk,cpct,cdmg'
+
+  export const buffs = [
+  ...TeamBuff,
+  {
+    title: '胡桃技能：[蝶引来生] 消耗一部分生命值,击退周围敌人,基于进入该状态时胡桃的生命值上限,提高胡桃[atkPlus]点攻击力',
+    sort: 9,
+    data: {
+      atkPlus: ({ talent, attr, calc }) => {
+        return Math.min(talent.e['攻击力提高'] * calc(attr.hp) / 100, attr.atk.base * 4)
+      }
     }
-  }}
-])
-
-export const defDmgIdx = 3
-export const mainAttr = 'atk,cpct,cdmg'
-
-export const defParams = {
-  layer: 0
-}
-
-export const buffs = [
-...TeamBuff,
-{
-  title: '胡桃技能：[蝶引来生] 消耗一部分生命值,击退周围敌人,基于进入该状态时胡桃的生命值上限,提高胡桃[atkPlus]点攻击力',
-  sort: 9,
-  data: {
-    atkPlus: ({ talent, attr, calc }) => {
-      return Math.min(talent.e['攻击力提高'] * calc(attr.hp) / 100, attr.atk.base * 4)
+  }, {
+    check: ({ params }) => params.half_blood === true,
+    title: '胡桃天赋：[血之灶火] 胡桃的生命值低于或等于50%时,获得[dmg]%火元素伤害加成',
+    data: {
+      dmg: 33
+    }
+  }, {
+    title: '胡桃2命：[最不安神晴又复雨] 血梅香造成的伤害提高[ePlus]点,安神秘法会为命中的敌人施加血梅香效果',
+    cons: 2,
+    sort: 9,
+    data: {
+      ePlus: ({ attr, calc }) => calc(attr.hp) * 0.1
     }
   }
-}, {
-  check: ({ params }) => params.half_blood === true,
-  title: '胡桃天赋：[血之灶火] 胡桃的生命值低于或等于50%时,获得[dmg]%火元素伤害加成',
-  data: {
-    dmg: 33
-  }
-}, {
-  title: '胡桃2命：[最不安神晴又复雨] 血梅香造成的伤害提高[ePlus]点,安神秘法会为命中的敌人施加血梅香效果',
-  cons: 2,
-  sort: 9,
-  data: {
-    ePlus: ({ attr, calc }) => calc(attr.hp) * 0.1
-  }
-}
-]
+  ]
 
     
