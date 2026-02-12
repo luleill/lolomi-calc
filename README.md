@@ -1,7 +1,3 @@
-<p align="center">
-  <img src="miku.jpg" width="500" alt="Miku的狗">
-</p>
-
 # Yunzai目录下安装
 git clone --depth=1 https://gitee.com/land-route_lu/lolomi-calc.git ./plugins/lolomi-calc/
 

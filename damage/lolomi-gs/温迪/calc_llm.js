@@ -23,17 +23,13 @@ export const details = applyStandardTeam([
 {
   title: '飓风箭六箭总伤',
   params: { WindsunderArrow : true },
-  dmg: ({ talent }, dmg) => {dmg
-      let a_1 = dmg(talent.a['一段伤害'], 'a')
-      let a_2 = dmg(talent.a['二段伤害'], 'a')
-      let a_3 = dmg(talent.a['三段伤害'], 'a')
-      let a_4 = dmg(talent.a['四段伤害'], 'a')
-      let a_5 = dmg(talent.a['五段伤害'], 'a')
-      let a_6 = dmg(talent.a['六段伤害'], 'a')
-      return {
-       dmg: a_1.dmg + a_2.dmg + a_3.dmg + a_4.dmg + a_5.dmg + a_6.dmg,
-       avg: a_1.avg + a_2.avg + a_3.avg + a_4.avg + a_5.avg + a_6.avg,
-      }
+  dmg: ({ talent }, dmg) => {
+    return '一二三四五六'.split('').reduce((acc, num) => {
+      const result = dmg(talent.a[`${num}段伤害`], 'a');
+      acc.dmg += result.dmg;
+      acc.avg += result.avg;
+      return acc;
+    }, { dmg: 0, avg: 0 });
   }
 }, {
   title: '「高天之歌」点按伤害',

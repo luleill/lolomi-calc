@@ -30,16 +30,13 @@ export const details = applyStandardTeam([
     dmg: ({ talent, attr, calc }, { heal }) => heal(talent.q['治疗量2'][0] * calc(attr.atk) / 100 + talent.q['治疗量2'][1] * 1)
   }, {
     title: '普攻五段总伤',
-    dmg: ({ talent }, dmg ) =>{
-        let a_1 = dmg(talent.a['一段伤害'], 'a', 'phy')
-        let a_2 = dmg(talent.a['二段伤害'], 'a', 'phy') 
-        let a_3 = dmg(talent.a['三段伤害'], 'a', 'phy')
-        let a_4 = dmg(talent.a['四段伤害'], 'a', 'phy')
-        let a_5 = dmg(talent.a['五段伤害'], 'a', 'phy')
-        return {
-        dmg: a_1.dmg + a_2.dmg + a_3.dmg + a_4.dmg + a_5.dmg,
-        avg: a_1.avg + a_2.avg + a_3.avg + a_4.avg + a_5.avg,
-        }
+    dmg: ({ talent }, dmg) => {
+      return '一二三四五'.split('').reduce((acc, num) => {
+        const result = dmg(talent.a[`${num}段伤害`], 'a', 'phy');
+        acc.dmg += result.dmg;
+        acc.avg += result.avg;
+        return acc;
+      }, { dmg: 0, avg: 0 });
     }
   }, {
     // 队伍伤害
@@ -55,16 +52,13 @@ export const details = applyStandardTeam([
       ...teamConfig(cons, team, artifact_normal).params, 
       superconductivity: true, cryo_two: true
     }),
-    dmg: ({ talent }, dmg ) =>{
-        let a_1 = dmg(talent.a['一段伤害'], 'a', 'phy')
-        let a_2 = dmg(talent.a['二段伤害'], 'a', 'phy') 
-        let a_3 = dmg(talent.a['三段伤害'], 'a', 'phy')
-        let a_4 = dmg(talent.a['四段伤害'], 'a', 'phy')
-        let a_5 = dmg(talent.a['五段伤害'], 'a', 'phy')
-        return {
-        dmg: a_1.dmg + a_2.dmg + a_3.dmg + a_4.dmg + a_5.dmg,
-        avg: a_1.avg + a_2.avg + a_3.avg + a_4.avg + a_5.avg,
-        }
+    dmg: ({ talent }, dmg) => {
+      return '一二三四五'.split('').reduce((acc, num) => {
+        const result = dmg(talent.a[`${num}段伤害`], 'a', 'phy');
+        acc.dmg += result.dmg;
+        acc.avg += result.avg;
+        return acc;
+      }, { dmg: 0, avg: 0 });
     }
   }, {
     title: ({ cons }) => `${teamConfig(cons, team_B, artifact_B, mainCharName).title}下落伤害`,

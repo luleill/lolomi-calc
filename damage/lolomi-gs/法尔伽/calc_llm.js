@@ -3,7 +3,7 @@ import { teamConfig, withStdTeam } from '../util.js'
 import { Config } from '#lolomi'
 
 const mainCharName = '法尔伽'
-
+ // 暂时不考虑那么多，默认全打风伤
 const team = ['珐露珊','杜林','班尼特']
 const artifact_normal = ['千岩', '宗室']
 
@@ -22,20 +22,20 @@ export const details = applyStandardTeam([
 },{
     title: '「狂飙突进」普攻五段总伤',
     dmg: ({ talent }, dmg) => {
-        const baseDamage = ['狂飙突进·一段伤害', '狂飙突进·二段伤害', '狂飙突进·三段伤害', '狂飙突进·四段伤害', '狂飙突进·五段伤害']
-            .map(key => dmg(talent.e[key], 'e'));
-        const totalBaseDmg = baseDamage.reduce((sum, d) => sum + d.dmg, 0);
-        const totalBaseAvg = baseDamage.reduce((sum, d) => sum + d.avg, 0);
-        return {
-            dmg: totalBaseDmg,
-            avg: totalBaseAvg
-        };
+        return '一二三四五'.split('').reduce((acc, num) => {
+            const result = dmg(talent.e[`狂飙突进·${num}段伤害`], 'e');
+            acc.dmg += result.dmg;
+            acc.avg += result.avg;
+            return acc;
+        }, { dmg: 0, avg: 0 });
     }
 }, {
   title: '「四风将起」伤害',
+  params: { sifeng: true },
   dmg: ({ talent }, dmg) => dmg(talent.e['四风将起伤害'], 'e')
 }, {
-  title: '「苍噬」伤害',
+  title: '特殊重击「苍噬」伤害',
+  params: { sifeng: true },
   dmg: ({ talent }, dmg) => dmg(talent.e['苍噬伤害'], 'e')
 }, {
   title: '「我即朔风」第一段伤害',
@@ -47,13 +47,15 @@ export const details = applyStandardTeam([
   // 队伍伤害
   title: ({ cons }) => `${teamConfig(cons, team_B, artifact_B, mainCharName).title}「四风将起」伤害`,
   params: ({cons}) => ({
-    ...teamConfig(cons, team_B, artifact_B).params
+    ...teamConfig(cons, team_B, artifact_B).params,
+    sifeng: true
   }),
   dmg: ({ talent }, dmg) => dmg(talent.e['四风将起伤害'], 'e')
 } ,{
   title: ({ cons }) => `${teamConfig(cons, team, artifact_normal, mainCharName).title}「四风将起」伤害`,
   params: ({cons}) => ({
-    ...teamConfig(cons, team, artifact_normal).params
+    ...teamConfig(cons, team, artifact_normal).params,
+    sifeng: true, pyro_two: true
   }),
   dmg: ({ talent }, dmg) => dmg(talent.e['四风将起伤害'], 'e')
 }, {
@@ -73,13 +75,17 @@ export const mainAttr = 'atk,cpct,cdmg'
 export const buffs = [
   ...TeamBuff,
   {
-    title: '法尔伽天赋：晓风的行军 1000点攻击力增伤10%',
+    title: '法尔伽天赋：晓风的行军 满层增伤25%',
     data: {
       dmg: 25,
-      eMulti: 140,
     }
   }, {
-    title: '法尔伽天赋：风帜的先引',
+    title: '法尔伽天赋：晓风的行军 双风特殊战技造成原本220%的伤害',
+    data: {
+      eMulti: 120,
+    }
+  }, {
+    title: '法尔伽天赋：风帜的先引 ae造成的伤害提升30%',
     data: {
       admg: 30,
       a2dmg: 30,
@@ -90,7 +96,7 @@ export const buffs = [
     check: ({ params }) => params.sifeng === true, 
     cons: 1,
     data: {
-      eMulti: 200,
+      eMulti: 100,
     }
   }, {
     title: '法尔伽4命：所有角色分别获得20%风元素伤害加成与对应元素伤害加成',

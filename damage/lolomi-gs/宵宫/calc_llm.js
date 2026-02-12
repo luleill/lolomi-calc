@@ -22,25 +22,27 @@ export const details = applyStandardTeam([
   }, {
     title: '「焰硝庭火舞」五段总伤',
     dmg: ({ talent, cons }, dmg) => {
-        const baseDamage = ['一段伤害', '二段伤害', '三段伤害', '四段伤害', '五段伤害']
-            .map(key => dmg(talent.a[key], 'a'));
-        
-        const totalBaseDmg = baseDamage.reduce((sum, d) => sum + d.dmg, 0);
-        const totalBaseAvg = baseDamage.reduce((sum, d) => sum + d.avg, 0);
+        const damageResults = '一二三四五'.split('').map(num => 
+            dmg(talent.a[`${num}段伤害`], 'a')
+        );
+        const totalBase = damageResults.reduce((acc, result) => ({
+            dmg: acc.dmg + result.dmg,
+            avg: acc.avg + result.avg
+        }), { dmg: 0, avg: 0 });
         // 6命额外伤害，默认1,3,5段触发
         if (cons >= 6) {
             const bonusKeys = [0, 2, 4];
-            const bonusDmg = bonusKeys.reduce((sum, idx) => sum + baseDamage[idx].dmg * 0.6, 0);
-            const bonusAvg = bonusKeys.reduce((sum, idx) => sum + baseDamage[idx].avg * 0.6, 0);
+            const bonusTotal = bonusKeys.reduce((acc, idx) => ({
+                dmg: acc.dmg + damageResults[idx].dmg * 0.6,
+                avg: acc.avg + damageResults[idx].avg * 0.6
+            }), { dmg: 0, avg: 0 });
+            
             return {
-                dmg: totalBaseDmg + bonusDmg,
-                avg: totalBaseAvg + bonusAvg
+                dmg: totalBase.dmg + bonusTotal.dmg,
+                avg: totalBase.avg + bonusTotal.avg
             };
         }
-        return {
-            dmg: totalBaseDmg,
-            avg: totalBaseAvg
-        };
+        return totalBase;
     }
   }, {
     title: '「焰硝庭火舞」尾箭伤害',
