@@ -1,21 +1,43 @@
 import ProfileDmg from '../../miao-plugin/models/ProfileDmg.js'
 import Config from './Config.js'
 import fs from 'node:fs'
-
+import _ from 'lodash'
+const _path = process.cwd()
 const cfg = Config.getConfig('user', 'config')
 const basePath = process.cwd()
 const pluginPath = `${basePath}/plugins/lolomi-calc`
 
 const Start = {
   init() {
-    logger.mark('[lolomi-calc] 初始化...')
+    logger.mark('[lolomi-calc] 初始化完成...')
     logger.mark('[lolomi-calc] 配置状态 - lolomicalc:', cfg.lolomicalc)
 
     this.originalDmgRulePath = ProfileDmg.dmgRulePath
+    this.initialization()
     this.setupPrioritySystem()
     this.startMonitoring()
   },
-
+  /**
+   * 初始化极限面板数据
+   */
+  initialization () {
+    const sourceBasePath = `${_path}/plugins/lolomi-calc/replace/data/1`
+    const fileMappings = [{
+      source: `${sourceBasePath}/PlayerData/gs`,
+      miaomiao: `${_path}/data/PlayerData/gs`,
+      extension: '.json'
+    }]
+    fileMappings.forEach(mapping => {
+      const sourceFiles = fs.readdirSync(mapping.source)
+        .filter(file => file.includes(mapping.extension))
+      sourceFiles.forEach(filename => {
+        fs.copyFileSync(
+          `${mapping.source}/${filename}`, 
+          `${mapping.miaomiao}/${filename}`
+        )
+      })
+    })
+  },
   /**
    * 优先级
    */
@@ -161,7 +183,7 @@ const Start = {
         const methodString = currentMethod?.toString() || ''
 
         if (!methodString.includes('[lolomi-calc]') && !methodString.includes('handleGenshinCharacter')) {
-          logger.warn('[lolomi-calc] 检测到方法被覆盖，正在恢复...')
+          logger.warn('[lolomi-calc] 检测到计算覆盖，执行恢复...')
           this.setupPrioritySystem()
         }
       } catch (e) {

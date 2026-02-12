@@ -14,20 +14,11 @@ export class feedback extends plugin {
       priority: 8000,
       rule: [
         {
-          reg: '^#(洛洛米|lolomi)计算(停用|关闭)$',
+          reg: '^#(洛洛米|lolomi)计算(停用|关闭|启用|开启)$',
           fnc: 'toggleLolomi',
           permission: 'master'
         }, {
-          reg: '^#(洛洛米|lolomi)计算(启用|开启)$',
-          fnc: 'toggleLolomi',
-          permission: 'master'
-        },
-        {
-          reg: '^#标配计算(停用|关闭)$',
-          fnc: 'toggleTemplaterTeam',
-          permission: 'master'
-        }, {
-          reg: '^#标配计算(启用|开启)$',
+          reg: '^#标配计算(停用|关闭|启用|开启)$',
           fnc: 'toggleTemplaterTeam',
           permission: 'master'
         }
