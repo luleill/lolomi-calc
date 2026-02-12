@@ -1,3 +1,8 @@
+<div style="display: flex; align-items: center; justify-content: center; gap: 20px; flex-wrap: wrap;">
+  <img src="./miku.jpg" alt="Miku" width="300">
+  <h1 style="margin: 0;">呀帕里，Miku酱哇卡哇伊哟</h1>
+</div>
+
 # Yunzai目录下安装
 git clone --depth=1 https://gitee.com/land-route_lu/lolomi-calc.git ./plugins/lolomi-calc/
 
