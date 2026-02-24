@@ -11,7 +11,7 @@ const team_B = ['珐露珊','闲云','芙宁娜']
 const artifact_B = ['千岩', '宗室']
 
 const config = Config.getConfig('user', 'config');
-const applyStandardTeam = withStdTeam(mainCharName, team, artifact_normal, config,{q:true},-3)
+const applyStandardTeam = withStdTeam(mainCharName, team, artifact_normal, config)
 
 export const details = applyStandardTeam([
   {

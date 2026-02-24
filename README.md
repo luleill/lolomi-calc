@@ -1,6 +1,6 @@
 <div style="display: flex; align-items: center; justify-content: center; gap: 20px; flex-wrap: wrap;">
   <img src="./miku.jpg" alt="Miku" width="300">
-  <h1 style="margin: 0;">呀帕里，Miku酱哇卡哇伊哟</h1>
+  <h2 style="margin: 0;">Miku Miku Beeeeeeeeam</h2>
 </div>
 
 # Yunzai目录下安装
