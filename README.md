@@ -1,5 +1,5 @@
 <div style="display: flex; align-items: center; justify-content: center; gap: 20px; flex-wrap: wrap;">
-  <img src="./miku.jpg" alt="Miku" width="300">
+  <img src="./miku.gif" alt="Miku" width="300">
   <h2 style="margin: 0;">Miku Miku Beeeeeeeeam</h2>
 </div>
 
