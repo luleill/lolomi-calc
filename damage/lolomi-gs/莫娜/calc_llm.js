@@ -52,8 +52,8 @@ dmg: ({ artis }) => {
 }}
 ])
   
-export const defParams = { Hexenzirkel: true } // 魔女会成员
-export const defDmgIdx = 3
+export const defParams = { Hexenzirkel: true }  // 魔导·秘仪队伍
+export const defDmgIdx = 1
 export const mainAttr = 'atk,cpct,cdmg,recharge'
 
 export const buffs = [

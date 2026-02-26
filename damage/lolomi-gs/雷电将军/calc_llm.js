@@ -15,12 +15,8 @@ const applyStandardTeam = withStdTeam(mainCharName, team, artifact_normal, confi
 
 export const details = applyStandardTeam([
   {
-    title: '触发特效后充能',
-    dmg: ({ attr, calc }) => {
-      return {
-        avg: Math.min(calc(attr.recharge) * 1)
-      }
-    }
+    title: '触发满特效后攻击力',
+    dmg: ({ attr, calc }) => {return { avg: Math.min(calc(attr.recharge) * 1)}}
   }, {
     title: '「雷罚恶曜之眼」协同伤害',
     dmg: ({ talent }, dmg) => dmg(talent.e['协同攻击伤害'], 'e')
@@ -66,7 +62,7 @@ export const details = applyStandardTeam([
     }}
   ])
   
-  export const defDmgIdx = 1
+  export const defDmgIdx = 3
   export const mainAttr = 'atk,cpct,cdmg,recharge,dmg'
   
   export const buffs = [
