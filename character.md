@@ -111,5 +111,8 @@
 - 雅珂达 Jahoda
 - 杜林 Durin
 - 哥伦比娅 Columbina
+- 兹白 Zibai
+- 叶洛亚 Illuga
+- 法尔伽 Varka
 
 </details>

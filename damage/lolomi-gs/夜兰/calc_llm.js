@@ -109,7 +109,7 @@ export const details = applyStandardTeam([
   }}
 ])
   
-export const defDmgIdx = 4
+export const defDmgIdx = 3
 export const mainAttr = 'hp,cpct,cdmg,mastery'
 
 export const buffs = [

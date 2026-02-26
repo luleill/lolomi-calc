@@ -161,9 +161,9 @@ export const details = applyStandardTeam([
   }}
 ]);
 
-export const defDmgIdx = 4;
+export const defDmgIdx = 6;
 export const mainAttr = 'hp,cpct,cdmg,mastery';
-export const defParams = { Moonsign: 2 };
+export const defParams = { Moonsign: 2 };  // 月兆满辉
 
 export const buffs = [
   ...TeamBuff,

@@ -3,11 +3,11 @@ import { teamConfig, withStdTeam } from '../util.js'
 import { Config } from '#lolomi'
 
 const mainCharName = '法尔伽'
- // 暂时不考虑那么多，默认全打风伤
+
 const team = ['珐露珊','杜林','班尼特']
 const artifact_normal = ['千岩', '宗室']
 
-const team_B = ['珐露珊','莫娜','班尼特']
+const team_B = ['温迪','杜林','班尼特']
 const artifact_B = ['千岩', '宗室']
 
 const config = Config.getConfig('user', 'config');
@@ -36,19 +36,23 @@ export const details = applyStandardTeam([
 }, {
   title: '特殊重击「苍噬」伤害',
   params: { sifeng: true },
-  dmg: ({ talent }, dmg) => dmg(talent.e['苍噬伤害'], 'e')
+  dmg: ({ talent }, dmg) => dmg(talent.e['苍噬伤害'][0] + talent.e['苍噬伤害'][1], 'e')
 }, {
-  title: '「我即朔风」第一段伤害',
-  dmg: ({ talent }, dmg) => dmg(talent.q['技能第一段伤害'], 'q')
-} ,{
-  title: '「我即朔风」第二段伤害',
-  dmg: ({ talent }, dmg) => dmg(talent.q['技能第二段伤害'], 'q')
-} ,{
+  title: '「我即朔风」两段总伤',
+  dmg: ({ talent }, dmg) => {
+    const Q1 = dmg(talent.q['技能第一段伤害'], 'q');
+    const Q2 = dmg(talent.q['技能第二段伤害'], 'q');
+    return {
+      dmg: Q1.dmg + Q2.dmg,
+      avg: Q1.avg + Q2.avg
+    };
+  }
+}, {
   // 队伍伤害
   title: ({ cons }) => `${teamConfig(cons, team_B, artifact_B, mainCharName).title}「四风将起」伤害`,
   params: ({cons}) => ({
     ...teamConfig(cons, team_B, artifact_B).params,
-    sifeng: true
+    sifeng: true, pyro_two: true
   }),
   dmg: ({ talent }, dmg) => dmg(talent.e['四风将起伤害'], 'e')
 } ,{
@@ -68,7 +72,7 @@ export const details = applyStandardTeam([
   }}
 ])
 
-export const defParams = { Hexenzirkel: true } // 魔女会成员
+export const defParams = { Hexenzirkel: true } // 魔导·秘仪队伍
 export const defDmgIdx = 1
 export const mainAttr = 'atk,cpct,cdmg'
 

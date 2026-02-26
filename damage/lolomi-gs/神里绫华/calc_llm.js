@@ -69,7 +69,7 @@ export const details = applyStandardTeam([
   ])
   
   export const mainAttr = 'atk,cpct,cdmg'
-  export const defDmgIdx = 2
+  export const defDmgIdx = 3
   
   export const buffs = [
     ...TeamBuff,

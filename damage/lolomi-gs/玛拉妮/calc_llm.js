@@ -31,6 +31,7 @@ export const details = applyStandardTeam([
     dmg: ({ talent, calc, attr }, { basic }) => basic(calc(attr.hp) * talent.e['鲨鲨撕咬基础伤害'] / 100, 'a')
   }, {
     title: '巨浪鲨鲨撕咬伤害',
+    dmgKey: 'e',
     dmg: ({ talent, calc, attr }, { basic }) => basic(calc(attr.hp) * ( talent.e['鲨鲨撕咬基础伤害'] + talent.e['巨浪鲨鲨撕咬伤害额外提升'] ) / 100, 'a')
   }, {
     title: '巨浪鲨鲨撕咬蒸发',
@@ -56,7 +57,7 @@ export const details = applyStandardTeam([
   }}
 ])
   
-export const defParams = { Nightsoul: true }
+export const defParams = { Nightsoul: true }  // 夜魂
 export const defDmgKey = 'e'
 export const mainAttr = 'hp,cpct,cdmg,mastery'
 

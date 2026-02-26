@@ -134,7 +134,10 @@
     'Nefer': '奈芙尔',
     'Jahoda': '雅珂达',
     'Durin': '杜林',
-    'Columbina': '哥伦比娅'
+    'Columbina': '哥伦比娅',
+    'Zibai': '兹白',
+    'Illuga': '叶洛亚',
+    'Varka': '法尔伽'
   };
 
   // 角色简称 - 常用辅助

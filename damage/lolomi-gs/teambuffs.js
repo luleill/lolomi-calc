@@ -529,6 +529,22 @@ let TeamBuff = [
     elevated: ({ params }) => params.Columbina_best ? 20 :  params.Columbina_mid ? 8.5 : 0,
     fypct: 7,
     }
+  },
+  {
+    check: ({ params }) => params.Illuga_low || params.Illuga_mid || params.Illuga_best,
+    title: '叶洛亚',
+    // 默认千精，纯水岩队伍，提升月结晶反应基础值，天赋吃满额外提升160%,
+    data: {
+    aPlus: ({ params }) => (params.Illuga_low_best || params.Illuga_low_mid) ? 8000 : params.Illuga_low_low ? 6400 : 0,
+    a2Plus: ({ params }) => (params.Illuga_best || params.Illuga_low_mid) ? 8000 : params.Illuga_low_low ? 6400 : 0,
+    a3Plus: ({ params }) => (params.Illuga_low_best || params.Illuga_low_mid) ? 8000 : params.Illuga_low_low ? 6400 : 0,
+    ePlus: ({ params }) => (params.Illuga_low_best || params.Illuga_low_mid) ? 8000 : params.Illuga_low_low ? 6400 : 0,
+    qPlus: ({ params }) => (params.Illuga_low_best || params.Illuga_low_mid) ? 8000 : params.Illuga_low_low ? 6400 : 0,
+    defPlus: ({ params }) => params.Illuga_best ? 200 : 0,
+    mastery: ({ params }) => params.Illuga_best ? 80 : 50,
+    cpct: ({ params }) => params.Illuga_best ? 10 : 5,
+    cdmg: ({ params }) => params.Illuga_best ? 30 : 10
+    }
   }
 ]
 
