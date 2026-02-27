@@ -68,16 +68,18 @@ export class calc extends plugin {
           }
           
           // 存储信息
-          this.restartUsers.set(e.user_id, {
+          const restartInfo = {
             qq: e.user_id,
-            timestamp: Date.now()
-          })
+            group_id: e.group_id,
+            user_id: e.user_id,
+            bot_id: e.self_id,
+            timestamp: Date.now(),
+            isForce: isForce
+          }
           
-          // 缓存标记
-          this.setCacheJSON('lolomi-calc:pending-restart', {
-            qq: e.user_id,
-            timestamp: Date.now()
-          }, 60)
+          this.restartUsers.set(e.user_id, restartInfo)
+          this.setCacheJSON('lolomi-calc:pending-restart', restartInfo, 60)
+          
           setTimeout(() => {
             let restartCommand = 'npm run start'
             if (process.argv[1].includes('pm2')) {
@@ -110,7 +112,14 @@ export class calc extends plugin {
       
       if (pendingRestart && pendingRestart.qq === e.user_id) {
         await redis.del('lolomi-calc:pending-restart')
-        e.reply('重启成功，新版lolomi-calc已生效')
+        let msg = ['重启成功，新版lolomi-calc已生效']
+        
+        if (pendingRestart.group_id) {
+          await Bot.sendGroupMsg(pendingRestart.bot_id, pendingRestart.group_id, msg)
+        } else {
+          await Bot.sendFriendMsg(pendingRestart.bot_id, pendingRestart.user_id, msg)
+        }
+        
         this.restartUsers.delete(pendingRestart.qq)
       }
     } catch (err) {
