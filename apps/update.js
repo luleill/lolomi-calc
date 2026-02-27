@@ -20,13 +20,15 @@ export class calc extends plugin {
         ]
       }
     )
+    this.key = 'lolomi-calc:restart'
     this.restartUsers = new Map()
   }
-  
+  init() {
+    Bot.once('online', this.restartMsg.bind(this))
+  }
   async setCacheJSON (key, data, EX = 3600 * 24 * 365) {
     await redis.set(key, JSON.stringify(data), { EX })
   }
-  
   async getCacheJSON (key) {
     let data = await redis.get(key)
     if (data) {
@@ -35,12 +37,27 @@ export class calc extends plugin {
     return null
   }
   
+  async restartMsg() {
+    try {
+      let restart = await redis.get(this.key)
+      if (!restart) return
+      await redis.del(this.key)
+      restart = JSON.parse(restart)
+      const msg = [`重启成功，新版lolomi-calc已生效，用时${Bot.getTimeDiff(restart.time)}`]
+      if (restart.group_id) {
+        await Bot.sendGroupMsg(restart.bot_id, restart.group_id, msg)
+      } else if (restart.user_id) {
+        await Bot.sendFriendMsg(restart.bot_id, restart.user_id, msg)
+      }
+    } catch (err) {
+      console.log('发送重启消息时出错:', err)
+    }
+  }
   async update (e) {
     if (!e.isMaster) {
       e.reply(`你谁？`, true)
       return false
     }
-    await this.checkRestartMessage(e)
     
     let isForce = e.msg.includes('强制')
     let repoPath = `${_path}/plugins/lolomi-calc`
@@ -49,7 +66,6 @@ export class calc extends plugin {
       : 'git pull origin master'
     
     if (fs.existsSync(repoPath)) {
-      e.reply(isForce ? '开始强制更新...' : '开始更新...')
       exec(command, { cwd: repoPath }, (error, stdout, stderr) => {
         if (error) {
           if (/(local changes|would be overwritten|Please, commit your changes or stash them)/.test(error.message)) {
@@ -67,18 +83,16 @@ export class calc extends plugin {
             e.reply('更新完成，正在尝试重新启动Yunzai以应用更新...')
           }
           
-          // 存储信息
+          // 存储重启信息到Redis
           const restartInfo = {
-            qq: e.user_id,
             group_id: e.group_id,
             user_id: e.user_id,
             bot_id: e.self_id,
-            timestamp: Date.now(),
+            time: Date.now(),
             isForce: isForce
           }
           
-          this.restartUsers.set(e.user_id, restartInfo)
-          this.setCacheJSON('lolomi-calc:pending-restart', restartInfo, 60)
+          redis.set(this.key, JSON.stringify(restartInfo), { EX: 3600 })
           
           setTimeout(() => {
             let restartCommand = 'npm run start'
@@ -90,8 +104,7 @@ export class calc extends plugin {
               if (error) {
                 e.reply('自动重启失败，请手动重启。\nError code: ' + error.code + '\n' + error.stack + '\n')
                 console.error(`重启失败\n${error.stack}`)
-                this.restartUsers.delete(e.user_id)
-                redis.del('lolomi-calc:pending-restart')
+                redis.del(this.key)
                 return
               } else if (stdout) {
                 console.log('重启成功，运行已转为后台，查看日志请用命令：npm run log')
@@ -104,26 +117,5 @@ export class calc extends plugin {
       })
     }
     return true
-  }
-  
-  async checkRestartMessage(e) {
-    try {
-      let pendingRestart = await this.getCacheJSON('lolomi-calc:pending-restart')
-      
-      if (pendingRestart && pendingRestart.qq === e.user_id) {
-        await redis.del('lolomi-calc:pending-restart')
-        let msg = ['重启成功，新版lolomi-calc已生效']
-        
-        if (pendingRestart.group_id) {
-          await Bot.sendGroupMsg(pendingRestart.bot_id, pendingRestart.group_id, msg)
-        } else {
-          await Bot.sendFriendMsg(pendingRestart.bot_id, pendingRestart.user_id, msg)
-        }
-        
-        this.restartUsers.delete(pendingRestart.qq)
-      }
-    } catch (err) {
-      console.log('检查重启消息时出错:', err)
-    }
   }
 }
