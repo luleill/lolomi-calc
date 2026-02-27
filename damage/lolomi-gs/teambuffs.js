@@ -143,7 +143,7 @@ let TeamBuff = [
       enemyDef:15
       }
   },{
-    check: ({ params }) => params.Venti_best || params.Venti_mid || params.Venti_low || params.Hexenzirkel,
+    check: ({ params }) => params.Venti_best || params.Venti_mid || params.Venti_low || params.Hexenzirkel === false,
     title: '温迪',
     // Hexenzirkel 魔导·秘仪队伍
     data: {
@@ -165,7 +165,7 @@ let TeamBuff = [
       }
     }
   },{
-    check: ({ params }) => params.Durin_best || params.Durin_mid || params.Durin_low ||params.Hexenzirkel,
+    check: ({ params }) => params.Durin_best || params.Durin_mid || params.Durin_low ||params.Hexenzirkel === false,
     title: '杜林',
     // Hexenzirkel 魔导·秘仪队伍
     data: {
@@ -184,7 +184,7 @@ let TeamBuff = [
       },
     }
   },{
-    check: ({ params }) => params.Klee_best || params.Klee_mid || params.Hexenzirkel,
+    check: ({ params }) => params.Klee_best || params.Klee_mid || params.Klee_low ||params.Hexenzirkel === false,
     title: '可莉',
     // Hexenzirkel 魔导·秘仪队伍
     data: {
@@ -198,7 +198,7 @@ let TeamBuff = [
       kx: 20
     }
   },{
-    check: ({ params }) =>  params.Fischl_best || params.Fischl_mid || params.Fischl_low ||   params.Hexenzirkel,
+    check: ({ params }) =>  params.Fischl_best || params.Fischl_mid || params.Fischl_low ||   params.Hexenzirkel === false,
     // 触发超载，全队加攻，触发感电，全队加精通，默认魔导队攻击和精通都吃
     title: '菲谢尔',
     data: {
@@ -292,7 +292,7 @@ let TeamBuff = [
     }
   },
   {
-    check: ({ params }) => params.Mona_low || params.Mona_mid || params.Mona_best || params.Hexenzirkel,
+    check: ({ params }) => params.Mona_low || params.Mona_mid || params.Mona_best || params.Hexenzirkel === false,
     title: '莫娜',
     // Hexenzirkel 魔导·秘仪队伍
     data: {
@@ -535,12 +535,12 @@ let TeamBuff = [
     title: '叶洛亚',
     // 默认千精，纯水岩队伍，提升月结晶反应基础值，天赋吃满额外提升160%,
     data: {
-    fyPlus: ({ params }) => (params.Illuga_best || params.Illuga_mid) ? 8000 : params.Illuga_low ? 6400 : 0,
-    aPlus: ({ params }) => (params.Illuga_best || params.Illuga_mid) ? 8000 : params.Illuga_low ? 6400 : 0,
-    a2Plus: ({ params }) => (params.Illuga_best || params.Illuga_mid) ? 8000 : params.Illuga_low ? 6400 : 0,
-    a3Plus: ({ params }) => (params.Illuga_best || params.Illuga_mid) ? 8000 : params.Illuga_low ? 6400 : 0,
-    ePlus: ({ params }) => (params.Illuga_best || params.Illuga_mid) ? 8000 : params.Illuga_low ? 6400 : 0,
-    qPlus: ({ params }) => (params.Illuga_best || params.Illuga_mid) ? 8000 : params.Illuga_low ? 6400 : 0,
+    fyplus: ({ params }) => (params.Illuga_best || params.Illuga_mid) ? 6400 : params.Illuga_low ? 5500 : 0,
+    aPlus: ({ params }) => (params.Illuga_best || params.Illuga_mid) ? 950 : params.Illuga_low ? 850 : 0,
+    a2Plus: ({ params }) => (params.Illuga_best || params.Illuga_mid) ? 950 : params.Illuga_low ? 850 : 0,
+    a3Plus: ({ params }) => (params.Illuga_best || params.Illuga_mid) ? 950 : params.Illuga_low ? 850 : 0,
+    ePlus: ({ params }) => (params.Illuga_best || params.Illuga_mid) ? 950 : params.Illuga_low ? 850 : 0,
+    qPlus: ({ params }) => (params.Illuga_best || params.Illuga_mid) ? 950 : params.Illuga_low ? 850 : 0,
     defPlus: ({ params }) => params.Illuga_best ? 200 : 0,
     mastery: ({ params }) => params.Illuga_best ? 80 : 50,
     cpct: ({ params }) => params.Illuga_best ? 10 : 5,

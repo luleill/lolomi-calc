@@ -104,6 +104,13 @@ export const details = applyStandardTeam([
         cdmg: 40,
       }
     }, {
+      check: ({ params }) => params.heavyHammer === true,
+      title: '莉奈娅2命：百万吨重锤的暴击伤害效果额外提升150%。',
+      cons: 2,
+      data: {
+        cdmg: 60,
+      }
+    }, {
       title: '莉奈娅4命：莉奈娅站场时自身防御力提升50%',
       cons: 4,
       data: {
