@@ -4,13 +4,19 @@ import fs from 'node:fs'
 const _path = process.cwd()
 const _logPath = `${_path}/plugins/lolomi-calc/CHANGELOG.md`
 
-let logs = {}
-let changelogs = []
-let currentVersion
-let versionCount = 4
+// 初始化
+let logs = {}           // 原始内容
+let changelogs = []     // 版本日志数组
+let currentVersion      // 当前版本号
+let versionCount = 4    // 日志版本数量
 
 let packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'))
 
+/**
+ * 格式化单行日志内容
+ * @param {string} line - 原始日志行
+ * @returns {string}
+ */
 const getLine = function (line) {
   line = line.replace(/(^\s*\*|\r)/g, '')
   line = line.replace(/\s*`([^`]+`)/g, '<span class="cmd">$1')
@@ -32,6 +38,8 @@ try {
       if (versionCount <= -1) {
         return false
       }
+      
+      // 匹配版本号（以#开头）
       let versionRet = /^#\s*([0-9a-zA-Z\\.~\s]+?)\s*$/.exec(line)
       if (versionRet && versionRet[1]) {
         let v = versionRet[1].trim()
@@ -54,20 +62,24 @@ try {
         if (!line.trim()) {
           return
         }
+        
+        // 一级变更项（以*开头的行）
         if (/^\*/.test(line)) {
           lastLine = {
             title: getLine(line),
             logs: []
           }
           temp.logs.push(lastLine)
-        } else if (/^\s{2,}\*/.test(line)) {
+        } 
+        // 二级变更项（以两个以上空格加*开头的行）
+        else if (/^\s{2,}\*/.test(line)) {
           lastLine.logs.push(getLine(line))
         }
       }
     })
   }
 } catch (e) {
-  // do nth
+  // 忽略错误
 }
 
 const yunzaiVersion = packageJson.version

@@ -11,7 +11,7 @@ const team_B = ['哥伦比娅','叶洛亚', '妮露']
 const artifact_B = ['夜歌']
 
 const config = Config.getConfig('user', 'config');
-const applyStandardTeam = withStdTeam(mainCharName, team_B, artifact_B, config)
+const applyStandardTeam = withStdTeam(mainCharName, team_B, artifact_B, config,{heavyHammer : true})
 
 export const details = applyStandardTeam([
   {

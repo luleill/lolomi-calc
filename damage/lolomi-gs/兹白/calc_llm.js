@@ -11,7 +11,7 @@ const team_B = ['叶洛亚','哥伦比娅','希诺宁']
 const artifact_B = ['夜歌']
 
 const config = Config.getConfig('user', 'config');
-const applyStandardTeam = withStdTeam(mainCharName, team, artifact_normal, config)
+const applyStandardTeam = withStdTeam(mainCharName, team_B, artifact_B, config,{taiyinDescent: true, cons_1: true, cons_2: true, cons_6: true})
 
 export const details = applyStandardTeam([
 {
@@ -74,7 +74,7 @@ export const details = applyStandardTeam([
 
 export const mainAttr = 'def,cpct,cdmg,mastery'
 export const defParams = { Moonsign: 2 }
-export const defDmgIdx = 2
+export const defDmgIdx = 4
 
 export const buffs = [
   ...TeamBuff,

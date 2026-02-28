@@ -1,22 +1,18 @@
 import { Cfg, Version, Common, Data } from '#lolomi'
 import Theme from './help/theme.js'
 import lodash from 'lodash'
-import fs from 'node:fs'
-
-const _path = process.cwd()
-const helpPath = `${_path}/plugins/lolomi-calc/resources/help`
 
 export class Help extends plugin {
   constructor () {
     super({
-      name: '[伤害计算拓展插件]帮助',
-      dsc: '伤害计算拓展帮助',
+      name: 'lolomi帮助',
+      dsc: 'lolomi帮助',
       event: 'message',
       priority: 40,
       rule: [
         {
           reg: '^#?(洛洛米|lolomi)帮助$',
-          fnc: 'help'
+          fnc: 'lolomihelp'
         },
         {
           reg: '^#?(洛洛米|lolomi)版本$',
@@ -26,41 +22,22 @@ export class Help extends plugin {
     })
   }
 
-  async help (e) {
+  async lolomihelp (e) {
     if (Cfg.get('sys.help', false)) return false
-
-    let custom = {}
-    let help = {}
-    if (fs.existsSync(`${helpPath}/help-cfg.js`)) {
-      console.log('lolomi-calc: 检测到存在help-cfg.js配置\n建议将help-cfg.js移为config/help.js或重新复制config/help_default.js进行配置~')
-      help = await import(`file://${helpPath}/help-cfg.js?version=${new Date().getTime()}`)
-    } else if (fs.existsSync(`${helpPath}/help-list.js`)) {
-      console.log('lolomi-calc: 检测到存在help-list.js配置，建议将help-list.js移为config/help.js或重新复制config/help_default.js进行配置~')
-      help = await import(`file://${helpPath}/help-list.js?version=${new Date().getTime()}`)
-    }
-
     let { diyCfg, sysCfg } = await Data.importCfg('help')
-
-    // 兼容一下旧字段
-    if (lodash.isArray(help.helpCfg)) {
-      custom = {
-        helpList: help.helpCfg,
-        helpCfg: {}
-      }
-    } else custom = help
-
-    let helpConfig = lodash.defaults(diyCfg.helpCfg || {}, custom.helpCfg, sysCfg.helpCfg)
-    let helpList = diyCfg.helpList || custom.helpList || sysCfg.helpList
-
+    // 自定义 > 默认
+    let helpConfig = lodash.defaults(diyCfg.helpCfg || {}, sysCfg.helpCfg)
+    let helpList = diyCfg.helpList || sysCfg.helpList
     let helpGroup = []
 
     lodash.forEach(helpList, (group) => {
       if (group.auth && group.auth === 'master' && !e.isMaster) return true
-
       lodash.forEach(group.list, (help) => {
         let icon = help.icon * 1
-        if (!icon) help.css = 'display:none'
-        else {
+        if (!icon) {
+          help.css = 'display:none'
+        } else {
+          // 图标编号转为坐标
           let x = (icon - 1) % 10
           let y = (icon - x - 1) / 10
           help.css = `background-position:-${x * 50}px -${y * 50}px`
@@ -69,28 +46,27 @@ export class Help extends plugin {
 
       helpGroup.push(group)
     })
+    
     let themeData = await Theme.getThemeData(diyCfg.helpCfg || {}, sysCfg.helpCfg || {})
+    
     return await Common.render('help/index', {
-      helpCfg: helpConfig,
-      helpGroup,
-      ...themeData,
-      element: 'default'
-    }, { e, scale: 1.2 })
+      helpCfg: helpConfig,    // 帮助配置
+      helpGroup,              // 帮助分组
+      ...themeData,           // 主题数据
+      element: 'default'      // 默认元素样式
+    }, { e, scale: 1.2 })     // 渲染参数：事件对象和缩放比例
   }
 
   async versionInfo (e) {
     try {
-      
       if (!Version.version) {
         return false;
       }
-      
       if (!Version.changelogs || Version.changelogs.length === 0) {
       }
-      
       const renderResult = await Common.render('help/version-info', {
-        currentVersion: Version.version,
-        changelogs: Version.changelogs,
+        currentVersion: Version.version,    // 当前版本号
+        changelogs: Version.changelogs,     // 版本日志
         elem: 'dendro'
       }, { e, scale: 1.2 });
       
