@@ -66,7 +66,7 @@ export class calc extends plugin {
       : 'git pull origin master'
     
     if (fs.existsSync(repoPath)) {
-      exec(command, { cwd: repoPath }, (error, stdout, stderr) => {
+      exec(command, { cwd: repoPath }, (error, stdout) => {
         if (error) {
           if (/(local changes|would be overwritten|Please, commit your changes or stash them)/.test(error.message)) {
             e.reply('插件存在冲突，请执行强制更新')
@@ -75,12 +75,12 @@ export class calc extends plugin {
           }
         } else {
           if (isForce) {
-            e.reply('强制更新完成，正在尝试重新启动Yunzai以应用更新...')
+            e.reply('强制更新完成，正在尝试重启以应用更新...')
           } else if (/(Already up[ -]to[ -]date|已经是最新的)/.test(stdout)) {
-            e.reply('lolomi_calc已是最新版本~')
+            e.reply('lolomi-calc已是最新版本~')
             return
           } else {
-            e.reply('更新完成，正在尝试重新启动Yunzai以应用更新...')
+            e.reply('更新完成，正在尝试重启以应用更新...')
           }
           
           // 存储重启信息到Redis
@@ -100,7 +100,7 @@ export class calc extends plugin {
               restartCommand = 'npm run restart'
             }
             
-            exec(restartCommand, (error, stdout, stderr) => {
+            exec(restartCommand, (error, stdout) => {
               if (error) {
                 e.reply('自动重启失败，请手动重启。\nError code: ' + error.code + '\n' + error.stack + '\n')
                 console.error(`重启失败\n${error.stack}`)
@@ -112,7 +112,7 @@ export class calc extends plugin {
                 process.exit()
               }
             })
-          }, 1500)
+          }, 3000)
         }
       })
     }

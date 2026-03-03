@@ -23,7 +23,7 @@ export const details = applyStandardTeam([
     title: '「狂飙突进」普攻五段总伤',
     dmg: ({ talent }, dmg) => {
         return '一二三四五'.split('').reduce((acc, num) => {
-            const result = dmg(talent.e[`狂飙突进·${num}段伤害`], 'e');
+            const result = dmg(talent.e[`狂飙突进·${num}段伤害`], 'a');
             acc.dmg += result.dmg;
             acc.avg += result.avg;
             return acc;
@@ -73,7 +73,7 @@ export const details = applyStandardTeam([
 ])
 
 export const defParams = { Hexenzirkel: true } // 魔女会成员
-export const defDmgIdx = 1
+export const defDmgIdx = 2
 export const mainAttr = 'atk,cpct,cdmg'
 
 export const buffs = [
