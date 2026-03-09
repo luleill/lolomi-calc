@@ -15,8 +15,8 @@ const applyStandardTeam = withStdTeam(mainCharName, team_B, artifact_B, config,{
 
 export const details = applyStandardTeam([
 {
-  title: '触发满特效后防御力',
-  dmg: ({ attr, calc }) => {
+    title: '触发满特效后防御力',
+    dmg: ({ attr, calc }) => {
     return { avg: Math.min(calc(attr.def) * 1)}
 }
 }, {
@@ -48,28 +48,27 @@ export const details = applyStandardTeam([
     title: '「三垣威仪法」第二段月结晶伤害',
     dmg: ({ attr, calc, talent } , { basic }) => basic(calc(attr.def) * talent.q['技能第二段伤害'] / 100, '', 'lunarCrystallize')
 }, {
-  // 组队
-  title: ({ cons }) => `${teamConfig(cons, team, artifact_normal, mainCharName).title}「灵驹飞踏」月结晶伤害`,
-  params: ({cons}) => ({
-    ...teamConfig(cons, team, artifact_normal).params, 
-    taiyinDescent: true, cons_1: true, cons_2: true, cons_6: true
-  }),
-  dmg: ({ attr, calc, talent } , { basic }) => basic(calc(attr.def) * talent.e['灵驹飞踏第二段伤害'] / 100, '', 'lunarCrystallize')
+    // 组队
+    title: ({ cons }) => `${teamConfig(cons, team, artifact_normal, mainCharName).title}「灵驹飞踏」月结晶伤害`,
+    params: ({cons}) => ({
+      ...teamConfig(cons, team, artifact_normal).params, 
+      taiyinDescent: true, cons_1: true, cons_2: true, cons_6: true
+    }),
+    dmg: ({ attr, calc, talent } , { basic }) => basic(calc(attr.def) * talent.e['灵驹飞踏第二段伤害'] / 100, '', 'lunarCrystallize')
 }, {
-  title: ({ cons }) => `${teamConfig(cons, team_B, artifact_B, mainCharName).title}「灵驹飞踏」月结晶伤害`,
-  params: ({cons}) => ({
-    ...teamConfig(cons, team_B, artifact_B).params, 
-    taiyinDescent: true, cons_1: true, cons_2: true, cons_6: true
-  }),
-  dmg: ({ attr, calc, talent } , { basic }) => basic(calc(attr.def) * talent.e['灵驹飞踏第二段伤害'] / 100, '', 'lunarCrystallize')
+    title: ({ cons }) => `${teamConfig(cons, team_B, artifact_B, mainCharName).title}「灵驹飞踏」月结晶伤害`,
+    params: ({cons}) => ({
+      ...teamConfig(cons, team_B, artifact_B).params, 
+      taiyinDescent: true, cons_1: true, cons_2: true, cons_6: true
+    }),
+    dmg: ({ attr, calc, talent } , { basic }) => basic(calc(attr.def) * talent.e['灵驹飞踏第二段伤害'] / 100, '', 'lunarCrystallize')
 }, {
-  title: '当前圣遗物套装',
-  dmg: ({ artis }) => {
-    return {
-      avg: artis ,
+    title: '当前圣遗物套装',
+    dmg: ({ artis }) => ({
+      avg: artis,
       type: 'text'
-    }
-  }}
+    })
+  }
 ])
 
 export const mainAttr = 'def,cpct,cdmg,mastery'
@@ -86,10 +85,10 @@ export const buffs = [
     }
   }, {
     title: '天赋：「叠嶂峦岫出云」水元素队友兹白精通提升60，岩元素队友兹白防御力提升15%',
-    // 兹叶月妮 默认双水单岩队友
+    // 默认单水双岩队友
     data: {
-      mastery: 120,
-      defPct: 15
+      mastery: 60,
+      defPct: 30
     }
   }, {
     title: '天赋：月兆祝赐·浮明若流 队伍中角色造成的月曜反应提升[fypct]%基础伤害',
