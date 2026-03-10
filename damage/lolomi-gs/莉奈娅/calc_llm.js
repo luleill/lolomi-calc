@@ -86,6 +86,7 @@ export const details = applyStandardTeam([
       }
     }, {
       title: '莉奈娅1命：提升造成的月结晶伤害，提升值相当于莉奈娅防御力的75%。',
+      sort: 9,
       cons: 1,
       data: {
         fyplus: ({ attr, calc }) => calc(attr.def) * 0.75
@@ -93,6 +94,7 @@ export const details = applyStandardTeam([
     }, {
       check: ({ params }) => params.heavyHammer === true,
       title: '莉奈娅1命：提升百万吨重锤伤害，每层提升值相当于莉奈娅防御力的150%。',
+      sort: 9,
       cons: 1,
       data: {
         fyplus: ({ attr, calc, cons }) => calc(attr.def) * (cons >= 6 ? 3.75 : 1.5) * (cons >= 6 ? 10 : 5)

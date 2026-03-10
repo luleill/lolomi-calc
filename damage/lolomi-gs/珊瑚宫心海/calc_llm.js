@@ -92,17 +92,20 @@ export const details = applyStandardTeam([
       }
     }, {
       title: '心海被动：开Q后重击伤害基于治疗加成提高[aPlus]',
+      sort: 9,
       data: {
         aPlus: ({ attr, calc }) => calc(attr.hp) * calc(attr.heal) * 0.15 / 100,
         a2Plus: ({ attr, calc }) => calc(attr.hp) * calc(attr.heal) * 0.15 / 100
       }
     }, {
       title: '海人化羽：开Q后普攻伤害提高[aPlus]',
+      sort: 9,
       data: {
         aPlus: ({ attr, talent, calc }) => calc(attr.hp) * talent.q['普通攻击伤害提升'] / 100
       }
     }, {
       title: '海人化羽：开Q后重击伤害提高[a2Plus]',
+      sort: 9,
       data: {
         a2Plus: ({ attr, talent, calc }) => calc(attr.hp) * talent.q['重击伤害提升'] / 100
       }
@@ -111,6 +114,7 @@ export const details = applyStandardTeam([
       cons: 1
     }, {
       title: '心海6命：开Q攻击获得治疗后，获得40%水伤加成',
+      sort: 6,
       cons: 6,
       data: {
         dmg: 40

@@ -93,13 +93,12 @@ export const details = applyStandardTeam([
     }}
   ])
   
-  export const defDmgIdx = 1
+  export const defDmgIdx = 2
   export const mainAttr = 'atk,cpct,cdmg,mastery'
   
   export const buffs = [
     ...TeamBuff,
     {
-      cons: 0,
       title: '甘雨天赋1：霜华矢发射后的5秒内霜华矢暴击率提高20%',
       data: {
         a2Cpct: 20

@@ -139,6 +139,7 @@ export const buffs = [
   {
     check: ({ params }) => params.waveflash === true,
     title: '「神里流·镜花」：每层浪闪提升瞬水剑伤害[aPlus]',
+    sort: 9,
     data: {
       aPlus: ({ attr, calc, talent, cons }) => calc(attr.hp) * talent.e['浪闪伤害值提高'] / 100 * (cons >= 2 ? 5 : 4)
     }

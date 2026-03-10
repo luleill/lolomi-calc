@@ -80,6 +80,7 @@ export const buffs = [
   {
     check: ({ params }) => params.taiyinDescent === true,
     title: '天赋：「月下素娥降仙」灵驹飞踏第二段伤害提升兹白防御力的60%', 
+    sort: 9,
     data: {
       fyplus: ({ attr, calc }) => calc(attr.def) * 60 / 100
     }
@@ -92,6 +93,7 @@ export const buffs = [
     }
   }, {
     title: '天赋：月兆祝赐·浮明若流 队伍中角色造成的月曜反应提升[fypct]%基础伤害',
+    sort: 9,
     data: {
       fypct: ({ attr, calc }) => Math.min(calc(attr.def) / 100 * 0.7, 14)
     }
@@ -111,6 +113,7 @@ export const buffs = [
   }, {
     check: ({ params }) => params.cons_2 === true,
     title: '兹白2命：灵驹飞踏第二段伤害进一步提升，提升值相当于兹白防御力的550%',
+    sort: 9,
     cons: 2,
     data: {
       fyplus: ({ attr, calc }) => (calc(attr.def) * 550 / 100)

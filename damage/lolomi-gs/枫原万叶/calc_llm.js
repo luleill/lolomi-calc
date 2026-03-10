@@ -80,7 +80,7 @@ export const details = applyStandardTeam([
     }}
   ])
   
-  export const defDmgIdx = 1
+  export const defDmgIdx = 3
   export const mainAttr = 'atk,cpct,cdmg,mastery'
   
   export const buffs = [
@@ -103,7 +103,9 @@ export const details = applyStandardTeam([
       title: '万叶6命：普通攻击、重击与下落攻击造成的伤害提升[dmg]',
       sort: 9,
       data: {
-        dmg: ({ calc, attr }) => calc(attr.mastery) * 0.2
+        aDmg: ({ calc, attr }) => calc(attr.mastery) * 0.2,
+        a2Dmg: ({ calc, attr }) => calc(attr.mastery) * 0.2,
+        a3Dmg: ({ calc, attr }) => calc(attr.mastery) * 0.2,
       }
     }
   ]

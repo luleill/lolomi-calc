@@ -70,6 +70,7 @@ export const buffs = [
   ...TeamBuff,
   {
   title: '神子天赋：基于元素精通提高杀生樱伤害[eDmg]%',
+  sort: 9,
   data: {
     eDmg: ({ attr, calc }) => calc(attr.mastery) * 0.15
   }
