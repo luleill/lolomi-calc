@@ -105,6 +105,7 @@ export const buffs = [
   {
     check: ({ params }) => params.izpapa === true,
     title: '天赋「白燧蝶的星衣」：E造成伤害提升[ePlus],Q造成的伤害提升[qPlus]',
+    sort: 9,
     data: {
       ePlus: ({ attr, calc }) => calc(attr.mastery) * 90 / 100,
       qPlus: ({ attr, calc }) => calc(attr.mastery) * 1200 / 100

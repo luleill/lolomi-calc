@@ -24,11 +24,10 @@ export const details = applyStandardTeam([
     })
   }, {
     title: ({ cons }) => `「焚曜之环」${cons >= 6 ? '+六命协同' : ''}伤害`,
-    params: { ringSun: true },
     dmg: ({ talent, attr, calc, cons }, { basic }) => {
       const ebaseDamage = basic(calc(attr.atk) * talent.e['焚曜之环伤害'] / 100, 'e,nightsoul')
       if (cons >= 6) {
-        const extraDamage = basic(calc(attr.atk) * 200 * 2 / 100, 'e,nightsoul');
+        const extraDamage = basic(calc(attr.atk) * 200 / 100, 'e,nightsoul');
         ebaseDamage.dmg += extraDamage.dmg;
         ebaseDamage.avg += extraDamage.avg;
       } 
@@ -90,6 +89,7 @@ export const buffs = [
   {
     check: ({ params }) => params.q === true,
     title: 'Q被动「死生之炉」：坠日斩伤害提升[qPlus]，驰轮车普攻伤害提升[aPlus]，重击伤害提升[a2Plus]',
+    sort: 9,
     data: {
       qPlus: ({ talent, calc, attr }) => 200 * talent.q['坠日斩伤害提升'] * calc(attr.atk) / 100 ,
       aPlus: ({ talent, calc, attr }) => 200 * talent.q['驰轮车普通攻击伤害提升'] * calc(attr.atk) / 100 ,
@@ -113,10 +113,17 @@ export const buffs = [
       atkPct: 40
     }
   },{
-    title: '2命「灰烬的代价」：基础攻击力提升[atkBase]，焚曜之环附近的敌人的防御力降低[enemyDef]，夜魂加持状态下，普攻伤害提升[aPlus]，重击伤害提升[a2Plus]，元素爆发伤害提升[qPlus]',
+    title: '2命「灰烬的代价」：基础攻击力提升200',
+    sort: 2,
     cons: 2,
     data: {
-      atkBase: 200,
+      atkBase: 200
+    }
+  },{
+    title: '2命「灰烬的代价」：焚曜之环附近的敌人的防御力降低20，夜魂加持状态下，普攻伤害提升[aPlus]，重击伤害提升[a2Plus]，元素爆发伤害提升[qPlus]',
+    sort: 9,
+    cons: 2,
+    data: {
       enemyDef: 20,
       aPlus: ({ calc, attr }) => calc(attr.atk) * 60 / 100,
       a2Plus: ({ calc, attr }) => calc(attr.atk) * 90 / 100,
