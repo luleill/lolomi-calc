@@ -3,64 +3,64 @@
 <details>
 <summary>点击展开/收起角色列表</summary>
 
-- 神里绫华 Kamisato_Ayaka
-- 琴 Jean
-- 丽莎 Lisa
-- 芭芭拉 Barbara
+- 神里绫华 Kamisato_Ayaka ✅
+- 琴 Jean ✅
+- 丽莎 Lisa ✅
+- 芭芭拉 Barbara ✅
 - 凯亚 Kaeya
 - 迪卢克 Diluc
 - 雷泽 Razor
 - 安柏 Amber
-- 温迪 Venti
+- 温迪 Venti ✅
 - 香菱 Xiang_Ling
 - 北斗 Bei_Dou
 - 行秋 Xing_Qiu
-- 魈 Xiao
+- 魈 Xiao ✅
 - 凝光 Ning_Guang
 - 可莉 Klee
-- 钟离 Zhong_Li
+- 钟离 Zhong_Li ✅
 - 菲谢尔 Fischl
 - 班尼特 Bennett
-- 达达利亚 Tartaglia
+- 达达利亚 Tartaglia ✅
 - 诺艾尔 Noelle
-- 七七 Qi_Qi
+- 七七 Qi_Qi ✅
 - 重云 Chong_Yun
-- 甘雨 Gan_Yu
+- 甘雨 Gan_Yu ✅
 - 阿贝多 Albedo
 - 迪奥娜 Diona
-- 莫娜 Mona
-- 刻晴 Ke_Qing
+- 莫娜 Mona ✅
+- 刻晴 Ke_Qing ✅
 - 砂糖 Sucrose
 - 辛焱 Xin_Yan
 - 罗莎莉亚 Rosaria
-- 胡桃 Hu_Tao
-- 枫原万叶 Kaedehara_Kazuha
+- 胡桃 Hu_Tao ✅
+- 枫原万叶 Kaedehara_Kazuha ✅
 - 烟绯 Yanfei
-- 宵宫 Yoimiya
+- 宵宫 Yoimiya ✅
 - 托马 Thoma
 - 优菈 Eula
-- 雷电将军 Raiden_Shogun
+- 雷电将军 Raiden_Shogun ✅
 - 早柚 Sayu
-- 珊瑚宫心海 Sangonomiya_Kokomi
+- 珊瑚宫心海 Sangonomiya_Kokomi ✅
 - 五郎 Gorou
 - 九条裟罗 Kujou_Sara
 - 荒泷一斗 Arataki_Itto
-- 八重神子 Yae_Miko
+- 八重神子 Yae_Miko ✅
 - 鹿野院平藏 Shikanoin_Heizou
-- 夜兰 Ye_Lan
+- 夜兰 Ye_Lan ✅
 - 绮良良 Kirara
 - 埃洛伊 Aloy
-- 申鹤 Shen_He
+- 申鹤 Shen_He ✅
 - 云堇 Yun_Jin
 - 久岐忍 Kuki_Shinobu
-- 神里绫人 Kamisato_Ayato
+- 神里绫人 Kamisato_Ayato ✅
 - 柯莱 Collei
 - 多莉 Dori
 - 提纳里 Tighnari
 - 妮露 Nilou
 - 赛诺 Cyno
 - 坎蒂丝 Candace
-- 纳西妲 Nahida
+- 纳西妲 Nahida ✅
 - 莱依拉 Layla
 - 流浪者 Wanderer
 - 珐露珊 Faruzan
@@ -88,13 +88,13 @@
 - 克洛琳德 Clorinde
 - 艾梅莉埃 Emilie
 - 卡齐娜 Kachina
-- 玛拉妮 Mualani
+- 玛拉妮 Mualani ✅
 - 基尼奇 Kinich
 - 希诺宁 Xilonen
 - 欧洛伦 Ororon
 - 恰斯卡 Chasca
-- 茜特菈莉 Citlali
-- 玛薇卡 Mavuika
+- 茜特菈莉 Citlali ✅
+- 玛薇卡 Mavuika ✅
 - 蓝砚 Lan_Yan
 - 梦见月瑞希 Mizuki
 - 伊安珊 Iansan
@@ -110,9 +110,9 @@
 - 奈芙尔 Nefer
 - 雅珂达 Jahoda
 - 杜林 Durin
-- 哥伦比娅 Columbina
-- 兹白 Zibai
+- 哥伦比娅 Columbina ✅
+- 兹白 Zibai ✅
 - 叶洛亚 Illuga
-- 法尔伽 Varka
+- 法尔伽 Varka ✅
 
 </details>

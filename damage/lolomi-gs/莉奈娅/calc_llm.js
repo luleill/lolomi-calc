@@ -28,10 +28,12 @@ export const details = applyStandardTeam([
     dmg: ({ talent, attr, calc }, { heal }) =>
       heal(talent.q['持续治疗量2'][0] * calc(attr.def) / 100 + talent.q['持续治疗量2'][1] * 1)
   }, {
-    title: '露米锤锤乱打伤害',
-    dmg: ({ talent, attr, calc }, { basic }) => basic(calc(attr.def) * talent.e['露米锤锤乱打伤害'] / 100, 'e')
+    title: '露米捶捶乱打伤害',
+    params: { ordinary: true },
+    dmg: ({ talent, attr, calc }, { basic }) => basic(calc(attr.def) * talent.e['露米捶捶乱打伤害'] / 100, 'e')
   }, {
     title: '露米加力重锤月结晶伤害',
+    params: { ordinary: true },
     dmg: ({ talent, attr, calc }, { basic }) => basic(calc(attr.def) * talent.e['露米加力重锤伤害'] / 100, '', 'lunarCrystallize')
   }, {
     title: '露米百万吨重锤伤害',
@@ -71,6 +73,7 @@ export const details = applyStandardTeam([
     ...TeamBuff,
     {
       title: '莉奈娅天赋：月结晶反应基础伤害提升[fypct]%',
+      sort: 9,
       data: {
         fypct: ({ attr, calc }) => Math.min((calc(attr.def) / 100 * 0.7), 14)
       }
@@ -81,10 +84,12 @@ export const details = applyStandardTeam([
       }
     }, {
       title: '莉奈娅天赋：当前场上月兆角色提升精通[mastery]',
+      sort: 9,
       data: {
         mastery: ({ attr, calc }) => calc(attr.def) * 0.05
       }
     }, {
+      check: ({ params }) => params.ordinary === true,
       title: '莉奈娅1命：提升造成的月结晶伤害，提升值相当于莉奈娅防御力的75%。',
       sort: 9,
       cons: 1,
@@ -100,6 +105,7 @@ export const details = applyStandardTeam([
         fyplus: ({ attr, calc, cons }) => calc(attr.def) * (cons >= 6 ? 3.75 : 1.5) * (cons >= 6 ? 10 : 5)
       }
     }, {
+      check: ({ params }) => params.ordinary === true,
       title: '莉奈娅2命：队伍水岩爆伤提升40%',
       cons: 2,
       data: {
