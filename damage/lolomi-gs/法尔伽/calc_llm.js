@@ -19,28 +19,59 @@ export const details = applyStandardTeam([
   dmg: ({ attr, calc }) => {
     return { avg: Math.min(calc(attr.atk) * 1)}
   }
-},{
-    title: '「狂飙突进」普攻五段总伤',
-    dmg: ({ talent }, dmg) => {
-        return '一二三四五'.split('').reduce((acc, num) => {
-            const result = dmg(talent.e[`狂飙突进·${num}段伤害`], 'a');
-            acc.dmg += result.dmg;
-            acc.avg += result.avg;
-            return acc;
-        }, { dmg: 0, avg: 0 });
-    }
 }, {
-  title: '「四风将起」伤害',
-  params: { sifeng: true },
-  dmg: ({ talent }, dmg) => dmg(talent.e['四风将起伤害'], 'e')
+  // 一轮普攻出伤顺序
+  // 第一段 火刀   第二段 风刀+扩散+火刀  
+  // 第三段 风刀+火刀   第四段 火刀+风刀   第五段 火刀+风刀+扩散  
+  // 特殊重击 火风扩火风   元素爆发 火风扩  
+  // 扩散伤害忽略不计，不加入总伤害计算
+  title: '「狂飙突进」普攻五段总伤害',
+  dmg: ({ talent }, dmg) => {
+    const segment1 = talent.e['狂飙突进·一段伤害'];
+    const segment2 = talent.e['狂飙突进·二段伤害2'];
+    const segment3 = talent.e['狂飙突进·三段伤害2'];
+    const segment4 = talent.e['狂飙突进·四段伤害2'];
+    const segment5 = talent.e['狂飙突进·五段伤害2'];
+
+    const anemoDamage = segment1 + segment2[0] + segment3[0] + segment4[1] + segment5[1];
+    const enchantDamage = segment2[1] + segment3[1] + segment4[0] + segment5[0];
+    
+    const totalAnemo = dmg(anemoDamage, 'a');
+    const totalEnchant = dmg(enchantDamage, 'a', 'coloringDmg');
+    return {
+      dmg: totalAnemo.dmg + totalEnchant.dmg,
+      avg: totalAnemo.avg + totalEnchant.avg
+    };
+  }
 }, {
-  title: '特殊重击「苍噬」伤害',
+  title: '扩散反应伤害',
+  dmg: ({}, { reaction }) => reaction('swirl')
+}, {
+  title: '「四风将起」总伤',
   params: { sifeng: true },
-  dmg: ({ talent }, dmg) => dmg(talent.e['苍噬伤害'][0] + talent.e['苍噬伤害'][1], 'e')
+  dmg: ({ talent } , dmg) => {
+  const enchant_e = dmg(talent.e['四风将起伤害2'][0], 'e', 'coloringDmg')
+  const anemo_e = dmg(talent.e['四风将起伤害2'][1], 'e')
+  return {
+    dmg: enchant_e.dmg + anemo_e.dmg,
+    avg: enchant_e.avg + anemo_e.avg
+  }
+}
+}, {
+  title: '特殊重击「苍噬」总伤',
+  params: { sifeng: true },
+  dmg: ({ talent }, dmg) => {
+    const enchant_a2 = dmg(talent.e['苍噬伤害2'][0] * 2, 'e', 'coloringDmg');
+    const anemo_a2 = dmg(talent.e['苍噬伤害2'][2] * 2, 'e');
+    return {
+      dmg: enchant_a2.dmg + anemo_a2.dmg,
+      avg: enchant_a2.avg + anemo_a2.avg
+    };
+  }
 }, {
   title: '「我即朔风」两段总伤',
   dmg: ({ talent }, dmg) => {
-    const Q1 = dmg(talent.q['技能第一段伤害'], 'q');
+    const Q1 = dmg(talent.q['技能第一段伤害'], 'q', 'coloringDmg');
     const Q2 = dmg(talent.q['技能第二段伤害'], 'q');
     return {
       dmg: Q1.dmg + Q2.dmg,
@@ -54,14 +85,28 @@ export const details = applyStandardTeam([
     ...teamConfig(cons, team_B, artifact_B).params,
     sifeng: true, pyro_two: true
   }),
-  dmg: ({ talent }, dmg) => dmg(talent.e['四风将起伤害'], 'e')
+    dmg: ({ talent }, dmg) => {
+    const enchant_a2 = dmg(talent.e['苍噬伤害2'][0] * 2, 'e', 'coloringDmg');
+    const anemo_a2 = dmg(talent.e['苍噬伤害2'][2] * 2, 'e');
+    return {
+      dmg: enchant_a2.dmg + anemo_a2.dmg,
+      avg: enchant_a2.avg + anemo_a2.avg
+    };
+  }
 } ,{
   title: ({ cons }) => `${teamConfig(cons, team, artifact_normal, mainCharName).title}「四风将起」伤害`,
   params: ({cons}) => ({
     ...teamConfig(cons, team, artifact_normal).params,
     sifeng: true, pyro_two: true
   }),
-  dmg: ({ talent }, dmg) => dmg(talent.e['四风将起伤害'], 'e')
+    dmg: ({ talent }, dmg) => {
+    const enchant_a2 = dmg(talent.e['苍噬伤害2'][0] * 2, 'e', 'coloringDmg');
+    const anemo_a2 = dmg(talent.e['苍噬伤害2'][2] * 2, 'e');
+    return {
+      dmg: enchant_a2.dmg + anemo_a2.dmg,
+      avg: enchant_a2.avg + anemo_a2.avg
+    };
+  }
 }, {
   title: '当前圣遗物套装',
   dmg: ({ artis }) => {
@@ -86,6 +131,8 @@ export const buffs = [
   }, {
     title: '法尔伽天赋：晓风的行军 双风特殊战技造成原本220%的伤害',
     data: {
+      aMulti: 120,
+      a2Multi: 120,
       eMulti: 120,
     }
   }, {
