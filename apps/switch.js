@@ -21,6 +21,10 @@ export class feedback extends plugin {
           reg: '^#标配计算(停用|关闭|启用|开启)$',
           fnc: 'toggleTemplaterTeam',
           permission: 'master'
+        }, {
+          reg: '^#命座对比(停用|关闭|启用|开启)$',
+          fnc: 'toggleConsCompare',
+          permission: 'master'
         }
       ]
     })
@@ -56,6 +60,24 @@ export class feedback extends plugin {
       
       const statusText = enable ? '启用' : '停用'
       this.e.reply(`已${statusText}lolomi-calc标配队友计算~重启后生效~`)
+    } catch (error) {
+      logger.error('保存配置失败:', error)
+    }
+    return true
+  }
+
+  async toggleConsCompare() {
+    try {
+      const configData = fs.readFileSync(configPath, 'utf8')
+      const config = YAML.parse(configData)
+      
+      const enable = this.e.msg.includes('启用') || this.e.msg.includes('开启')
+      config.conscompare = enable
+      
+      fs.writeFileSync(configPath, YAML.stringify(config), 'utf8')
+      
+      const statusText = enable ? '启用' : '停用'
+      this.e.reply(`已${statusText}lolomi-calc面板命座对比~重启后生效~`)
     } catch (error) {
       logger.error('保存配置失败:', error)
     }

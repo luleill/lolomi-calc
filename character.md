@@ -60,7 +60,7 @@
 - 妮露 Nilou
 - 赛诺 Cyno
 - 坎蒂丝 Candace
-- 纳西妲 Nahida ✅
+- 纳西妲 Nahida 
 - 莱依拉 Layla
 - 流浪者 Wanderer
 - 珐露珊 Faruzan

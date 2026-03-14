@@ -75,6 +75,7 @@ let CharCfg = {
       defParams: cfg.defParams || {}, // 默认参数，一般为空
       defDmgIdx: cfg.defDmgIdx || -1, // 默认详情index
       defDmgKey: cfg.defDmgKey || '',
+      consDmgKey: cfg.consDmgKey || '', // 命座对比伤害键
       mainAttr: cfg.mainAttr || 'atk,cpct,cdmg', // 伤害属性
       enemyName: cfg.enemyName || '喵喵' // 敌人名称
     }

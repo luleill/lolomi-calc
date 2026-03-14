@@ -3,7 +3,9 @@
 lolomicalc: true
 # 启用lolomi评分规则
 lolomiartis: true
-# 标配队友预设
+# 计算面板添加标配队友预设
 templateteam: false
 # 极限预设面板
 panelmodel: 1
+# 计算面板添加前后命座对比
+conscompare: false

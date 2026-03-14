@@ -30,32 +30,17 @@ export const helpList = [
       {
         icon: 58,
         title: 'jx刻晴',
-        desc: '查看角色理论极限面板'
+        desc: '极限面板，暂时沿用老数据，需要更新角色可提'
       },
       {
         icon: 59,
         title: 'hb胡桃',
-        desc: '查询角色核爆极限面板'
+        desc: '核爆面板'
       },
       {
         icon: 60,
         title: 'fz心海',
-        desc: '查询角色辅助极限面板'
-      },
-      {
-        icon: 6,
-        title: 'jx面板',
-        desc: '已定义的所有角色极限面板'
-      },
-      {
-        icon: 7,
-        title: 'hb面板',
-        desc: '已定义的所有角色核爆面板'
-      },
-      {
-        icon: 8,
-        title: 'fz面板',
-        desc: '已定义的所有角色辅助面板'
+        desc: '辅助面板'
       },
       {
         icon: 81,
@@ -70,17 +55,27 @@ export const helpList = [
       {
         icon: 81,
         title: '#洛洛米计算启用',
-        desc: '首次安装默认停用'
+        desc: '首次安装默认启用'
       },
       {
         icon: 81,
         title: '#洛洛米计算停用',
-        desc: '禁用插件'
+        desc: '禁用插件，手动重启生效'
+      },
+      {
+        icon: 81,
+        title: '#命座对比停用',
+        desc: '首次安装默认停用，计算面板不展示命座对比'
+      },
+      {
+        icon: 81,
+        title: '#命座对比启用',
+        desc: '开启命座对比，重启生效，返回图片会变慢几秒'
       },
       {
         icon: 81,
         title: '#更新洛洛米',
-        desc: '标准更新'
+        desc: '标准更新，更新成功自动重启'
       },
       {
         icon: 81,
