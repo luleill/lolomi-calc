@@ -378,7 +378,8 @@ let TeamBuff = [
     title: '妮露',
     data: {
       mastery: ({ params }) => (params.Nilou_best || params.Nilou_mid) ? 120 : params.Nilou_low ? 280 : 0,
-      kx: ({ params }) => (params.Nilou_best || params.Nilou_mid) ? 35 : 0
+      kx: ({ params, element }) => 
+        ((params.Nilou_best || params.Nilou_mid) && (element === '水' || element === '草')) ? 35 : 0
     }
   },
   {
