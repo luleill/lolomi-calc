@@ -175,13 +175,39 @@ const ConsCompare = {
         
         if (char) {
           const originalTalent = {}
+          const currentCons = originalProfile.cons
+          const talentCons = char.talentCons || {}
+          const addTalent = { a: 3, e: 3, q: 3 }
+          
           lodash.forEach(tempProfile.talent, (ds, key) => {
             if (ds && ds.original !== undefined) {
               originalTalent[key] = ds.original
             } else if (lodash.isNumber(ds)) {
-              originalTalent[key] = ds
+              let original = ds
+              const consUp = talentCons[key]
+              if (consUp) {
+                if (lodash.isArray(consUp)) {
+                  for (const consLvl of consUp) {
+                    if (currentCons >= consLvl) original -= addTalent[key]
+                  }
+                } else if (currentCons >= consUp) {
+                  original -= addTalent[key]
+                }
+              }
+              originalTalent[key] = original
             } else if (ds && ds.level !== undefined) {
-              originalTalent[key] = ds.level
+              let original = ds.level
+              const consUp = talentCons[key]
+              if (consUp) {
+                if (lodash.isArray(consUp)) {
+                  for (const consLvl of consUp) {
+                    if (currentCons >= consLvl) original -= addTalent[key]
+                  }
+                } else if (currentCons >= consUp) {
+                  original -= addTalent[key]
+                }
+              }
+              originalTalent[key] = original
             }
           })
           

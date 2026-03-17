@@ -16,6 +16,7 @@ export const details = applyStandardTeam([
     dmg: ({ attr, calc }) => ({ avg: Math.min(calc(attr.atk))})
   }, {
     title: `2 命提供增伤基础值`,
+    cons: 2,
     dmg: ({ calc, attr }) => ({ avg: calc(attr.atk) * 240 / 100 })
   }, {
     title: `「花刀技法」释放治疗量`,
