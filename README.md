@@ -23,6 +23,7 @@ git clone --depth=1 https://gitee.com/land-route_lu/lolomi-calc.git ./plugins/lo
 * 低命辅助角色展示具体增益量，高命辅助根据命座展示作为主 c 的伤害数据
 * 增加组队配队伤害，根据面板主角色命座配置预设队友
 * 主角色 6 命默认配置 6+5 队友，2-5 命默认配置 2+1 队友，2 命以下配置 0+0 队友
+* 队伍伤害计算一般都不考虑buff覆盖率和生效次数，高配情况下存在20万以内的伤害差异属于正常现象
 
 <details>
 <summary><b>效果图预览</b></summary>
@@ -67,5 +68,6 @@ git clone --depth=1 https://gitee.com/land-route_lu/lolomi-calc.git ./plugins/lo
 - 魈
 - 菲林斯
 - 伊涅芙
+- 爱可菲
 
 </details>

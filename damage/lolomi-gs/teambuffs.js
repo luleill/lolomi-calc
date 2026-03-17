@@ -254,17 +254,12 @@ let TeamBuff = [
         params.Furina_low ? 75 : 0,
       }
   },{
-    _getEscoffierValue: (params, element, highValue, lowValue) => {
-      if (params.Escoffier_best && element === '冰') return highValue;
-      if (params.Escoffier_mid && element === '冰') return lowValue;
-      return 0;
-    },
     check: ({ params }) => params.Escoffier_low || params.Escoffier_mid || params.Escoffier_best,
     title: '爱可菲',
     data: {
-      kx: 55,
+      kx: ({ element }) => (element === '冰' || element === '水') ? 55 : 0,
       cdmg : ({ params, element }) => (params.Escoffier_best || params.Escoffier_mid && element === '冰') ? 60 : 0,
-      _getValue: (params, element) => (params.Escoffier_best && element === '冰') ? 9600 : (params.Escoffier_mid && element === '冰') ? 8400 : 0,
+      // 爱可菲获得5层「冷煮」，除爱可菲外的附近的当前场上角色普通攻击、重击、下落攻击、元素战技和元素爆发对敌人造成冰元素伤害时，将消耗1层「冷煮」，提升造成的伤害
       aPlus: ({ params, element }) => (params.Escoffier_best && element === '冰') ? 9600 : (params.Escoffier_mid && element === '冰') ? 8400 : 0,
       a2Plus: ({ params, element }) => (params.Escoffier_best && element === '冰') ? 9600 : (params.Escoffier_mid && element === '冰') ? 8400 : 0,
       a3Plus: ({ params, element }) => (params.Escoffier_best && element === '冰') ? 9600 : (params.Escoffier_mid && element === '冰') ? 8400 : 0,

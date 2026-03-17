@@ -5,6 +5,9 @@
 
 import Config from './Config.js'
 import ProfileDmg from '../../miao-plugin/models/ProfileDmg.js'
+import lodash from 'lodash'
+import Character from '../../miao-plugin/models/Character.js'
+import CharTalent from '../../miao-plugin/models/character/CharTalent.js'
 
 const cfg = Config.getConfig('user', 'config')
 
@@ -166,6 +169,28 @@ const ConsCompare = {
     try {
       const tempProfile = JSON.parse(JSON.stringify(originalProfile))
       tempProfile.cons = cons
+      
+      if (tempProfile.talent && tempProfile.id && tempProfile.elem) {
+        const char = Character.get({ id: tempProfile.id, elem: tempProfile.elem })
+        
+        if (char) {
+          const originalTalent = {}
+          lodash.forEach(tempProfile.talent, (ds, key) => {
+            if (ds && ds.original !== undefined) {
+              originalTalent[key] = ds.original
+            } else if (lodash.isNumber(ds)) {
+              originalTalent[key] = ds
+            } else if (ds && ds.level !== undefined) {
+              originalTalent[key] = ds.level
+            }
+          })
+          
+          const newTalent = CharTalent.getAvatarTalent(char, originalTalent, cons, 'original')
+          if (newTalent) {
+            tempProfile.talent = newTalent
+          }
+        }
+      }
       
       const targetDetail = details?.[targetIdx]
       const targetDmgKey = targetDetail?.dmgKey || null

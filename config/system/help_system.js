@@ -25,7 +25,7 @@ export const helpCfg = {
 
 export const helpList = [
   {
-    group: '极限面板',
+    group: '有问题联系729011189',
     list: [
       {
         icon: 58,
