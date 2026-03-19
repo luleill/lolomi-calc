@@ -69,5 +69,6 @@ git clone --depth=1 https://gitee.com/land-route_lu/lolomi-calc.git ./plugins/lo
 - 菲林斯
 - 伊涅芙
 - 爱可菲
+- 丝柯克
 
 </details>

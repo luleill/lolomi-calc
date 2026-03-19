@@ -102,7 +102,7 @@
 - 爱可菲 Escoffier ✅
 - 伊法 Ifa
 - 塔利雅 Dahlia
-- 丝柯克 Skirk
+- 丝柯克 Skirk ✅
 - 伊涅芙 Ineffa ✅
 - 爱诺 Aino
 - 菈乌玛 Lauma

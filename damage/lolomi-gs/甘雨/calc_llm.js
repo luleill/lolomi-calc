@@ -40,14 +40,14 @@ export const details = applyStandardTeam([
   }, {
     params: { q: true },
     title: '「降众天华」冰凌伤害',
-    dmg: ({ talent, calc, attr }, {basic}) => basic(calc(attr.atk) * talent.q['冰棱伤害'] / 100, 'q')
+    dmg: ({ talent }, dmg) => dmg(talent.q['冰棱伤害'], 'q')
   }, {
     params: { q: true },
     title: 'Q后10秒站场总伤',
     // 10秒非满命默认2秒一箭，预计4箭，满命预存一箭一共射6箭
     // 大招具有随机性，默认单个敌人处于正中心，10秒命中15次
     dmg: ({ talent, cons }, dmg ) => {
-      const ebaseDamage = dmg(talent.e['技能伤害'] * (cons >= 1 ? 2 : 1), 'e');
+      const ebaseDamage = dmg(talent.e['技能伤害'] * (cons >= 2 ? 2 : 1), 'e');
       const qbaseDamage = dmg(talent.q['冰棱伤害'] * 15, 'q');
       const a2Damage = dmg((talent.a['霜华矢命中伤害'] + talent.a['霜华矢·霜华绽发伤害']) * (cons >= 6 ? 6 : 4), 'a2') ;
       return {
