@@ -22,7 +22,7 @@ export const details = applyStandardTeam([
       const acounts = '一二三四五'.split('');
       const aDamage = acounts.reduce((sum, num) => sum + calc(attr.atk) * talent.e[`${num}段伤害`] / 100, 0);
       const totala = dmg.basic(aDamage, 'a');
-      const c6Extra = cons >= 6 ? dmg.basic(calc(attr.atk) * 180 * 3 * 3/ 100, 'q') : { dmg: 0, avg: 0 };
+      const c6Extra = cons >= 6 ? dmg.basic(calc(attr.atk) * 180 * 3 * 3 / 100, 'q') : { dmg: 0, avg: 0 };
       const c1Extra = cons >= 1 ? dmg.basic(calc(attr.atk) * 500 * 3 / 100, 'a2') : { dmg: 0, avg: 0 };
       return {
         dmg: totala.dmg + c6Extra.dmg + c1Extra.dmg,
@@ -55,7 +55,7 @@ export const details = applyStandardTeam([
       const aDamage = acounts.reduce((sum, num) => sum + calc(attr.atk) * talent.e[`${num}段伤害`] / 100, 0);
       const totala = dmg.basic(aDamage, 'a');
       const a2Damage = dmg.basic(calc(attr.atk) * talent.e[`重击伤害`] / 100,'a2');
-      const c6Extra = cons >= 6 ? dmg.basic(calc(attr.atk) * 180 * 3 * 3/ 100, 'q') : { dmg: 0, avg: 0 };
+      const c6Extra = cons >= 6 ? dmg.basic(calc(attr.atk) * 180 * 3 * 3 / 100, 'q') : { dmg: 0, avg: 0 };
       const c1Extra = cons >= 1 ? dmg.basic(calc(attr.atk) * 500 * 5 / 100, 'a2') : { dmg: 0, avg: 0 };
       return {
         dmg: totala.dmg * 3 + a2Damage.dmg + c6Extra.dmg + c1Extra.dmg,
@@ -113,11 +113,10 @@ export const buffs = [
     }
   }, {
     check: ({ params }) => params.mie === true,
-    title: '「极恶技·灭」：每点蛇之狡谋提升本次元素爆发造成的伤害[qPlus]',
+    title: '「极恶技·灭」：每点蛇之狡谋提升本次元素爆发造成的伤害 [qPlus]',
     data: {
       qPct: ({ talent, cons }) => {
-        let num = cons > 1 ? 22 : 12
-        return num * talent.q['蛇之狡谋加成']
+        return talent.q['蛇之狡谋加成'] * (cons > 1 ? 22 : 12)
       }
     }
   }, {
