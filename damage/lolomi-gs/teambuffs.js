@@ -1,3 +1,118 @@
+/**
+ * 同类型武器被动去重
+ * 配置两种情况：
+ * 1. 预设队友：{ char, getValue: (params) => number }
+ * 2. 主角色自身武器：{ char: '__mainWeapon__', weaponNames, getValue: (ds) => number }
+ *    weaponNames: 拥有同类型效果的武器列表
+ *    getValue: 主角色的武器精炼效果
+ *    主角色武器效果和队友重复时取最高值
+ */
+const MUTEX_WEAPON_PASSIVES = [
+  {
+    // 终末嗟叹之诗 / 苍古自由之誓 / 松籁响起之时 - 被动「千年的大乐章」：攻击力提升
+    passiveName: '千年的大乐章',
+    field: 'atkPct',
+    providers: [
+      {
+        // 主角色装备同类型武器时的精炼等级对应值
+        char: '__mainWeapon__',
+        weaponNames: ['终末嗟叹之诗', '苍古自由之誓', '松籁响起之时'],
+        getValue: (ds) => {
+          const refineTable = [20, 25, 30, 35, 40]
+          const refine = (ds.refine || 0)
+          return refineTable[Math.min(refine, 4)]
+        }
+      },
+      // 终末嗟叹之诗
+      {
+        // 九条裟罗
+        char: 'Sara',
+        getValue: (params) => params.Sara_best ? 40 : params.Sara_mid ? 20 : 0
+      },
+      {
+        // 珐露珊
+        char: 'Faruzan',
+        getValue: (params) => params.Faruzan_best ? 40 : params.Faruzan_mid ? 20 : 0
+      },
+      {
+        // 温迪
+        char: 'Venti',
+        getValue: (params) => params.Venti_best ? 40 : params.Venti_mid ? 20 : 0
+      },
+      // 苍古自由之誓
+      {
+        // 枫原万叶
+        char: 'Kazuha',
+        getValue: (params) => params.Kazuha_best ? 40 : params.Kazuha_mid ? 20 : 0
+      },
+      {
+        // 琴
+        char: 'Jean',
+        getValue: (params) => params.Jean_best ? 40 : params.Jean_mid ? 20 : 0
+      }
+    ]
+  }
+  // 预留，遇到有其他武器冲突的时候再加
+]
+
+/**
+ * 同名圣遗物去重
+ */
+const MUTEX_ARTI_PASSIVES = [
+  { artiName: '昔日宗室之仪', paramKey: 'zongshi'  }, // 宗室 - 队伍20%攻击力
+  { artiName: '烬城勇者绘卷', paramKey: 'jincheng' }, // 烬城 - 全元素伤害40%
+  { artiName: '纺月的夜歌', paramKey: 'yege'     }, // 夜歌 - 精通120+月曜10%
+  { artiName: '深林的记忆', paramKey: 'caotao'   }, // 草套 - 降草抗30%
+  { artiName: '翠绿之影', paramKey: 'fengtao'  }, // 风套 - 降风抗40%
+  { artiName: '千岩牢固', paramKey: 'qianyan'  }, // 千岩 - 战技命中后加攻20%
+  { artiName: '悠古的磐岩', paramKey: 'panyan'   }, // 磐岩 - 结晶元素增伤35%
+]
+
+/**
+ * 同类型武器被动的实际效果
+ * @param {string} passiveName - 武器被动名称
+ * @param {string} field - buff增益字段
+ * @param {string} charKey - 队友名称
+ */
+const getMutexPassiveValue = (passiveName, field, charKey, params, ds = null) => {
+  const group = MUTEX_WEAPON_PASSIVES.find(g => g.passiveName === passiveName && g.field === field)
+  if (!group) return 0
+  const allValues = group.providers.map(p => {
+    if (p.char === '__mainWeapon__') {
+      if (!ds || !ds.weapon) return 0
+      const weaponName = ds.weapon.name || (ds.weapon.weaponName)
+      if (!p.weaponNames.includes(weaponName)) return 0
+      return p.getValue(ds)
+    }
+    return p.getValue(params)
+  })
+  const maxValue = Math.max(...allValues)
+
+  const selfProvider = group.providers.find(p => p.char === charKey)
+  if (!selfProvider) return 0
+  const selfIdx = group.providers.findIndex(p => p.char === charKey)
+  const selfValue = allValues[selfIdx]
+
+  if (selfValue === 0) return 0
+  if (selfValue < maxValue) return 0
+
+  const firstMaxIdx = allValues.findIndex(v => v === maxValue)
+  if (selfIdx !== firstMaxIdx) return 0
+
+  return maxValue
+}
+
+/**
+ * 队伍同名圣遗物效果去重
+ */
+const artiEffectActive = (paramKey, params, artis) => {
+  if (!params[paramKey]) return false
+  const mutex = MUTEX_ARTI_PASSIVES.find(m => m.paramKey === paramKey)
+  if (!mutex) return true
+  if (artis && artis[mutex.artiName] >= 4) return false
+  return true
+}
+
 let TeamBuff = [
   // 纳塔地方传奇满层增伤+双药(20暴击20爆伤，属伤药)
   {
@@ -52,21 +167,21 @@ let TeamBuff = [
 
   // 队友圣遗物增益
   { 
-    check: ({ params }) => params.zongshi === true,
+    check: ({ params, artis }) => artiEffectActive('zongshi', params, artis),
     title: '昔日宗室之仪：队伍中所有角色攻击力提升[atkPct]%',
     data: {
       atkPct: 20
     }    
   },
   { 
-    check: ({ params }) => params.jincheng === true,
+    check: ({ params, artis }) => artiEffectActive('jincheng', params, artis),
     title: '烬城勇者绘卷：所有元素伤害加成与物理伤害加成提升[dmg]%',
     data: {
       dmg: 40
     }    
   },
   { 
-    check: ({ params }) => params.yege === true,
+    check: ({ params, artis }) => artiEffectActive('yege', params, artis),
     title: '纺月的夜歌：元素精通提升[mastery],月曜反应造成的伤害提升[lunarBloom]%',
     data: {
       mastery: 120,
@@ -76,28 +191,28 @@ let TeamBuff = [
     }    
   },
   { 
-    check: ({ params }) => params.jiaoguan === true,
+    check: ({ params, artis }) => artiEffectActive('jiaoguan', params, artis),
     title: '教官：触发元素反应后，队伍中所有角色的元素精通提高[mastery]点',
     data: {
       mastery: 120
     }    
   },
   { 
-    check: ({ params }) => params.fengtao === true,
+    check: ({ params, artis }) => artiEffectActive('fengtao', params, artis),
     title: '翠绿之影：根据扩散的元素类型，降低受到影响的敌人[fykx]%的对应元素抗性',
     data: {
       kx: 40
     }    
   },
   { 
-    check: ({ params }) => params.caotao === true,
+    check: ({ params, artis }) => artiEffectActive('caotao', params, artis),
     title: '深林的记忆：使命中目标的元素抗性降低[kx]%',
     data: {
       kx: 30
     }    
   },
   { 
-    check: ({ params }) => params.qianyan === true,
+    check: ({ params, artis }) => artiEffectActive('qianyan', params, artis),
     title: '千岩牢固：元素战技命中敌人后，使队伍中附近的所有角色攻击力提升[atkPct]%，护盾强效提升[shield]%',
     data: {
       atkPct: 20,
@@ -105,7 +220,7 @@ let TeamBuff = [
     }    
   },
   { 
-    check: ({ params }) => params.panyan === true,
+    check: ({ params, artis }) => artiEffectActive('panyan', params, artis),
     title: '悠古的磐岩：获得结晶反应形成的晶片时，队伍中所有角色获得[dmg]%对应元素伤害加成',
     data: {
       dmg: 35
@@ -162,7 +277,8 @@ let TeamBuff = [
         } else if (params.Venti_best && element !== '风') {
           return 24
         }
-      }
+      },
+      atkPct: (ds) => getMutexPassiveValue('千年的大乐章', 'atkPct', 'Venti', ds.params, ds),
     }
   },{
     check: ({ params }) => params.Durin_best || params.Durin_mid || params.Durin_low ||params.Hexenzirkel === false,
@@ -278,9 +394,8 @@ let TeamBuff = [
         params.Sara_low ? 77.33 * 649 / 100 : 0,
       cdmg: ({ params , element }) => 
         (params.Sara_best && element === '雷') ? 60 : 0,
-      atkPct: ({ params }) => 
-        params.Sara_best ? 40 : 
-        params.Sara_mid ? 20 : 0,
+      // 终末被动取去重
+      atkPct: (ds) => getMutexPassiveValue('千年的大乐章', 'atkPct', 'Sara', ds.params, ds),
       mastery: ({ params }) => 
         params.Sara_best ? 200 : 
         params.Sara_mid ? 100 : 0,
@@ -333,7 +448,8 @@ let TeamBuff = [
     // 精一苍古加攻20增伤16  精五加攻40增伤32 
     data: {
       mastery: ({ params }) => (params.Kazuha_best || params.Kazuha_mid) ? 200 : 0,
-      atkPct: ({ params }) => (params.Kazuha_best || params.Kazuha_mid) ? 40 : 20,
+      // 苍古被动去重
+      atkPct: (ds) => getMutexPassiveValue('千年的大乐章', 'atkPct', 'Kazuha', ds.params, ds),
       dmg: ({ params }) => (params.Kazuha_best || params.Kazuha_mid) ? 72 : 56
     }
   },
@@ -462,7 +578,7 @@ let TeamBuff = [
       kx: ({element}) => (element === '风') ? 30 : 0,
       dmg: ({params ,element}) => (params.Faruzan_best || params.Faruzan_mid && element === '风') ? 38.25 : (params.Faruzan_low && element === '风') ? 32.4 : 0,
       mastery: ({ params }) => params.Faruzan_best ? 200 : params.Faruzan_mid ? 100 : 0,
-      atkPct: ({ params }) => params.Faruzan_best ? 40 : params.Faruzan_mid ? 20 : 0,
+      atkPct: (ds) => getMutexPassiveValue('千年的大乐章', 'atkPct', 'Faruzan', ds.params, ds),
     }
   },
   {
