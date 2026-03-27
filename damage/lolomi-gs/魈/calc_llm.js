@@ -93,12 +93,8 @@ export const details = applyStandardTeam([
     dmg: ({ talent }, dmg) => dmg(talent.a['低空/高空坠地冲击伤害'][1], 'a3')
   }, {
     title: '当前圣遗物套装',
-    dmg: ({ artis }) => {
-      return {
-        avg: artis ,
-        type: 'text'
-      }
-    }}
+    dmg: ({ artis }) => ({ avg: artis, type: 'text' })
+  }
   ])
 
   export const defDmgIdx = 4

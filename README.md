@@ -10,7 +10,7 @@ git clone --depth=1 https://gitee.com/land-route_lu/lolomi-calc.git ./plugins/lo
 复用liangshi-calc框架
 源地址 https://gitee.com/liangshi233/liangshi-calc/tree/master
 * 计算只适配了梁氏和喵喵，原神角色计算优先级会高于梁氏和喵喵
-* 如果装了其他计算插件导致报错，请直接卸载我的
+* 会提前更新下版本的角色计算，要提前用的话需要自己在miao-plugin里更新对应数据，一般只以V1测试数据写伤害计算，正式服上线后再做对应调整
 # 相关依赖
 * Miao-Yunzai   https://github.com/yoimiya-kokomi/Miao-Yunzai
 * miao-plugin   https://github.com/yoimiya-kokomi/miao-plugin
