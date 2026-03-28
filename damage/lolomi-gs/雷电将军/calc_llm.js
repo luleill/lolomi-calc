@@ -15,7 +15,7 @@ const applyStandardTeam = withStdTeam(mainCharName, team, artifact_normal, confi
 
 export const details = applyStandardTeam([
   {
-    title: '触发满特效后攻击力',
+    title: '触发特效后攻击力',
     dmg: ({ attr, calc }) => ({ avg: calc(attr.atk) })
   }, {
     title: '「雷罚恶曜之眼」协同伤害',
@@ -57,7 +57,7 @@ export const details = applyStandardTeam([
     title: ({ cons }) => `${teamConfig(cons, team_B, artifact_B, mainCharName).title} 满愿力拔刀`,
     params: ({ cons }) => ({
       ...teamConfig(cons, team_B, artifact_B).params,
-      type: 0, q: true
+      type: 0, q: true, pyro_two: true
     }),
     dmg: ({ talent }, dmg) => dmg(talent.q['梦想一刀基础伤害'], 'q')
   }, {
