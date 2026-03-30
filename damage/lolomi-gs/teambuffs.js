@@ -59,13 +59,13 @@ const MUTEX_WEAPON_PASSIVES = [
  * 同名圣遗物去重
  */
 const MUTEX_ARTI_PASSIVES = [
-  { artiName: '昔日宗室之仪', paramKey: 'zongshi'  }, // 宗室 - 队伍20%攻击力
-  { artiName: '烬城勇者绘卷', paramKey: 'jincheng' }, // 烬城 - 全元素伤害40%
-  { artiName: '纺月的夜歌', paramKey: 'yege'     }, // 夜歌 - 精通120+月曜10%
-  { artiName: '深林的记忆', paramKey: 'caotao'   }, // 草套 - 降草抗30%
-  { artiName: '翠绿之影', paramKey: 'fengtao'  }, // 风套 - 降风抗40%
-  { artiName: '千岩牢固', paramKey: 'qianyan'  }, // 千岩 - 战技命中后加攻20%
-  { artiName: '悠古的磐岩', paramKey: 'panyan'   }, // 磐岩 - 结晶元素增伤35%
+  { artiName: '', paramKey: 'zongshi'  }, // 宗室 - 队伍20%攻击力
+  { artiName: '', paramKey: 'jincheng' }, // 烬城 - 全元素伤害40%
+  { artiName: '', paramKey: 'yege'     }, // 夜歌 - 精通120+月曜10%
+  { artiName: '', paramKey: 'qianyan'  }, // 千岩 - 战技命中后加攻20%
+  { artiName: '', paramKey: 'panyan'   }, // 磐岩 - 结晶元素增伤35%
+  { artiName: '', paramKey: 'fengtao'  }, // 翠绿 - 降风抗40%
+  { artiName: '', paramKey: 'caotao'   }, // 草套 - 降草抗30%
 ]
 
 /**
@@ -432,12 +432,14 @@ let TeamBuff = [
       qPlus: ({ params }) => params.Citlali_best ? 3000 : params.Citlali_mid ? 2600 : 0,
       mastery: ({ params }) => (params.Citlali_best || params.Citlali_mid) ? 250 : 0,
       kx: ({ params, element }) => {
-        const isHydroOrPyro = element === '火' || element === '水';
-        return (params.Citlali_best && isHydroOrPyro) ? 40 : (params.Citlali_mid && isHydroOrPyro) ? 20 : 0;
+        // 考虑到可以通过附魔，其他元素角色也能打出蒸发和融化反应
+        // 不限制水火角色，如果有队伍带茜特菈莉辅助但是不打蒸发和融化，伤害就会异常高很多
+        // const isHydroOrPyro = element === '火' || element === '水';
+        return (params.Citlali_best) ? 40 : (params.Citlali_mid) ? 20 : 0;
       },
       dmg: ({ params, element }) => {
-        const isHydroOrPyro = element === '火' || element === '水';
-        return (params.Citlali_best && isHydroOrPyro) ? 116 : params.Citlali_best ? 56 : params.Citlali_mid ? 28 : 0;
+        // const isHydroOrPyro = element === '火' || element === '水';
+        return (params.Citlali_best) ? 116 : params.Citlali_best ? 56 : params.Citlali_mid ? 28 : 0;
       }
     },
   },
