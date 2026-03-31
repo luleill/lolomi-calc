@@ -437,9 +437,8 @@ let TeamBuff = [
         // const isHydroOrPyro = element === '火' || element === '水';
         return (params.Citlali_best) ? 40 : (params.Citlali_mid) ? 20 : 0;
       },
-      dmg: ({ params, element }) => {
-        // const isHydroOrPyro = element === '火' || element === '水';
-        return (params.Citlali_best) ? 116 : params.Citlali_best ? 56 : params.Citlali_mid ? 28 : 0;
+      dmg: ({ params }) => {
+        return params.Citlali_best ? 116 : params.Citlali_mid ? 28 : 0;
       }
     },
   },
