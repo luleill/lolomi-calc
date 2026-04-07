@@ -352,12 +352,16 @@ function insertStdTeamAtPosSync(details, mainCharName, team, artifact_normal, sh
   const stdTitle = originalTitle
     .replace(/^(高配|中配|低配)/, '标配');
   
+  const mkStdParams = (cons, ctx) => ({
+    ...teamConfig(cons, team, artifact_normal).params,
+    ...(typeof extraParams === 'function' ? extraParams(ctx) : extraParams)
+  });
+  
   const standardTeamItem = {
     title: stdTitle,
-    params: {
-      ...teamConfig(2, team, artifact_normal).params,
-      ...extraParams
-    },
+    params: typeof extraParams === 'function' 
+      ? (ctx) => mkStdParams(2, ctx)
+      : mkStdParams(2, {}),
     dmg: targetItem.dmg
   };
   
@@ -366,10 +370,9 @@ function insertStdTeamAtPosSync(details, mainCharName, team, artifact_normal, sh
   
   const maxTeamItem = {
     title: maxTitle,
-    params: {
-      ...teamConfig(6, team, artifact_normal).params,
-      ...extraParams
-    },
+    params: typeof extraParams === 'function'
+      ? (ctx) => mkStdParams(6, ctx)
+      : mkStdParams(6, {}),
     dmg: targetItem.dmg
   };
   

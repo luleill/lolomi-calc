@@ -11,7 +11,7 @@ const team_B = ['叶洛亚','哥伦比娅','希诺宁']
 const artifact_B = ['夜歌']
 
 const config = Config.getConfig('user', 'config');
-const applyStandardTeam = withStdTeam(mainCharName, team, artifact_normalTotal, config, { spiritSteed: true, '月辉明光': 2 })
+const applyStandardTeam = withStdTeam(mainCharName, team, artifact_normalTotal, config, ({ artis }) => ({ spiritSteed: true, '月辉明光': artis?.['穹境示现之夜'] >= 4 ? 2 : 1 }))
 
 /** 
  * 单人总伤计算1命只生效1次，利用miao的公式拆分计算模拟补偿，和实际会有差异
@@ -160,19 +160,19 @@ export const details = applyStandardTeam([
     }
   }, {
     // 组队
-    title: ({ cons }) => `${teamConfig(cons, team_B, artifact_B, mainCharName).title}「灵驹飞踏」月结晶伤害`,
-    params: ({cons}) => ({
+    title: ({ cons }) => `${teamConfig(cons, team_B, artifact_B, mainCharName).title}「灵驱飞踏」月结晶伤害`,
+    params: ({cons, artis}) => ({
       ...teamConfig(cons, team_B, artifact_B).params, 
-      spiritSteed: true, '月辉明光': 2
+      spiritSteed: true, '月辉明光': artis?.['穹境示现之夜'] >= 4 ? 2 : 1  
     }),
-    dmg: ({ attr, calc, talent } , { basic }) => basic(calc(attr.def) * talent.e['灵驹飞踏第二段伤害'] / 100, '', 'lunarCrystallize')
+    dmg: ({ attr, calc, talent } , { basic }) => basic(calc(attr.def) * talent.e['灵驱飞踏第二段伤害'] / 100, '', 'lunarCrystallize')
   }, {
-    title: ({ cons }) => `${teamConfig(cons, team, artifact_normalTotal, mainCharName).title}「灵驹飞踏」月结晶伤害`,
-    params: ({cons}) => ({
+    title: ({ cons }) => `${teamConfig(cons, team, artifact_normalTotal, mainCharName).title}「灵驱飞踏」月结晶伤害`,
+    params: ({cons, artis}) => ({
       ...teamConfig(cons, team, artifact_normalTotal).params, 
-      spiritSteed: true, '月辉明光': 2
+      spiritSteed: true, '月辉明光': artis?.['穹境示现之夜'] >= 4 ? 2 : 1 
     }),
-    dmg: ({ attr, calc, talent } , { basic }) => basic(calc(attr.def) * talent.e['灵驹飞踏第二段伤害'] / 100, '', 'lunarCrystallize')
+    dmg: ({ attr, calc, talent } , { basic }) => basic(calc(attr.def) * talent.e['灵驱飞踏第二段伤害'] / 100, '', 'lunarCrystallize')
   }, {
     title: '当前圣遗物套装',
     dmg: ({ artis }) => ({ avg: artis, type: 'text' })

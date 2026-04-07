@@ -14,7 +14,7 @@ const team_C = ['珐露珊', '闲云', '芙宁娜']
 const artifact_C = ['千岩', '宗室']
 
 const config = Config.getConfig('user', 'config');
-const applyStandardTeam = withStdTeam(mainCharName, team, artifact_normal, config, {fwzsy: true})
+const applyStandardTeam = withStdTeam(mainCharName, team, artifact_normal, config, ({ artis }) => ({ fwzsy : true, fengtao: !!(artis?.['翠绿之影'] >= 4) }))
 
 export const details = applyStandardTeam([
   {
@@ -48,7 +48,7 @@ export const details = applyStandardTeam([
   }, {
     title: '染色站场13秒总伤',
     // 默认场上有个火元素：E + Q + 2轮5A + E
-    // E次数：基础2次；1命直接默认+1次，西风剑根据精炼等级+期望次数
+    // E次数：基础2次；1命直接默认+1次，祭礼剑根据精炼等级+期望次数
     // 扩散次数：首次E扩散2次，后续E在Q中默认只扩散1次，Q扩散5次
     // 普攻伤害：六命实际情况吃不满buff，也默认全附魔2轮5A，基础3次E
     params: ({ artis }) => ({ isQ: true, fengtao: !!(artis?.['翠绿之影'] >= 4) }),
@@ -68,7 +68,7 @@ export const details = applyStandardTeam([
       };
       // 一轮循环E的期望次数
       const baseE    = cons >= 1 ? 3 : 2;
-      const xifengP  = weapon?.name === '西风剑' ? ([0.5, 0.575, 0.65, 0.725, 0.8][refine] ?? 0.5) : 0;
+      const xifengP  = weapon?.name === '祭礼剑' ? ([0.5, 0.575, 0.65, 0.725, 0.8][refine] ?? 0.5) : 0;
       const totalE   = baseE + (xifengP > 0 ? 1 - Math.pow(1 - xifengP, baseE) : 0);
       // Q
       const qSlash   = dmg(talent.q['斩击伤害'], 'q');
@@ -112,7 +112,7 @@ export const details = applyStandardTeam([
     }),
     // miao框架定义的融化限制了火和冰角色，是火元素角色才返回2.0系数
     // 万叶本身风元素，打的融化被判断为冰打火，返回的是1.5
-    // 最终伤害手动加一个倍率补偿系数 2.0 / 1.5 = 4/3
+    // 最终伤害手动加一个倍率补偿系数4/3
     dmg: ({ talent }, dmg) => {
       const meltDmg = dmg(talent.a['低空/高空坠地冲击伤害'][1], 'a3', 'melt')
       return { dmg: meltDmg.dmg * (4/3), avg: meltDmg.avg * (4/3) }
