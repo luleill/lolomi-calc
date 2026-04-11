@@ -66,7 +66,7 @@ export const buffs = [
   {
     title: '被动「虚己之赐」：提升攻击力[atkPlus]',
     data: {
-      atkPlus: ({ attr, calc, talent }) => Math.min(calc(attr.atk) * talent.e['虚己之赐攻击力加成比例'] / 100, talent.e['最大攻击力加成']),
+      atkPlus: ({ attr, calc, talent }) => Math.min(calc(attr.atk) * talent.e['虚己之赐攻击力加成比例'] / 100, talent.e['虚己之赐攻击力加成上限']),
     }
   },{
     title: '天赋「分有」：圣祝之引额外提升300点攻击力',

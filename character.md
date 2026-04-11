@@ -114,5 +114,9 @@
 - 兹白 Zibai ✅
 - 叶洛亚 Illuga
 - 法尔伽 Varka ✅
+- 洛恩 Lohen ✅
+- 莉奈娅 Linnea ✅
+- 尼可 Nicole ✅
+- 布伦妮 Prune ✅
 
 </details>

@@ -72,5 +72,8 @@ git clone --depth=1 https://gitee.com/land-route_lu/lolomi-calc.git ./plugins/lo
 - 伊涅芙
 - 爱可菲
 - 丝柯克
+- 尼可
+- 洛恩
+- 布伦妮
 
 </details>
