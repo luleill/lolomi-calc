@@ -4,10 +4,10 @@ import { teamConfig, withStdTeam } from '../util.js'
 
 const mainCharName = '莉奈娅'
 
-const team = ['哥伦比娅','叶洛亚', '希诺宁']
+const team = ['哥伦比娅', '叶洛亚', '希诺宁']
 const artifact_normal = ['烬城', '夜歌']
 
-const team_B = ['哥伦比娅','叶洛亚', '妮露']
+const team_B = ['哥伦比娅', '叶洛亚', '五郎']
 const artifact_B = ['夜歌']
 
 const config = Config.getConfig('user', 'config');
@@ -94,7 +94,6 @@ export const details = applyStandardTeam([
   export const mainAttr = 'def,cpct,cdmg'
   export const defParams = { Moonsign: 2, geo_two: true }
   export const defDmgIdx = 8
-  // export const defDmgKey = 'e'
   export const consDmgKey = '露米百万吨重锤伤害'
   
   export const buffs = [

@@ -30,6 +30,11 @@ const MUTEX_WEAPON_PASSIVES = [
         getValue: (params) => params.Sara_best ? 40 : params.Sara_mid ? 20 : 0
       },
       {
+        // 五郎
+        char: 'Gorou',
+        getValue: (params) => params.Gorou_best ? 40 : params.Gorou_mid ? 20 : 0
+      },
+      {
         // 珐露珊
         char: 'Faruzan',
         getValue: (params) => params.Faruzan_best ? 40 : params.Faruzan_mid ? 20 : 0
@@ -38,6 +43,11 @@ const MUTEX_WEAPON_PASSIVES = [
         // 温迪
         char: 'Venti',
         getValue: (params) => params.Venti_best ? 40 : params.Venti_mid ? 20 : 0
+      },
+      {
+        // 夜兰
+        char: 'YeLan',
+        getValue: (params) => params.YeLan_best ? 40 : params.YeLan_mid ? 20 : 0
       },
       // 苍古自由之誓
       {
@@ -64,8 +74,8 @@ const MUTEX_ARTI_PASSIVES = [
   { artiName: '', paramKey: 'yege'     }, // 夜歌 - 精通120+月曜10%
   { artiName: '', paramKey: 'qianyan'  }, // 千岩 - 战技命中后加攻20%
   { artiName: '', paramKey: 'panyan'   }, // 磐岩 - 结晶元素增伤35%
-  { artiName: '', paramKey: 'fengtao'  }, // 翠绿 - 降风抗40%
-  { artiName: '', paramKey: 'caotao'   }, // 草套 - 降草抗30%
+  { artiName: '', paramKey: 'fengtao'  }, // 风套 - 减抗40%
+  { artiName: '', paramKey: 'caotao'   }, // 草套 - 减草抗30%
 ]
 
 /**
@@ -279,6 +289,7 @@ let TeamBuff = [
         }
       },
       atkPct: (ds) => getMutexPassiveValue('千年的大乐章', 'atkPct', 'Venti', ds.params, ds),
+      mastery: ({ params }) => params.YeLan_best ? 200 : params.YeLan_mid ? 100 : 0,
     }
   },{
     check: ({ params }) => params.Durin_best || params.Durin_mid || params.Durin_low ||params.Hexenzirkel === false,
@@ -543,7 +554,7 @@ let TeamBuff = [
     data: {
       hpPct: ({ params }) => params.YeLan_best ? 40 : 0,
       mastery: ({ params }) => params.YeLan_best ? 200 : params.YeLan_mid ? 100 : 0,
-      atkPct: ({ params }) => params.YeLan_best ? 40 : params.YeLan_mid ? 20 : 0,
+      atkPct: (ds) => getMutexPassiveValue('千年的大乐章', 'atkPct', 'YeLan', ds.params, ds),
       dmg: 15
     }
   },
@@ -658,6 +669,42 @@ let TeamBuff = [
     mastery: ({ params }) => params.Illuga_best ? 80 : 50,
     cpct: ({ params }) => params.Illuga_best ? 10 : 5,
     cdmg: ({ params }) => params.Illuga_best ? 30 : 10
+    }
+  },
+  {
+    check: ({ params }) => params.Linnea_low || params.Linnea_mid || params.Linnea_best,
+    title: '莉奈娅',
+    // 高配4500防御，中4000防御，低3500防御,
+    data: {
+    fypct: 14,
+    kx: ({ element }) => (element === '岩') ? 30 : 0,
+    mastery: ({ params }) => {
+      // 非月兆角色无精通加成
+      const moonsign = params.Moonsign || 0
+      if (!moonsign) return 0
+      if (params.Linnea_best) return 225
+      if (params.Linnea_mid) return 200
+      return 175
+    },
+    fyplus: ({ params }) => params.Linnea_best ? 10125 : (params.Linnea_mid ? 3375 : 0),
+    cdmg: ({ params, element }) => (element === '水' || element === '岩') && (params.Linnea_best || params.Linnea_mid) ? 40 : 0,
+    defPct: ({ params }) => params.Linnea_best ? 25 : 0,
+    elevated: ({ params }) => params.Linnea_best ? 25 : 0,
+    dmg: ({ params, element }) => element === '岩' && (params.Linnea_best ? 40 : params.Linnea_mid ? 20 : 0),
+    lunarCrystallize: ({ params }) => params.Linnea_bestd ? 40 : params.Linnea_mid ? 20 : 0,
+    }
+  },
+  {
+    check: ({ params }) => params.Gorou_low || params.Gorou_mid || params.Gorou_best,
+    title: '五郎',
+    // 默认三岩队伍，高配6+5终末，中2+1终末，低0+0
+    data: {
+    defPlus: ({ params }) => (params.Gorou_best) ? 438.09 : (params.Gorou_mid || params.Gorou_low) ? 371.09 : 0,
+    dmg: ({ element }) => (element === '岩') ? 15 : 0,
+    cdmg: ({ params, element }) => (element === '岩' && params.Gorou_best) ? 40 : 0,
+    defPct: 25,
+    atkPct: (ds) => getMutexPassiveValue('千年的大乐章', 'atkPct', 'Gorou', ds.params, ds),
+    mastery: ({ params }) => params.Gorou_best ? 200 : params.Gorou_mid ? 100 : 0,
     }
   }
 ]

@@ -4,11 +4,14 @@ import { Config } from '#lolomi'
 
 const mainCharName = '兹白'
 
-const team = ['叶洛亚','哥伦比娅', '妮露']
+const team = ['莉奈娅', '哥伦比娅', '叶洛亚']
 const artifact_normalTotal = ['夜歌']
 
-const team_B = ['叶洛亚','哥伦比娅','希诺宁']
+const team_B = ['莉奈娅', '哥伦比娅', '希诺宁']
 const artifact_B = ['夜歌']
+
+const team_C = ['莉奈娅', '哥伦比娅', '五郎']
+const artifact_C = ['夜歌']
 
 const config = Config.getConfig('user', 'config');
 const applyStandardTeam = withStdTeam(mainCharName, team, artifact_normalTotal, config, ({ artis }) => ({ spiritSteed: true, '月辉明光': artis?.['穹境示现之夜'] >= 4 ? 2 : 1 }))
@@ -163,6 +166,13 @@ export const details = applyStandardTeam([
     title: ({ cons }) => `${teamConfig(cons, team_B, artifact_B, mainCharName).title}「灵驱飞踏」月结晶伤害`,
     params: ({cons, artis}) => ({
       ...teamConfig(cons, team_B, artifact_B).params, 
+      spiritSteed: true, '月辉明光': artis?.['穹境示现之夜'] >= 4 ? 2 : 1  
+    }),
+    dmg: ({ attr, calc, talent } , { basic }) => basic(calc(attr.def) * talent.e['灵驱飞踏第二段伤害'] / 100, '', 'lunarCrystallize')
+  }, {
+    title: ({ cons }) => `${teamConfig(cons, team_C, artifact_C, mainCharName).title}「灵驱飞踏」月结晶伤害`,
+    params: ({cons, artis}) => ({
+      ...teamConfig(cons, team_C, artifact_C).params, 
       spiritSteed: true, '月辉明光': artis?.['穹境示现之夜'] >= 4 ? 2 : 1  
     }),
     dmg: ({ attr, calc, talent } , { basic }) => basic(calc(attr.def) * talent.e['灵驱飞踏第二段伤害'] / 100, '', 'lunarCrystallize')
