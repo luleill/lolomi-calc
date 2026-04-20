@@ -44,10 +44,10 @@ export const details = applyStandardTeam([
     }
   }, {
     title: '单人月结晶伤害',
-    dmg: ({}, { reaction }) => reaction('lunarCrystallize')
+    params: { ordinary: true },
+    dmg: ({}, { basic }) => basic(0, '', 'lunarCrystallize')
   }, {
     title: '露米捶捶乱打伤害',
-    params: { ordinary: true },
     dmg: ({ talent, attr, calc }, { basic }) => basic(calc(attr.def) * talent.e['露米捶捶乱打伤害2'][0] / 100, 'e')
   }, {
     title: '露米加力重锤月结晶伤害',
@@ -59,15 +59,16 @@ export const details = applyStandardTeam([
     dmg: ({ talent, attr, calc }, { basic }) => basic(calc(attr.def) * talent.e['露米百万吨重锤伤害'] / 100, '', 'lunarCrystallize')
   }, {
     title: '点按露米后台一轮总伤',
-    // 默认场上已触发月笼，9轮共18次普通捶捶乱打，5次加力重锤月结晶，3轮月笼共9次
+    // 默认场上已触发月笼，9轮共18次普通捶捶乱打，5次加力重锤月结晶，2命加力重锤时额外触发月笼协奏，共15次，3轮月笼共9次
     params: { ordinary: true, isbackground: true },
-    dmg: ({ talent, calc, attr }, { basic, reaction }) => {
+    dmg: ({ talent, calc, attr, cons }, { basic }) => {
       const ebase = basic(calc(attr.def) * talent.e['露米捶捶乱打伤害2'][0] / 100, 'e');
       const eluna = basic(calc(attr.def) * talent.e['露米加力重锤伤害'] / 100, '', 'lunarCrystallize')
-      const moonCage = reaction('lunarCrystallize')
+      const moonCage = basic(0, '', 'lunarCrystallize')
+      const moonCage_C2 = basic(0, '', 'lunarCrystallize')
       return {
-        dmg: ebase.dmg * 18 + eluna.dmg * 5 + moonCage.dmg * 9,
-        avg: ebase.avg * 18 + eluna.avg * 5 + moonCage.avg * 9,
+        dmg: ebase.dmg * 18 + eluna.dmg * 5 + moonCage.dmg * 9 + moonCage_C2.dmg * (cons >= 2 ? 15 : 0),
+        avg: ebase.avg * 18 + eluna.avg * 5 + moonCage.avg * 9 + moonCage_C2.avg * (cons >= 2 ? 15 : 0)
       };
     }
   }, {
@@ -110,7 +111,9 @@ export const details = applyStandardTeam([
         kx: 30
       }
     }, {
-      title: '天赋「万类博物图鉴」：非月兆角色站场提升莉奈娅精通[mastery]',
+      check: ({ params }) => params.isbackground === true,
+      // 莉奈娅自己站场应该是吃不到精通加成
+      title: '天赋「万类博物图鉴」：非月兆角色站场提升后台莉奈娅精通[mastery]',
       sort: 9,
       data: {
         mastery: ({ attr, calc }) => calc(attr.def) * 0.05
