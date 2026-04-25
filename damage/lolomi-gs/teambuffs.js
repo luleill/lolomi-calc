@@ -9,7 +9,7 @@
  */
 const MUTEX_WEAPON_PASSIVES = [
   {
-    // 终末嗟叹之诗 / 苍古自由之誓 / 松籁响起之时 - 被动「千年的大乐章」：攻击力提升
+    // 终末嗟叹之诗 / 苍古自由之誓 / 松籁响起之时 - 「千年的大乐章」同类被动：攻击力提升
     passiveName: '千年的大乐章',
     field: 'atkPct',
     providers: [
@@ -23,43 +23,19 @@ const MUTEX_WEAPON_PASSIVES = [
           return refineTable[Math.min(refine, 4)]
         }
       },
-      // 终末嗟叹之诗
-      {
-        // 九条裟罗
-        char: 'Sara',
-        getValue: (params) => params.Sara_best ? 40 : params.Sara_mid ? 20 : 0
-      },
-      {
-        // 五郎
-        char: 'Gorou',
-        getValue: (params) => params.Gorou_best ? 40 : params.Gorou_mid ? 20 : 0
-      },
-      {
-        // 珐露珊
-        char: 'Faruzan',
-        getValue: (params) => params.Faruzan_best ? 40 : params.Faruzan_mid ? 20 : 0
-      },
-      {
-        // 温迪
-        char: 'Venti',
-        getValue: (params) => params.Venti_best ? 40 : params.Venti_mid ? 20 : 0
-      },
-      {
-        // 夜兰
-        char: 'YeLan',
-        getValue: (params) => params.YeLan_best ? 40 : params.YeLan_mid ? 20 : 0
-      },
-      // 苍古自由之誓
-      {
-        // 枫原万叶
-        char: 'Kazuha',
-        getValue: (params) => params.Kazuha_best ? 40 : params.Kazuha_mid ? 20 : 0
-      },
-      {
-        // 琴
-        char: 'Jean',
-        getValue: (params) => params.Jean_best ? 40 : params.Jean_mid ? 20 : 0
-      }
+      // 可能携带对应武器的角色
+      ...[
+        'Sara',   // 九条裟罗
+        'Gorou',  // 五郎
+        'Faruzan', // 珐露珊
+        'Venti',   // 温迪
+        'YeLan',   // 夜兰
+        'Kazuha',  // 枫原万叶
+        'Jean'     // 琴
+      ].map(char => ({
+        char,
+        getValue: (params) => params[`${char}_best`] ? 40 : params[`${char}_mid`] ? 20 : 0
+      }))
     ]
   }
   // 预留，遇到有其他武器冲突的时候再加
@@ -530,13 +506,13 @@ let TeamBuff = [
     // 二命hydro水系加45生命  pyro火系加45攻击 geo岩系50增伤 cryo冰系60爆伤
     data: {
       kx: ({ params }) => params.Xilonen_best ? 45 : (params.Xilonen_mid || params.Xilonen_low) ? 36 : 0,
-      hpPct: ({ params}) => params.Xilonen_hydro ? 45 : 0,
-      atkPct: ({ params}) => params.Xilonen_pyro ? 45 : 0,
-      dmg: ({ params}) => params.Xilonen_geo ? 50 : 0,
-      cdmg: ({ params}) => params.Xilonen_cryo ? 60 : 0,
+      hpPct: ({ params}) => (params.Xilonen_hydro && params.Xilonen_best || params.Xilonen_mid) ? 45 : 0,
+      atkPct: ({ params}) => (params.Xilonen_pyro && params.Xilonen_best || params.Xilonen_mid) ? 45 : 0,
+      dmg: ({ params}) => (params.Xilonen_geo && params.Xilonen_best || params.Xilonen_mid) ? 50 : 0,
+      cdmg: ({ params}) => (params.Xilonen_cryo && params.Xilonen_best || params.Xilonen_mid) ? 60 : 0,
       aPlus: ({ params}) => params.Xilonen_best ? 2600 : 0,
-      a2Plus: ({ params}) => params.Xilonen_electro ? 2600 : 0,
-      a3Plus: ({ params}) => params.Xilonen_anemo ? 2600 : 0,
+      a2Plus: ({ params}) => params.Xilonen_best ? 2600 : 0,
+      a3Plus: ({ params}) => params.Xilonen_best ? 2600 : 0,
     }
   },
   {
