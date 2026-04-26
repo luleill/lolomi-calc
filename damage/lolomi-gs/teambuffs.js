@@ -295,12 +295,6 @@ let TeamBuff = [
       dmg: ({ params , element }) => (params.Klee_best && element === '火' ) ? 10 : 0,
     }
   },{
-    check: ({ params }) => params.ZhongLi_low || params.ZhongLi_mid || params.ZhongLi_best,
-    title: '钟离',
-    data: {
-      kx: 20
-    }
-  },{
     check: ({ params }) =>  params.Fischl_best || params.Fischl_mid || params.Fischl_low ||   params.Hexenzirkel === false,
     // 触发超载，全队加攻，触发感电，全队加精通，默认魔导队攻击和精通都吃
     title: '菲谢尔',
@@ -475,10 +469,22 @@ let TeamBuff = [
   {
     check: ({ params }) => params.Nilou_low || params.Nilou_mid || params.Nilou_best,
     title: '妮露',
+    // 高配6+5默认8万血，中2+1默认6.5万血，圣显之钥根据血量加全队精通
+    // 天赋纯水草队+100精通
     data: {
-      mastery: ({ params }) => (params.Nilou_best || params.Nilou_mid) ? 120 : params.Nilou_low ? 280 : 0,
-      kx: ({ params, element }) => 
-        ((params.Nilou_best || params.Nilou_mid) && (element === '水' || element === '草')) ? 35 : 0
+      mastery: ({ params }) => {
+        // 圣显之钥提供的精通
+        const weaponMastery = params.Nilou_best ? 320 : params.Nilou_mid ? 130 : 0
+        // 纯水草队天赋加100精通
+        const talentMastery = params.pureHydroDendro === false ? 0 : 100
+        return weaponMastery + talentMastery
+      },
+      kx: ({ params, element }) => {
+        // 二命减抗35%需要同时满足：中高配 + 纯水草队 + 主角色是水或草元素
+        const isNotPureHydroDendro = params.pureHydroDendro === false
+        const isMidOrBest = params.Nilou_best || params.Nilou_mid
+        return (isMidOrBest && !isNotPureHydroDendro && (element === '水' || element === '草')) ? 35 : 0
+      }
     }
   },
   {

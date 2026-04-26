@@ -28,7 +28,7 @@ const definedconfig_C = {
 
 const config = Config.getConfig('user', 'config');
 const applyStandardTeam = withStdTeam(mainCharName, team, artifact_normal, config, {
-  q: true, Crystallize_c2: true, lunaType: 'lunarCrystallize', hydro_two: true, geo_two: true
+  q: true, Crystallize_c2: true, lunaType: 'lunarCrystallize', hydro_two: true, geo_two: true, pureHydroDendro: false
 })
 
 export const details = applyStandardTeam([
@@ -143,14 +143,14 @@ export const details = applyStandardTeam([
     title: ({cons}) => `${teamDefined(cons, definedconfig_B, artifact_B, mainCharName).title}「引力干涉」月感电伤害`,
     params: ({cons}) => ({
       ...teamDefined(cons, definedconfig_B, artifact_B, mainCharName).params,
-      q: true, Charged_c2: true, lunaType: 'lunarCharged', hydro_two: true
+      q: true, Charged_c2: true, lunaType: 'lunarCharged', hydro_two: true, pureHydroDendro: false
     }),
     dmg: ({ attr, calc, talent } , { basic }) => basic(calc(attr.hp) * talent.e['引力干涉·月感电伤害'] / 100, '', 'lunarCharged')
   }, {
     title: ({cons}) => `${teamDefined(cons, definedconfig_C, artifact_C, mainCharName).title}「引力干涉」月结晶伤害`,
     params: ({cons}) => ({
       ...teamDefined(cons, definedconfig_C, artifact_C, mainCharName).params,
-      q: true, Crystallize_c2: true, lunaType: 'lunarCrystallize', hydro_two: true, geo_two: true
+      q: true, Crystallize_c2: true, lunaType: 'lunarCrystallize', hydro_two: true, geo_two: true, pureHydroDendro: false
     }),
     dmg: ({ attr, calc, talent } , { basic }) => basic(calc(attr.hp) * talent.e['引力干涉·月结晶伤害'] / 100, '', 'lunarCrystallize')
   }, {
@@ -163,6 +163,7 @@ export const defParams = { Moonsign: 2 };
 export const defDmgIdx = 8;
 export const consDmgKey = '月感电EQ切后台15秒总伤'
 export const mainAttr = 'hp,cpct,cdmg,mastery';
+
 
 export const buffs = [
   ...TeamBuff,

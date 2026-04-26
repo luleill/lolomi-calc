@@ -4,14 +4,14 @@ import { Config } from '#lolomi'
 
 const mainCharName = '菲林斯'
 
-const team = ['伊涅芙','哥伦比娅','妮露']
+const team = ['伊涅芙', '哥伦比娅', '妮露']
 const artifact_normal = ['夜歌']
 
-const team_B = ['伊涅芙','哥伦比娅','希诺宁']
+const team_B = ['伊涅芙', '哥伦比娅', '希诺宁']
 const artifact_B = ['夜歌']
 
 const config = Config.getConfig('user', 'config');
-const applyStandardTeam = withStdTeam(mainCharName, team, artifact_normal, config)
+const applyStandardTeam = withStdTeam(mainCharName, team, artifact_normal, config, {pureHydroDendro: false})
 
 export const details = applyStandardTeam([
   {
@@ -105,6 +105,7 @@ export const details = applyStandardTeam([
     title: ({ cons }) => `${teamConfig(cons, team, artifact_normal, mainCharName).title}「雷霆交响」月感电`,
     params: ({cons}) => ({
       ...teamConfig(cons, team, artifact_normal).params,
+      pureHydroDendro: false
     }),
     dmg: ({ talent, calc, attr }, { basic }) => {
       const q1Damage = calc(attr.atk) * talent.q['雷霆交响伤害'] / 100;
