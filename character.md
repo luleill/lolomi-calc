@@ -105,9 +105,9 @@
 - 丝柯克 Skirk ✅
 - 伊涅芙 Ineffa ✅
 - 爱诺 Aino
-- 菈乌玛 Lauma
+- 菈乌玛 Lauma ✅
 - 菲林斯 Flins ✅
-- 奈芙尔 Nefer
+- 奈芙尔 Nefer ✅
 - 雅珂达 Jahoda
 - 杜林 Durin
 - 哥伦比娅 Columbina ✅
