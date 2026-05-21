@@ -10,12 +10,15 @@ const artifact_normal = ['宗室']
 const config = Config.getConfig('user', 'config');
 const applyStandardTeam = withStdTeam(mainCharName, team, artifact_normal, config,{pyro_two: true})
 
+// 「奥迹造影」协同伤害
+const aojiDmg = ({ talent, calc, attr }, { basic }) => basic(calc(attr.atk) * talent.q['奥迹造影伤害'] / 100)
+
 export const details = applyStandardTeam([
   {
     title: '触发特效后攻击力',
-    dmg: ({ attr, calc }) => ({ avg: Math.min(calc(attr.atk)) })
+    dmg: ({ attr, calc }) => ({ avg: calc(attr.atk) })
   }, {
-    title: '「虚己之赐」基础攻击力提升',
+    title: '「圣祝之引」基础攻击力提升',
     dmg: ({ talent, calc, attr, cons }) => {
       const ebase = Math.min(calc(attr.atk) * talent.e['虚己之赐攻击力加成比例'] / 100, talent.e['虚己之赐攻击力加成上限'])
       return {
@@ -23,8 +26,8 @@ export const details = applyStandardTeam([
       }
     }
   },{
-    check: ({ cons }) => cons >= 4,
     title: '4命「先导之佑」基础伤害提升值',
+    cons: 4,
     dmg: ({ calc, attr }) => {
       return {
         avg: calc(attr.atk) * 70 / 100
@@ -32,16 +35,41 @@ export const details = applyStandardTeam([
     }
   }, {
     title: '「炽光护盾」吸收量',
-    dmg: ({ talent, calc, attr }, { shield }) => shield(talent.e['护盾吸收量2'][0] * calc(attr.atk) / 100 + talent.e['护盾吸收量2'][1] * 1)
+    dmg: ({ talent, calc, attr }, { shield }) => shield(talent.e['护盾吸收量2'][0] * calc(attr.atk) / 100 + talent.e['护盾吸收量2'][1])
+  }, {
+    title: '「圣言默示·未现之光」释放伤害',
+    dmg: ({ talent }, dmg) => dmg(talent.e['技能伤害'], 'e')
   }, {
     title: '「奥迹造影」协同伤害',
-    dmg: ({ talent, calc, attr }, { basic }) => basic(calc(attr.atk) * talent.q['奥迹造影伤害'] / 100)
+    dmg: aojiDmg
   }, {
     title: '1命「奥迹造影·合一」协同伤害',
+    cons: 1,
     dmg: ({} , dmg) => dmg(600)
   }, {
     title: '「圣言默示·天路历程」释放伤害',
     dmg: ({ talent }, dmg) => dmg(talent.q['技能伤害'], 'q')
+  }, {
+    // 单人站场一轮总伤
+    // EQ+3A循环至Q结束20秒，10轮3A，奥迹造影协同默认5次，1命默认4次
+    title: '单人站场20秒总伤',
+    dmg: ({ talent, attr, calc, cons }, { basic }) => {
+      const atk = calc(attr.atk)
+      const eRelease = basic(atk * talent.e['技能伤害'] / 100, 'e')
+      const qRelease = basic(atk * talent.q['技能伤害'] / 100, 'q')
+      const aRound = ['一段伤害', '二段伤害', '三段伤害'].reduce((total, key) => {
+        const d = basic(atk * talent.a[key] / 100, 'a')
+        return { dmg: total.dmg + d.dmg, avg: total.avg + d.avg }
+      }, { dmg: 0, avg: 0 })
+      const aoji = basic(atk * talent.q['奥迹造影伤害'] / 100)
+      const aojiHeyi = basic(atk * 6)
+      const aojiCount = talent.q['奥迹造影攻击次数'] || 5
+      const heyiCount = cons >= 1 ? 4 : 0
+      return {
+        dmg: eRelease.dmg + qRelease.dmg + aRound.dmg * 10 + aoji.dmg * aojiCount + aojiHeyi.dmg * heyiCount,
+        avg: eRelease.avg + qRelease.avg + aRound.avg * 10 + aoji.avg * aojiCount + aojiHeyi.avg * heyiCount,
+      }
+    }
   }, {
     // 组队
     title: ({ cons }) => `${teamConfig(cons, team, artifact_normal, mainCharName).title}「奥迹造影」协同伤害`,
@@ -49,7 +77,7 @@ export const details = applyStandardTeam([
       ...teamConfig(cons, team, artifact_normal).params, 
       pyro_two: true
     }),
-    dmg: ({ talent, calc, attr }, { basic }) => basic(calc(attr.atk) * talent.q['奥迹造影伤害'] / 100)
+    dmg: aojiDmg
   }, {
     title: '当前圣遗物套装',
     dmg: ({ artis }) => ({ avg: artis, type: 'text' })
@@ -58,8 +86,8 @@ export const details = applyStandardTeam([
 
 export const mainAttr = 'atk,cpct,cdmg'
 export const defParams = { Hexenzirkel: true }
-export const consDmgKey = '「奥迹造影」协同伤害'
-export const defDmgIdx = 4
+export const consDmgKey = '单人站场20秒总伤'
+export const defDmgIdx = 5
 
 export const buffs = [
   ...TeamBuff,
