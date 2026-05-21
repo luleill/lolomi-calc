@@ -118,5 +118,6 @@
 - 莉奈娅 Linnea ✅
 - 尼可 Nicole ✅
 - 布伦妮 Prune ✅
+- 桑多涅 Marionettenew ✅
 
 </details>
