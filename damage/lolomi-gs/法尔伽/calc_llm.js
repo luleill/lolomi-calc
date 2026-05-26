@@ -4,11 +4,11 @@ import { Config } from '#lolomi'
 
 const mainCharName = '法尔伽'
 
-const team = ['温迪','杜林','班尼特']
-const artifact_normal = ['千岩', '宗室']
+const team = ['温迪', '杜林', '尼可']
+const artifact_normal = ['千岩', '宗室', '美赐']
 
-const team_B = ['珐露珊','杜林','班尼特']
-const artifact_B = ['千岩', '宗室']
+const team_B = ['珐露珊', '杜林', '尼可']
+const artifact_B = ['千岩', '宗室', '美赐']
 
 const config = Config.getConfig('user', 'config');
 const applyStandardTeam = withStdTeam(mainCharName, team, artifact_normal, config,{sifeng: true, pyro_two: true})

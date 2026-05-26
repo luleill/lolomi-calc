@@ -4,11 +4,11 @@ import { Config } from '#lolomi'
 
 const mainCharName = '温迪'
 
-const team = ['珐露珊', '杜林', '班尼特']
-const artifact_normal = ['千岩', '宗室']
+const team = ['珐露珊', '杜林', '尼可']
+const artifact_normal = ['千岩', '宗室', '美赐']
 
-const team_B = ['珐露珊', '莫娜', '班尼特']
-const artifact_B = ['千岩', '宗室']
+const team_B = ['珐露珊', '莫娜', '尼可']
+const artifact_B = ['千岩', '宗室', '美赐']
 
 const config = Config.getConfig('user', 'config');
 const applyStandardTeam = withStdTeam(mainCharName, team, artifact_normal, config,{ cons_2: true, q: true, ssfr: true })
@@ -37,7 +37,7 @@ const calcRotation = ({ talent, cons, attr }, dmg) => {
   const swirlUnit = dmg.reaction('swirl').avg;
   const dotHits = 20, colorHits = 20, swirlHits = 17;
   const qTotal = {
-    dmg: qDot.dmg * dotHits + qColor.dmg * colorHits,
+    dmg: qDot.dmg * dotHits + qColor.dmg * colorHits + swirlUnit * swirlHits,
     avg: qDot.avg * dotHits + qColor.avg * colorHits + swirlUnit * swirlHits,
   };
   // 飓风箭单轮3A

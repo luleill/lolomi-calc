@@ -50,8 +50,9 @@ const MUTEX_ARTI_PASSIVES = [
   { artiName: '', paramKey: 'yege'     }, // 夜歌 - 精通120+月曜10%
   { artiName: '', paramKey: 'qianyan'  }, // 千岩 - 战技命中后加攻20%
   { artiName: '', paramKey: 'panyan'   }, // 磐岩 - 结晶元素增伤35%
-  { artiName: '', paramKey: 'fengtao'  }, // 风套 - 减抗40%
+  { artiName: '', paramKey: 'fengtao'  }, // 风套 - 扩散减抗40%
   { artiName: '', paramKey: 'caotao'   }, // 草套 - 减草抗30%
+  { artiName: '', paramKey: 'tianmei'  }, // 天之美赐 - 魔导队伍伤害提升40%
 ]
 
 /**
@@ -102,7 +103,7 @@ const artiEffectActive = (paramKey, params, artis) => {
 let TeamBuff = [
   // 纳塔地方传奇满层增伤+双药(20暴击20爆伤，属伤药)
   {
-    check: ({ params }) => params.legend_max  === true,
+    check: ({ params }) => params.legend_max === true,
     title: '纳塔地方传奇900增伤',
     data: {
       dmg: 900 + 15,
@@ -117,19 +118,22 @@ let TeamBuff = [
     data: {
       kx: 25
     }
-  },{
+  },
+  {
     check: ({ params }) => params.hydro_two === true,
     title: '元素共鸣：[愈疗之水] 生命值上限提升[hpPct]%',
     data: {
       hpPct: 25
     }
-  },{
+  },
+  {
     check: ({ params }) => params.pyro_two === true,
     title: '元素共鸣：[热诚之火] 攻击力提高[atkPct]%',
     data: {
       atkPct: 25
     }
-  },{
+  },
+  {
     check: ({ params }) => params.geo_two === true,
     title: '元素共鸣：[坚定之岩] 护盾强效提升[shield]%，造成的伤害提升[dmg]%，降低敌人[kx]%元素抗性',
     data: {
@@ -137,13 +141,15 @@ let TeamBuff = [
       dmg: 15,
       kx: ({ element }) => element === '岩' ? 20 : 0
     }
-  },{
+  },
+  {
     check: ({ params }) => params.dendro_two === true,
     title: '元素共鸣：[蔓生之草] 触发燃烧、原激化、绽放反应后，提升元素精通[mastery]点,',
     data: {
       mastery: 80
     }
-  },{
+  },
+  {
     check: ({ params }) => params.cryo_two === true,
     title: '元素共鸣：[粉碎之冰] 攻击处于冰元素附着或冻结下的敌人时，暴击率提高[cpct]%',
     data: {
@@ -212,6 +218,13 @@ let TeamBuff = [
       dmg: 35
     }    
   },
+  { 
+    check: ({ params, artis }) => artiEffectActive('tianmei', params, artis),
+    title: '天之美赐：施放元素战技后附近的所有角色获得[dmg]%元素伤害加成',
+    data: {
+      dmg: ({ params }) => params.Hexenzirkel ? 40 : 0
+    }    
+  },
 
   // 辅助队友增益配
   // 配置说明：
@@ -227,48 +240,45 @@ let TeamBuff = [
     title: '神里绫华',
     // 四命减防30%
     data: {
-      enemyDef:(params) => params.KamisatoAyaka_best ? 30 : 0
-      }
-  },{
+      enemyDef: (params) => params.KamisatoAyaka_best ? 30 : 0
+    }
+  },
+  {
     check: ({ params }) => params.Jean_best || params.Jean_mid || params.Jean_low,
     title: '琴',
-    // 四命减风抗40%
+    // 四命减风扗40%
     data: {
-      kx:({ params , element}) => (params.Jean_best && element === '风') ? 40 : 0
-      }
-  },{
+      kx: ({ params, element }) => (params.Jean_best && element === '风') ? 40 : 0
+    }
+  },
+  {
     check: ({ params }) => params.Lisa_best || params.Lisa_mid || params.Lisa_best_low,
     title: '丽莎',
     // 被动减防15%
     data: {
-      enemyDef:15
-      }
-  },{
+      enemyDef: 15
+    }
+  },
+  {
     check: ({ params }) => params.Venti_best || params.Venti_mid || params.Venti_low || params.Hexenzirkel === false,
     title: '温迪',
     // Hexenzirkel 魔导·秘仪队伍
     data: {
-      dmg: ({ params , element}) => {
-        if (params.Hexenzirkel && element !== '风') {
-          return 50
-        } else if ( params.Venti_best && element === '风') {
-          return 25
-        }
+      dmg: ({ params, element }) => {
+        if (params.Hexenzirkel && element !== '风') return 50
+        if (params.Venti_best && element === '风') return 25
       },
-      kx: ({ params , element }) => {
-        if (params.Venti_best && element === '风') {  
-          return 44
-        } else if (params.Venti_mid && element === '风') {
-          return 24
-        } else if (params.Venti_best && element !== '风') {
-          return 24
-        }
+      kx: ({ params, element }) => {
+        if (params.Venti_best && element === '风') return 44
+        if (params.Venti_mid && element === '风') return 24
+        if (params.Venti_best && element !== '风') return 24
       },
       atkPct: (ds) => getMutexPassiveValue('千年的大乐章', 'atkPct', 'Venti', ds.params, ds),
-      mastery: ({ params }) => params.YeLan_best ? 200 : params.YeLan_mid ? 100 : 0,
+      mastery: ({ params }) => params.Venti_best ? 200 : params.Venti_mid ? 100 : 0
     }
-  },{
-    check: ({ params }) => params.Durin_best || params.Durin_mid || params.Durin_low ||params.Hexenzirkel === false,
+  },
+  {
+    check: ({ params }) => params.Durin_best || params.Durin_mid || params.Durin_low || params.Hexenzirkel === false,
     title: '杜林',
     // Hexenzirkel 魔导·秘仪队伍
     data: {
@@ -280,48 +290,53 @@ let TeamBuff = [
         if ((params.Durin_best || params.Durin_mid || params.Durin_low) && (element !== '水' || element !== '冰')) return 20
       },
       atkPct: ({ params }) => {
-        if ((params.Durin_best && params.Hexenzirkel)) return 56
+        if (params.Durin_best && params.Hexenzirkel) return 56
         if (params.Durin_best) return 32
         if (params.Durin_mid && params.Hexenzirkel) return 28
         if (params.Durin_mid) return 16
-      },
+      }
     }
-  },{
-    check: ({ params }) => params.Klee_best || params.Klee_mid || params.Klee_low ||params.Hexenzirkel === false,
+  },
+  {
+    check: ({ params }) => params.Klee_best || params.Klee_mid || params.Klee_low || params.Hexenzirkel === false,
     title: '可莉',
     // Hexenzirkel 魔导·秘仪队伍
     data: {
       enemyDef: ({ params }) => (params.Klee_best || params.Klee_mid) ? 23 : 0,
-      dmg: ({ params , element }) => (params.Klee_best && element === '火' ) ? 10 : 0,
+      dmg: ({ params, element }) => (params.Klee_best && element === '火') ? 10 : 0
     }
-  },{
-    check: ({ params }) =>  params.Fischl_best || params.Fischl_mid || params.Fischl_low ||   params.Hexenzirkel === false,
+  },
+  {
+    check: ({ params }) => params.Fischl_best || params.Fischl_mid || params.Fischl_low || params.Hexenzirkel === false,
     // 触发超载，全队加攻，触发感电，全队加精通，默认魔导队攻击和精通都吃
     title: '菲谢尔',
     data: {
-      atkPct: ({ params }) => (params.Fischl_best || params.Fischl_mid || params.Fischl_low && params.Hexenzirkel) ? 22.5 : 0,
-      mastery: ({ params }) => (params.Fischl_best || params.Fischl_mid || params.Fischl_low && params.Hexenzirkel) ? 90 : 0,
+      atkPct: ({ params }) => (params.Fischl_best || params.Fischl_mid || (params.Fischl_low && params.Hexenzirkel)) ? 22.5 : 0,
+      mastery: ({ params }) => (params.Fischl_best || params.Fischl_mid || (params.Fischl_low && params.Hexenzirkel)) ? 90 : 0
     }
-  },{
+  },
+  {
     check: ({ params }) => params.Bennett_low || params.Bennett_mid || params.Bennett_best,
     title: '班尼特',
     // 高配13级q风鹰剑 中配13级q原木刀 低配10级q西风剑
     data: {
-      atkPlus: ({ params }) => 
-        params.Bennett_best ? 139 * 865.2 / 100 : 
-        params.Bennett_mid ? 139 * 756.2 / 100 : 
+      atkPlus: ({ params }) =>
+        params.Bennett_best ? 139 * 865.2 / 100 :
+        params.Bennett_mid ? 139 * 756.2 / 100 :
         params.Bennett_low ? 120.8 * 645.2 / 100 : 0
-    },
-  },{
+    }
+  },
+  {
     check: ({ params }) => params.XiangLing_low || params.XiangLing_mid || params.XiangLing_best,
     title: '香菱',
     // 前台主c默认吃到锅巴辣椒加成
     data: {
-      atkpct: 10,
+      atkPct: 10,
       dmg: ({ params, element }) => (params.XiangLing_best && element === '火') ? 15 : 0,
       kx: ({ params, element }) => (params.XiangLing_best || params.XiangLing_mid) && element === '火' ? 15 : 0
     }
-  },{
+  },
+  {
     check: ({ params }) => params.Mika_low || params.Mika_mid || params.Mika_best,
     title: '米卡',
     // 6命必须，所有带米卡的物理队伍默认米卡满命
@@ -329,57 +344,61 @@ let TeamBuff = [
       phy: 40,
       cdmg: 60
     }
-  },{
+  },
+  {
     check: ({ params }) => params.ChongYun_low || params.ChongYun_mid || params.ChongYun_best,
     title: '重云',
     data: {
-      kx: ({ params , element }) => (
-        params.ChongYun_best || params.ChongYun_mid || params.ChongYun_low 
+      kx: ({ params, element }) => (
+        (params.ChongYun_best || params.ChongYun_mid || params.ChongYun_low)
         && element === '冰') ? 10 : 0
-    },
-  },{ 
+    }
+  },
+  {
     check: ({ params }) => params.Furina_low || params.Furina_mid || params.Furina_best,
     title: '芙宁娜',
     data: {
-      dmg: ({ params }) => 
-        params.Furina_best ? 124: 
-        params.Furina_mid ? 100 : 
+      dmg: ({ params }) =>
+        params.Furina_best ? 124 :
+        params.Furina_mid ? 100 :
         params.Furina_low ? 75 : 0,
-      phy: ({ params }) => 
-        params.Furina_best ? 124 : 
-        params.Furina_mid ? 100 : 
-        params.Furina_low ? 75 : 0,
-      }
-  },{
+      phy: ({ params }) =>
+        params.Furina_best ? 124 :
+        params.Furina_mid ? 100 :
+        params.Furina_low ? 75 : 0
+    }
+  },
+  {
     check: ({ params }) => params.Escoffier_low || params.Escoffier_mid || params.Escoffier_best,
     title: '爱可菲',
     data: {
       kx: ({ element }) => (element === '冰' || element === '水') ? 55 : 0,
-      cdmg : ({ params, element }) => (params.Escoffier_best || params.Escoffier_mid && element === '冰') ? 60 : 0,
+      cdmg: ({ params, element }) => ((params.Escoffier_best || params.Escoffier_mid) && element === '冰') ? 60 : 0,
       // 爱可菲获得5层「冷煮」，除爱可菲外的附近的当前场上角色普通攻击、重击、下落攻击、元素战技和元素爆发对敌人造成冰元素伤害时，将消耗1层「冷煮」，提升造成的伤害
       aPlus: ({ params, element }) => (params.Escoffier_best && element === '冰') ? 9600 : (params.Escoffier_mid && element === '冰') ? 8400 : 0,
       a2Plus: ({ params, element }) => (params.Escoffier_best && element === '冰') ? 9600 : (params.Escoffier_mid && element === '冰') ? 8400 : 0,
       a3Plus: ({ params, element }) => (params.Escoffier_best && element === '冰') ? 9600 : (params.Escoffier_mid && element === '冰') ? 8400 : 0,
       ePlus: ({ params, element }) => (params.Escoffier_best && element === '冰') ? 9600 : (params.Escoffier_mid && element === '冰') ? 8400 : 0,
       qPlus: ({ params, element }) => (params.Escoffier_best && element === '冰') ? 9600 : (params.Escoffier_mid && element === '冰') ? 8400 : 0,
-      atkPct: ({ params}) => params.Escoffier_best ? 64 : params.Escoffier_mid ? 32 : 0
+      atkPct: ({ params }) => params.Escoffier_best ? 64 : params.Escoffier_mid ? 32 : 0
     }
-  },{
+  },
+  {
     check: ({ params }) => params.Sara_low || params.Sara_mid || params.Sara_best,
     title: '九条裟罗',
     // 高配13级e精五终末 中配13级e精一终末 低配10级e西风弓
     data: {
-      atkPlus: ({ params }) => 
-        params.Sara_best ? 91.29 * 803 / 100 : 
-        params.Sara_mid ? 91.29 * 803 / 100 : 
+      atkPlus: ({ params }) =>
+        params.Sara_best ? 91.29 * 803 / 100 :
+        params.Sara_mid ? 91.29 * 803 / 100 :
         params.Sara_low ? 77.33 * 649 / 100 : 0,
-      cdmg: ({ params , element }) => 
+      cdmg: ({ params, element }) =>
         (params.Sara_best && element === '雷') ? 60 : 0,
       // 终末被动取去重
       atkPct: (ds) => getMutexPassiveValue('千年的大乐章', 'atkPct', 'Sara', ds.params, ds),
-      mastery: ({ params }) => 
-        params.Sara_best ? 200 : 
-        params.Sara_mid ? 100 : 0,
+      mastery: ({ params }) =>
+        params.Sara_best ? 200 :
+        params.Sara_mid ? 100 : 0
     }
   },
   {
@@ -388,16 +407,16 @@ let TeamBuff = [
     // Hexenzirkel 魔导·秘仪队伍
     data: {
       dmg: 60,
-      swirl: ({params}) => params.Mona_best || params.Mona_mid ? 15 : 0,
-      electroCharged: ({params}) => params.Mona_best || params.Mona_mid ? 15 : 0,
-      lunarCharged: ({params}) => params.Mona_best || params.Mona_mid ? 15 : 0,
-      vaporize: ({params}) => {
+      swirl: ({ params }) => params.Mona_best || params.Mona_mid ? 15 : 0,
+      electroCharged: ({ params }) => params.Mona_best || params.Mona_mid ? 15 : 0,
+      lunarCharged: ({ params }) => params.Mona_best || params.Mona_mid ? 15 : 0,
+      vaporize: ({ params }) => {
         const isMonaC1 = params.Mona_best || params.Mona_mid;
         const isHexenzirkel = params.Hexenzirkel;
         return (isMonaC1 && isHexenzirkel) ? 30 : (isMonaC1 || isHexenzirkel) ? 15 : 0;
       },
       mastery: ({ params }) => params.Mona_best || params.Mona_mid ? 80 : 0,
-      cpct : ({ params }) => params.Mona_best ? 15 : 0,
+      cpct: ({ params }) => params.Mona_best ? 15 : 0,
       cdmg: ({ params }) => params.Mona_best && params.Hexenzirkel ? 15 : 0,
     },
   },
@@ -445,7 +464,7 @@ let TeamBuff = [
       a3Plus: ({ params }) => params.ShenHe_best ? 5000 : params.ShenHe_mid ? 3500 : params.ShenHe_low ? 3000 : 0,
       ePlus: ({ params }) => params.ShenHe_best ? 5000 : params.ShenHe_mid ? 3500 : params.ShenHe_low ? 3000 : 0,
       qPlus: ({ params }) => params.ShenHe_best ? 5000 : params.ShenHe_mid ? 3500 : params.ShenHe_low ? 3000 : 0,
-      cdmg : ({ params }) => { params.ShenHe_best || params.ShenHe_mid ? 15 : 0},
+      cdmg: ({ params }) => (params.ShenHe_best || params.ShenHe_mid) ? 15 : 0,
       kx: 15,
       dmg: 15,
       eDmg: 15,
@@ -462,8 +481,8 @@ let TeamBuff = [
     // 天赋默认吃满+10暴击
     data: { 
       a3Plus: ({ params }) => (params.XianYun_best || params.XianYun_mid) ? 18000 : params.XianYun_low ? 7000 : 0,
-      cdmg : 10,
-      a3Dmg: ({ params }) => params.XianYun_best ? 80 : params.XianYun_mid ? 28 :0,
+      cdmg: 10,
+      a3Dmg: ({ params }) => params.XianYun_best ? 80 : params.XianYun_mid ? 28 : 0
     } 
   },
   {
@@ -512,13 +531,13 @@ let TeamBuff = [
     // 二命hydro水系加45生命  pyro火系加45攻击 geo岩系50增伤 cryo冰系60爆伤
     data: {
       kx: ({ params }) => params.Xilonen_best ? 45 : (params.Xilonen_mid || params.Xilonen_low) ? 36 : 0,
-      hpPct: ({ params}) => (params.Xilonen_hydro && params.Xilonen_best || params.Xilonen_mid) ? 45 : 0,
-      atkPct: ({ params}) => (params.Xilonen_pyro && params.Xilonen_best || params.Xilonen_mid) ? 45 : 0,
-      dmg: ({ params}) => (params.Xilonen_geo && params.Xilonen_best || params.Xilonen_mid) ? 50 : 0,
-      cdmg: ({ params}) => (params.Xilonen_cryo && params.Xilonen_best || params.Xilonen_mid) ? 60 : 0,
-      aPlus: ({ params}) => params.Xilonen_best ? 2600 : 0,
-      a2Plus: ({ params}) => params.Xilonen_best ? 2600 : 0,
-      a3Plus: ({ params}) => params.Xilonen_best ? 2600 : 0,
+      hpPct: ({ params }) => (params.Xilonen_hydro && (params.Xilonen_best || params.Xilonen_mid)) ? 45 : 0,
+      atkPct: ({ params }) => (params.Xilonen_pyro && (params.Xilonen_best || params.Xilonen_mid)) ? 45 : 0,
+      dmg: ({ params }) => (params.Xilonen_geo && (params.Xilonen_best || params.Xilonen_mid)) ? 50 : 0,
+      cdmg: ({ params }) => (params.Xilonen_cryo && (params.Xilonen_best || params.Xilonen_mid)) ? 60 : 0,
+      aPlus: ({ params }) => params.Xilonen_best ? 2600 : 0,
+      a2Plus: ({ params }) => params.Xilonen_best ? 2600 : 0,
+      a3Plus: ({ params }) => params.Xilonen_best ? 2600 : 0
     }
   },
   {
@@ -568,9 +587,9 @@ let TeamBuff = [
       a3Plus: ({ params }) => (params.Faruzan_best || params.Faruzan_mid) ? 258 : params.Faruzan_low ? 209 : 0,
       ePlus: ({ params }) => (params.Faruzan_best || params.Faruzan_mid) ? 258 : params.Faruzan_low ? 209 : 0,
       qPlus: ({ params }) => (params.Faruzan_best || params.Faruzan_mid) ? 258 : params.Faruzan_low ? 209 : 0,
-      cdmg: ({ params , element}) => (params.Faruzan_best && element === '风') ? 40 : 0,
-      kx: ({element}) => (element === '风') ? 30 : 0,
-      dmg: ({params ,element}) => (params.Faruzan_best || params.Faruzan_mid && element === '风') ? 38.25 : (params.Faruzan_low && element === '风') ? 32.4 : 0,
+      cdmg: ({ params, element }) => (params.Faruzan_best && element === '风') ? 40 : 0,
+      kx: ({ element }) => (element === '风') ? 30 : 0,
+      dmg: ({ params, element }) => (params.Faruzan_best || (params.Faruzan_mid && element === '风')) ? 38.25 : (params.Faruzan_low && element === '风') ? 32.4 : 0,
       mastery: ({ params }) => params.Faruzan_best ? 200 : params.Faruzan_mid ? 100 : 0,
       atkPct: (ds) => getMutexPassiveValue('千年的大乐章', 'atkPct', 'Faruzan', ds.params, ds),
     }
@@ -608,72 +627,72 @@ let TeamBuff = [
     check: ({ params }) => params.Lauma_low || params.Lauma_mid || params.Lauma_best,
     title: '菈乌玛',
     data: {
-    kx: ({ params }) => params.Lauma_best ? 34 : (params.Lauma_mid || params.Lauma_low) ? 25 : 0,
-    fyPlus: ({ params }) => (params.Lauma_best || params.Lauma_mid) ? 9000 : params.Lauma_low ? 4800 : 0,
-    lunarBloom: ({ params }) => {
-      if (params.Lauma_best) return 120;
-      if (params.Lauma_mid) return 80;
-      return 0;
-    },
-    elevated: ({ params }) => params.Lauma_best ? 25 : 0,
-    cpct: 10,
-    cdmg: 20,
-    fypct: 14
+      kx: ({ params }) => params.Lauma_best ? 34 : (params.Lauma_mid || params.Lauma_low) ? 25 : 0,
+      fyPlus: ({ params }) => (params.Lauma_best || params.Lauma_mid) ? 9000 : params.Lauma_low ? 4800 : 0,
+      lunarBloom: ({ params }) => {
+        if (params.Lauma_best) return 120;
+        if (params.Lauma_mid) return 80;
+        return 0;
+      },
+      elevated: ({ params }) => params.Lauma_best ? 25 : 0,
+      cpct: 10,
+      cdmg: 20,
+      fypct: 14
     }
   },
   {
     check: ({ params }) => params.Columbina_low || params.Columbina_mid || params.Columbina_best,
     title: '哥伦比娅',
     data: {
-    lunarBloom: ({ params }) => params.Columbina_best ? 49 : (params.Columbina_mid|| params.Columbina_low) ? 40 : 0,
-    lunarCharged: ({ params }) => params.Columbina_best ? 49 : (params.Columbina_mid|| params.Columbina_low) ? 40 : 0,
-    lunarCrystallize: ({ params }) => params.Columbina_best ? 49 : (params.Columbina_mid|| params.Columbina_low) ? 40 : 0,
-    atkPlus: ({ params }) => params.Columbina_best || params.Columbina_mid ? 600 : 0,
-    defPlus: ({ params }) => params.Columbina_best || params.Columbina_mid ? 600 : 0,
-    mastery: ({ params }) => params.Columbina_best || params.Columbina_mid ? 200 : 0,
-    cdmg: ({ params }) => params.Columbina_best ? 80 : 0,
-    elevated: ({ params }) => params.Columbina_best ? 20 :  params.Columbina_mid ? 8.5 : 0,
-    fypct: 7,
+      lunarBloom: ({ params }) => params.Columbina_best ? 49 : (params.Columbina_mid || params.Columbina_low) ? 40 : 0,
+      lunarCharged: ({ params }) => params.Columbina_best ? 49 : (params.Columbina_mid || params.Columbina_low) ? 40 : 0,
+      lunarCrystallize: ({ params }) => params.Columbina_best ? 49 : (params.Columbina_mid || params.Columbina_low) ? 40 : 0,
+      atkPlus: ({ params }) => params.Columbina_best || params.Columbina_mid ? 600 : 0,
+      defPlus: ({ params }) => params.Columbina_best || params.Columbina_mid ? 600 : 0,
+      mastery: ({ params }) => params.Columbina_best || params.Columbina_mid ? 200 : 0,
+      cdmg: ({ params }) => params.Columbina_best ? 80 : 0,
+      elevated: ({ params }) => params.Columbina_best ? 20 : params.Columbina_mid ? 8.5 : 0,
+      fypct: 7
     }
   },
   {
     check: ({ params }) => params.Illuga_low || params.Illuga_mid || params.Illuga_best,
     title: '叶洛亚',
-    // 默认千精，纯水岩队伍，提升月结晶反应基础值，天赋吃满额外提升160%,
+    // 默认千精，纯水岩队伍，提升月结晶反应基础值，天赋吃满额外提升160%
     data: {
-    fyplus: ({ params }) => (params.Illuga_best || params.Illuga_mid) ? 6400 : params.Illuga_low ? 5500 : 0,
-    aPlus: ({ params }) => (params.Illuga_best || params.Illuga_mid) ? 950 : params.Illuga_low ? 850 : 0,
-    a2Plus: ({ params }) => (params.Illuga_best || params.Illuga_mid) ? 950 : params.Illuga_low ? 850 : 0,
-    a3Plus: ({ params }) => (params.Illuga_best || params.Illuga_mid) ? 950 : params.Illuga_low ? 850 : 0,
-    ePlus: ({ params }) => (params.Illuga_best || params.Illuga_mid) ? 950 : params.Illuga_low ? 850 : 0,
-    qPlus: ({ params }) => (params.Illuga_best || params.Illuga_mid) ? 950 : params.Illuga_low ? 850 : 0,
-    defPlus: ({ params }) => params.Illuga_best ? 200 : 0,
-    mastery: ({ params }) => params.Illuga_best ? 80 : 50,
-    cpct: ({ params }) => params.Illuga_best ? 10 : 5,
-    cdmg: ({ params }) => params.Illuga_best ? 30 : 10
+      fyplus: ({ params }) => (params.Illuga_best || params.Illuga_mid) ? 6400 : params.Illuga_low ? 5500 : 0,
+      aPlus: ({ params }) => (params.Illuga_best || params.Illuga_mid) ? 950 : params.Illuga_low ? 850 : 0,
+      a2Plus: ({ params }) => (params.Illuga_best || params.Illuga_mid) ? 950 : params.Illuga_low ? 850 : 0,
+      a3Plus: ({ params }) => (params.Illuga_best || params.Illuga_mid) ? 950 : params.Illuga_low ? 850 : 0,
+      ePlus: ({ params }) => (params.Illuga_best || params.Illuga_mid) ? 950 : params.Illuga_low ? 850 : 0,
+      qPlus: ({ params }) => (params.Illuga_best || params.Illuga_mid) ? 950 : params.Illuga_low ? 850 : 0,
+      defPlus: ({ params }) => params.Illuga_best ? 200 : 0,
+      mastery: ({ params }) => params.Illuga_best ? 80 : 50,
+      cpct: ({ params }) => params.Illuga_best ? 10 : 5,
+      cdmg: ({ params }) => params.Illuga_best ? 30 : 10
     }
   },
   {
     check: ({ params }) => params.Linnea_low || params.Linnea_mid || params.Linnea_best,
     title: '莉奈娅',
-    // 高配4500防御，中4000防御，低3500防御,
+    // 高配4500防御，中4000防御，低3500防御
     data: {
-    fypct: 14,
-    kx: ({ element }) => (element === '岩') ? 30 : 0,
-    mastery: ({ params }) => {
-      // 非月兆角色无精通加成
-      const moonsign = params.Moonsign || 0
-      if (!moonsign) return 0
-      if (params.Linnea_best) return 225
-      if (params.Linnea_mid) return 200
-      return 175
-    },
-    fyplus: ({ params }) => params.Linnea_best ? 10125 : (params.Linnea_mid ? 3375 : 0),
-    cdmg: ({ params, element }) => (element === '水' || element === '岩') && (params.Linnea_best || params.Linnea_mid) ? 40 : 0,
-    defPct: ({ params }) => params.Linnea_best ? 25 : 0,
-    elevated: ({ params }) => params.Linnea_best ? 25 : 0,
-    dmg: ({ params, element }) => element === '岩' && (params.Linnea_best ? 40 : params.Linnea_mid ? 20 : 0),
-    lunarCrystallize: ({ params }) => params.Linnea_bestd ? 40 : params.Linnea_mid ? 20 : 0,
+      fypct: 14,
+      kx: ({ element }) => (element === '岩') ? 30 : 0,
+      mastery: ({ params }) => {
+        // 非月兆角色无精通加成
+        const moonsign = params.Moonsign || 0
+        if (!moonsign) return 0
+        if (params.Linnea_best) return 225
+        if (params.Linnea_mid) return 200
+        return 175
+      },
+      fyplus: ({ params }) => params.Linnea_best ? 10125 : (params.Linnea_mid ? 3375 : 0),
+      cdmg: ({ params, element }) => (element === '水' || element === '岩') && (params.Linnea_best || params.Linnea_mid) ? 40 : 0,
+      defPct: ({ params }) => params.Linnea_best ? 25 : 0,
+      elevated: ({ params }) => params.Linnea_best ? 25 : 0,
+      dmg: ({ params, element }) => element === '岩' && (params.Linnea_best ? 40 : params.Linnea_mid ? 20 : 0),
+      lunarCrystallize: ({ params }) => params.Linnea_best ? 40 : params.Linnea_mid ? 20 : 0
     }
   },
   {
@@ -681,12 +700,32 @@ let TeamBuff = [
     title: '五郎',
     // 默认三岩队伍，高配6+5终末，中2+1终末，低0+0
     data: {
-    defPlus: ({ params }) => (params.Gorou_best) ? 438.09 : (params.Gorou_mid || params.Gorou_low) ? 371.09 : 0,
-    dmg: ({ element }) => (element === '岩') ? 15 : 0,
-    cdmg: ({ params, element }) => (element === '岩' && params.Gorou_best) ? 40 : 0,
-    defPct: 25,
-    atkPct: (ds) => getMutexPassiveValue('千年的大乐章', 'atkPct', 'Gorou', ds.params, ds),
-    mastery: ({ params }) => params.Gorou_best ? 200 : params.Gorou_mid ? 100 : 0,
+      defPlus: ({ params }) => params.Gorou_best ? 438.09 : (params.Gorou_mid || params.Gorou_low) ? 371.09 : 0,
+      dmg: ({ element }) => (element === '岩') ? 15 : 0,
+      cdmg: ({ params, element }) => (element === '岩' && params.Gorou_best) ? 40 : 0,
+      defPct: 25,
+      atkPct: (ds) => getMutexPassiveValue('千年的大乐章', 'atkPct', 'Gorou', ds.params, ds),
+      mastery: ({ params }) => params.Gorou_best ? 200 : params.Gorou_mid ? 100 : 0
+    }
+  },
+  {
+    check: ({ params }) => params.Nicole_best || params.Nicole_mid || params.Nicole_low || params.Hexenzirkel === false,
+    title: '尼可',
+    // Hexenzirkel 魔导·秘仪队伍
+    // 低配0+0: 默认4000攻，攻击力提升至多900
+    // 中配2+1: 默认4000攻，减抗20%
+    // 高配6+5: 默认5000攻, 减抗20%, 4命基础提升3500, 6命无视防御40
+    // 专武精五 58增伤，精一 26增伤
+    data: {
+      atkPlus: ({ params }) => params.Nicole_best ? 1248 : params.Nicole_mid ? 1140 : 900,
+      kx: ({ params }) => (params.Nicole_best || params.Nicole_mid) ? 20 : 0,
+      aPlus: ({ params }) => params.Nicole_best ? 3500 : 0,
+      a2Plus: ({ params }) => params.Nicole_best ? 3500 : 0,
+      a3Plus: ({ params }) => params.Nicole_best ? 3500 : 0,
+      ePlus: ({ params }) => params.Nicole_best ? 3500 : 0,
+      qPlus: ({ params }) => params.Nicole_best ? 3500 : 0,
+      ignore: ({ params }) => params.Nicole_best ? 40 : 0,
+      dmg: ({ params }) => params.Nicole_best ? 58 : params.Nicole_mid ? 26 : 0
     }
   }
 ]

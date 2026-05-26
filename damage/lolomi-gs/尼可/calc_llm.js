@@ -5,7 +5,7 @@ import { Config } from '#lolomi'
 const mainCharName = '尼可'
 
 const team = ['法尔伽', '温迪', '杜林']
-const artifact_normal = ['宗室']
+const artifact_normal = ['宗室', '美赐']
 
 const config = Config.getConfig('user', 'config');
 const applyStandardTeam = withStdTeam(mainCharName, team, artifact_normal, config,{pyro_two: true})

@@ -109,7 +109,7 @@
 - 菲林斯 Flins ✅
 - 奈芙尔 Nefer ✅
 - 雅珂达 Jahoda
-- 杜林 Durin
+- 杜林 Durin ✅
 - 哥伦比娅 Columbina ✅
 - 兹白 Zibai ✅
 - 叶洛亚 Illuga

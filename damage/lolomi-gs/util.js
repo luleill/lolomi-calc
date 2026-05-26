@@ -7,7 +7,8 @@
     'caotao': '深林的记忆',
     'qianyan': '千岩牢固',
     'panyan': '悠古的磐岩',
-    'zongshi': '昔日宗室之仪'
+    'zongshi': '昔日宗室之仪',
+    'tianmei': '天之美赐',
   };
 
   // 圣遗物别名
@@ -23,6 +24,8 @@
     '千岩': 'qianyan',
     '磐岩': 'panyan',
     '宗室': 'zongshi',
+    '天美': 'tianmei',
+    '美赐': 'tianmei',
   };
 
   // 角色映射
@@ -139,6 +142,7 @@
     'Illuga': '叶洛亚',
     'Varka': '法尔伽',
     'Linnea': '莉奈娅',
+    'Nicole': '尼可',
   };
 
   // 角色简称 - 常用辅助
