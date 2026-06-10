@@ -4,34 +4,32 @@ import { Config } from '#lolomi'
 
 const mainCharName = '玛薇卡'
 
-const team = ['茜特菈莉','枫原万叶', '班尼特']
-const artifact_normal = ['烬城', '风套','宗室']
+const team = ['茜特菈莉', '希诺宁', '尼可']
+const artifact_normal = ['千岩', '烬城', '天美']
 
-const team_B = ['茜特菈莉','希诺宁', '班尼特']
+const team_B = ['茜特菈莉', '希诺宁', '班尼特']
 const artifact_B = ['千岩', '烬城', '宗室']
 
 const team_C = ['茜特菈莉']
 const artifact_C = ['烬城']
 
 const config = Config.getConfig('user', 'config');
-const applyStandardTeam = withStdTeam(mainCharName, team_B, artifact_B, config,{q: true, pyro_two: true, Xilonen_pyro: true})
+const applyStandardTeam = withStdTeam(mainCharName, team, artifact_normal, config,{q: true, pyro_two: true, Xilonen_pyro: true})
 
 export const details = applyStandardTeam([
   {
     title: '触发特效后攻击力',
-    dmg: ({ attr, calc }) => ({
-      avg: Math.min(calc(attr.atk) * 1)
-    })
+    dmg: ({ attr, calc }) => ({ avg: calc(attr.atk) })
   }, {
     title: ({ cons }) => `「焚曜之环」${cons >= 6 ? '+六命协同' : ''}伤害`,
-    dmg: ({ talent, attr, calc, cons }, { basic }) => {
-      const ebaseDamage = basic(calc(attr.atk) * talent.e['焚曜之环伤害'] / 100, 'e,nightsoul')
+    dmg: ({ talent, attr, calc, cons }, dmg) => {
+      const ring = dmg(talent.e['焚曜之环伤害'], 'e,nightsoul')
       if (cons >= 6) {
-        const extraDamage = basic(calc(attr.atk) * 200 / 100, 'e,nightsoul');
-        ebaseDamage.dmg += extraDamage.dmg;
-        ebaseDamage.avg += extraDamage.avg;
-      } 
-      return ebaseDamage;
+        const extra = dmg(200, 'e,nightsoul')
+        ring.dmg += extra.dmg
+        ring.avg += extra.avg
+      }
+      return ring
     }
   }, {
     title: '满战意「坠日斩」伤害',
@@ -42,26 +40,36 @@ export const details = applyStandardTeam([
     params: { q: true },
     dmg: ({ talent }, dmg) => dmg(talent.q['技能伤害'], 'q,nightsoul', 'melt')
   }, {
-    title: '满战意Q后驰轮车重击伤害',
+    title: '满战意驰轮车重击循环伤害',
     params: { q: true },
     dmg: ({ talent }, dmg) => dmg(talent.e['驰轮车重击循环伤害'], 'a2,nightsoul')
   }, {
-    title: '满战意Q后驰轮车重击融化伤害',
+    title: '满战意驰轮车重击融化伤害',
     params: { q: true },
     dmg: ({ talent }, dmg) => dmg(talent.e['驰轮车重击循环伤害'], 'a2,nightsoul', 'melt')
+  }, {
+    title: '单人站场10秒总伤',
+    // 满战意EQ起手 + 驰轮车重击循环×9 + 6命协同4次
+    params: { q: true, jiyangezi: 30 },
+    dmg: ({ talent, cons }, dmg) => {
+      const eHit = dmg(talent.e['技能伤害'], 'e,nightsoul')
+      const qHit = dmg(talent.q['技能伤害'], 'q,nightsoul')
+      const a2Hit = dmg(talent.e['驰轮车重击循环伤害'], 'a2,nightsoul')
+      let c6Blaze = { dmg: 0, avg: 0 }
+      if (cons >= 6) {
+        c6Blaze = dmg(500, 'e,nightsoul')
+      }
+      return {
+        dmg: eHit.dmg + qHit.dmg + a2Hit.dmg * 9 + c6Blaze.dmg * 4,
+        avg: eHit.avg + qHit.avg + a2Hit.avg * 9 + c6Blaze.avg * 4
+      }
+    }
   }, {
     // 队伍伤害
     title: ({ cons }) => `${teamConfig(cons, team_C, artifact_C, mainCharName).title}「坠日斩」融化`,
     params: ({cons}) => ({
-      ...teamConfig(cons, team_C, artifact_C).params, 
+      ...teamConfig(cons, team_C, artifact_C).params,
       q: true
-    }),
-    dmg: ({ talent }, dmg) => dmg(talent.q['技能伤害'], 'q,nightsoul', 'melt')
-  }, {
-    title: ({ cons }) => `${teamConfig(cons, team, artifact_normal, mainCharName).title}「坠日斩」融化`,
-    params: ({cons}) => ({
-      ...teamConfig(cons, team, artifact_normal).params, 
-      q: true, pyro_two: true, Xilonen_pyro: true
     }),
     dmg: ({ talent }, dmg) => dmg(talent.q['技能伤害'], 'q,nightsoul', 'melt')
   }, {
@@ -72,17 +80,22 @@ export const details = applyStandardTeam([
     }),
     dmg: ({ talent }, dmg) => dmg(talent.q['技能伤害'], 'q,nightsoul', 'melt')
   }, {
+    title: ({ cons }) => `${teamConfig(cons, team, artifact_normal, mainCharName).title}「坠日斩」融化`,
+    params: ({cons}) => ({
+      ...teamConfig(cons, team, artifact_normal).params,
+      q: true, pyro_two: true, Xilonen_pyro: true
+    }),
+    dmg: ({ talent }, dmg) => dmg(talent.q['技能伤害'], 'q,nightsoul', 'melt')
+  }, {
     title: '当前圣遗物套装',
-    dmg: ({ artis }) => ({
-      avg: artis,
-      type: 'text'
-    })
+    dmg: ({ artis }) => ({ avg: artis, type: 'text' })
   }
-])
+  ])
 
 export const mainAttr = 'atk,mastery,cpct,cdmg'
 export const defParams = { Nightsoul: true }
 export const defDmgIdx = 2
+export const consDmgKey = '单人站场10秒总伤'
 
 export const buffs = [
   ...TeamBuff,
@@ -102,9 +115,9 @@ export const buffs = [
     }
   },{
     check: ({ params }) => params.q === true,
-    title: '天赋「基扬戈兹」：满战意释放元素爆发后，造成的伤害提升[dmg]%',
+    title: ({ params }) => `天赋「基扬戈兹」：满战意释放元素爆发后，伤害提升${params.jiyangezi ?? 40}%`,
     data: {
-      dmg: 40
+      dmg: ({ params }) => params.jiyangezi ?? 40
     }
   },{
     title: '1命「夜主的授记」：获取战意后，玛薇卡的攻击力提升[atkPct]%',
@@ -131,15 +144,13 @@ export const buffs = [
     }
   },{
     check: ({ params }) => params.q === true,
-    title: '4命「领袖的觉悟」：额外获得[dmg]%伤害加成 ',
+    title: '4命「领袖的觉悟」：额外获得10%伤害加成 ',
     cons: 4,
     data: {
       dmg: 10
     }
   },{
-    title: '6命「人之名解放」：焚曜之环命中时，额外造成200%攻击力的火元素范围伤害',
+    title: '6命「人之名解放」：焚曜之环额外造成200%攻击力的火伤，驰轮车额外造成500%攻击力的火伤',
     cons: 6,
-    data: {
-    }
   }
 ]
