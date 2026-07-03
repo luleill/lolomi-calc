@@ -143,6 +143,8 @@
     'Varka': '法尔伽',
     'Linnea': '莉奈娅',
     'Nicole': '尼可',
+    'Marionettenew': '桑多涅',
+    'Odette': '奥黛塔',
   };
 
   // 角色简称 - 常用辅助
@@ -154,6 +156,7 @@
     '奶奶': 'Citlali',
     '九条': 'Sara',
     '少女': 'Columbina',
+    '木偶': 'Marionettenew',
   };
 
   const nameAbbr = (characterName) => {

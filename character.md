@@ -119,5 +119,6 @@
 - 尼可 Nicole ✅
 - 布伦妮 Prune ✅
 - 桑多涅 Marionettenew ✅
+- 奥黛塔 Odette ✅
 
 </details>
