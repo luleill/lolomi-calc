@@ -246,7 +246,7 @@ let TeamBuff = [
   {
     check: ({ params }) => params.Jean_best || params.Jean_mid || params.Jean_low,
     title: '琴',
-    // 四命减风扗40%
+    // 四命减风抗40%
     data: {
       kx: ({ params, element }) => (params.Jean_best && element === '风') ? 40 : 0
     }
@@ -726,6 +726,57 @@ let TeamBuff = [
       qPlus: ({ params }) => params.Nicole_best ? 3500 : 0,
       ignore: ({ params }) => params.Nicole_best ? 40 : 0,
       dmg: ({ params }) => params.Nicole_best ? 58 : params.Nicole_mid ? 26 : 0
+    }
+  },
+  {
+    check: ({ params }) => params.QiQi_low || params.QiQi_mid || params.QiQi_best,
+    title: '七七',
+    // E持续期间全队星超导增伤50%
+    // 6命提升星超导基础值，只生效4次，保守一点按七七实际3000攻击算
+    data: {
+      stellarConduct: 50,
+      fyplus: ({ params }) => params.QiQi_best ? 18000 : 0
+    }
+  },
+  {
+    check: ({ params }) => params.Diona_low || params.Diona_mid || params.Diona_best,
+    title: '迪奥娜',
+    // 6命Q领域内精通+200，星超导增伤40
+    data: {
+      stellarConduct: ({ params }) => params.Diona_best ? 40 : 0,
+      mastery: ({ params }) => params.Diona_best ? 200 : 0
+    }
+  },
+  {
+    check: ({ params }) => params.YaeMiko_low || params.YaeMiko_mid || params.YaeMiko_best,
+    title: '八重神子',
+    // 1命触发星超导时，雷伤+50，星超导增伤50
+    // 2命四阶杀生樱提升精通200
+    // 4命提升20雷伤
+    data: {
+      dmg: ({ params, element }) => (params.YaeMiko_best || params.YaeMiko_mid) && element === '雷' ? 50 : 0,
+      stellarConduct: ({ params }) => (params.YaeMiko_best || params.YaeMiko_mid) ? 50 : 0,
+      mastery: ({ params }) => (params.YaeMiko_best || params.YaeMiko_mid) ? 200 : 0,
+      dmg: ({ params, element }) => (params.YaeMiko_best && element === '雷') ? 20 : 0,
+    }
+  },
+  {
+    check: ({ params }) => params.Cyno_low || params.Cyno_mid || params.Cyno_best,
+    title: '赛诺',
+    // 1命200精通继承给上场队友
+    // 2命满层星超导增伤80
+    data: {
+      mastery: ({ params }) => (params.Cyno_mid || params.Cyno_best) ? 200 : 0,
+      stellarConduct: ({ params }) => (params.Cyno_mid || params.Cyno_best) ? 80 : 0
+    }
+  },
+  {
+    check: ({ params }) => params.BeiDou_low || params.BeiDou_mid || params.BeiDou_best,
+    title: '北斗',
+    // 6命降低敌人冰雷抗15,精通+200
+    data: {
+      kx: ({ params, element }) => (params.BeiDou_best) && (element === '冰' || element === '雷') ? 15 : 0,
+      mastery: ({ params }) => (params.BeiDou_best) ? 200 : 0
     }
   }
 ]
