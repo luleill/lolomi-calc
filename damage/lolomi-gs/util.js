@@ -171,6 +171,7 @@
       '阿蕾奇诺': '仆',
       '纳西妲': '草',
       '哥伦比娅': '月',
+      '迪奥娜': '猫',
     };
     
     return specials[characterName] || characterName.charAt(0);

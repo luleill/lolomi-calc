@@ -36,7 +36,7 @@ export const details = applyStandardTeam([
   }, {
     title: '「棱晶弹」星超导伤害',
     params: { ispower: true },
-    dmg: ({ attr, calc, talent }, { basic }) => basic(calc(attr.atk) * talent.e['棱晶弹星超导伤害'] / 100, '', 'stellarConduct')
+    dmg: ({ attr, calc, talent }, { basic }) => basic(calc(attr.atk) * talent.e['棱晶弹星超导伤害'] / 100, 'e', 'stellarConduct')
   }, {
     title: '「聚能光束」单段伤害',
     dmg: ({ talent }, dmg) => dmg(talent.q['聚能光束伤害'], 'q')
@@ -101,7 +101,7 @@ export const details = applyStandardTeam([
         totalDmg += cluster.dmg
         totalAvg += cluster.avg
       }
-      const eBulletStar = basic(calc(attr.atk) * talent.e['棱晶弹星超导伤害'] / 100, '', 'stellarConduct')
+      const eBulletStar = basic(calc(attr.atk) * talent.e['棱晶弹星超导伤害'] / 100, 'e', 'stellarConduct')
       totalDmg += eBulletStar.dmg * eCount
       totalAvg += eBulletStar.avg * eCount
       const qBomb = basic(calc(attr.atk) * talent.q['轰炸伤害'] / 100, 'q')
@@ -118,12 +118,32 @@ export const details = applyStandardTeam([
       return { dmg: totalDmg, avg: totalAvg }
     }
   }, {
+    title: ({ cons }) => `${teamConfig(cons, team_B, artifact_B, mainCharName).title}「聚能光束」星超导`,
+    params: ({cons}) => ({
+      ...teamConfig(cons, team_B, artifact_B).params,
+      cryo_two: true, tactic: 10
+    }),
+    dmg: ({ attr, calc, talent, params }, { basic }) => {
+      const tacticMult = 1 + Math.min(params.tactic ?? 10, 10) * 0.10
+      return basic(calc(attr.atk) * talent.q['聚能光束星超导伤害'] / 100 * tacticMult, '', 'stellarConduct')
+    }
+  }, {
     title: ({ cons }) => `${teamConfig(cons, team_B, artifact_B, mainCharName).title}「冷凝射线」星超导`,
     params: ({cons}) => ({
       ...teamConfig(cons, team_B, artifact_B).params,
       cryo_two: true
     }),
     dmg: ({ attr, calc, talent }, { basic }) => basic(calc(attr.atk) * talent.a['重击冷凝射线星超导伤害'] / 100, 'a2', 'stellarConduct')
+  }, {
+    title: ({ cons }) => `${teamConfig(cons, team, artifact_normal, mainCharName).title}「聚能光束」星超导`,
+    params: ({cons}) => ({
+      ...teamConfig(cons, team, artifact_normal).params,
+      Xilonen_cryo: true, cryo_two: true, tactic: 10
+    }),
+    dmg: ({ attr, calc, talent, params }, { basic }) => {
+      const tacticMult = 1 + Math.min(params.tactic ?? 10, 10) * 0.10
+      return basic(calc(attr.atk) * talent.q['聚能光束星超导伤害'] / 100 * tacticMult, '', 'stellarConduct')
+    }
   }, {
     title: ({ cons }) => `${teamConfig(cons, team, artifact_normal, mainCharName).title}「冷凝射线」星超导`,
     params: ({cons}) => ({
