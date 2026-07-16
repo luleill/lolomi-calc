@@ -81,7 +81,7 @@
 - 娜维娅 Navia
 - 嘉明 Gaming
 - 闲云 Xian_Yun
-- 千织 Chiori
+- 千织 Chiori ✅
 - 希格雯 Sigewinne
 - 阿蕾奇诺 Arlecchino
 - 赛索斯 Sethos
