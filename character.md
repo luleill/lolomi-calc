@@ -83,7 +83,7 @@
 - 闲云 Xian_Yun
 - 千织 Chiori ✅
 - 希格雯 Sigewinne ✅
-- 阿蕾奇诺 Arlecchino
+- 阿蕾奇诺 Arlecchino ✅
 - 赛索斯 Sethos
 - 克洛琳德 Clorinde
 - 艾梅莉埃 Emilie

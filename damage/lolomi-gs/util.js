@@ -143,6 +143,8 @@
     'Varka': '法尔伽',
     'Linnea': '莉奈娅',
     'Nicole': '尼可',
+    'Lohen': '洛恩',
+    'Prune': '布伦妮',
     'Marionettenew': '桑多涅',
     'Odette': '奥黛塔',
   };

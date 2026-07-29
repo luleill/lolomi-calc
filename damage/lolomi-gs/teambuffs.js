@@ -100,6 +100,14 @@ const artiEffectActive = (paramKey, params, artis) => {
   return true
 }
 
+/**
+ * 队伍魔导角色计数：队伍凑齐魔导秘仪才生效天之美赐的40增伤效果，否则只吃20增伤
+ * 用于主角色非魔导，但带了魔导辅助的情况，例如 玛茜希尼
+ */
+const HEXEN_TEAMMATES = ['Sucrose', 'Nicole', 'Durin', 'Venti', 'Mona', 'Klee', 'Fischl', 'Albedo', 'Razor', 'Varka', 'Lohen', 'Prune']
+const hexenCount = (params) => (params.Hexenzirkel ? 1 : 0) +
+  HEXEN_TEAMMATES.filter(n => params[`${n}_best`] || params[`${n}_mid`] || params[`${n}_low`]).length
+
 let TeamBuff = [
   // 纳塔地方传奇满层增伤+双药(20暴击20爆伤，属伤药)
   {
@@ -114,28 +122,28 @@ let TeamBuff = [
   // 队伍增益 - 元素共鸣buff
   {
     check: ({ params }) => params.superconductivity === true,
-    title: '元素反应：[超导] 降低受超导影响生物[kx]%的物理抗性',
+    title: '元素反应：[超导] 降低受超导影响生物25%的物理抗性',
     data: {
       kx: 25
     }
   },
   {
     check: ({ params }) => params.hydro_two === true,
-    title: '元素共鸣：[愈疗之水] 生命值上限提升[hpPct]%',
+    title: '元素共鸣：[愈疗之水] 生命值上限提升25%',
     data: {
       hpPct: 25
     }
   },
   {
     check: ({ params }) => params.pyro_two === true,
-    title: '元素共鸣：[热诚之火] 攻击力提高[atkPct]%',
+    title: '元素共鸣：[热诚之火] 攻击力提高25%',
     data: {
       atkPct: 25
     }
   },
   {
     check: ({ params }) => params.geo_two === true,
-    title: '元素共鸣：[坚定之岩] 护盾强效提升[shield]%，造成的伤害提升[dmg]%，降低敌人[kx]%元素抗性',
+    title: '元素共鸣：[坚定之岩] 护盾强效提升25%，造成的伤害提升15%，降低敌人20%元素抗性',
     data: {
       shield: 25,
       dmg: 15,
@@ -144,14 +152,14 @@ let TeamBuff = [
   },
   {
     check: ({ params }) => params.dendro_two === true,
-    title: '元素共鸣：[蔓生之草] 触发燃烧、原激化、绽放反应后，提升元素精通[mastery]点,',
+    title: '元素共鸣：[蔓生之草] 触发燃烧、原激化、绽放反应后，提升元素精通80点,',
     data: {
       mastery: 80
     }
   },
   {
     check: ({ params }) => params.cryo_two === true,
-    title: '元素共鸣：[粉碎之冰] 攻击处于冰元素附着或冻结下的敌人时，暴击率提高[cpct]%',
+    title: '元素共鸣：[粉碎之冰] 攻击处于冰元素附着或冻结下的敌人时，暴击率提高15%',
     data: {
       cpct: 15
     }
@@ -160,21 +168,21 @@ let TeamBuff = [
   // 队友圣遗物增益
   { 
     check: ({ params, artis }) => artiEffectActive('zongshi', params, artis),
-    title: '昔日宗室之仪：队伍中所有角色攻击力提升[atkPct]%',
+    title: '昔日宗室之仪：队伍中所有角色攻击力提升20%',
     data: {
       atkPct: 20
     }    
   },
   { 
     check: ({ params, artis }) => artiEffectActive('jincheng', params, artis),
-    title: '烬城勇者绘卷：所有元素伤害加成与物理伤害加成提升[dmg]%',
+    title: '烬城勇者绘卷：所有元素伤害加成与物理伤害加成提升40%',
     data: {
       dmg: 40
     }    
   },
   { 
     check: ({ params, artis }) => artiEffectActive('yege', params, artis),
-    title: '纺月的夜歌：元素精通提升[mastery],月曜反应造成的伤害提升[lunarBloom]%',
+    title: '纺月的夜歌：元素精通提升120,月曜反应造成的伤害提升10%',
     data: {
       mastery: 120,
       lunarCharged: 10,
@@ -184,28 +192,28 @@ let TeamBuff = [
   },
   { 
     check: ({ params, artis }) => artiEffectActive('jiaoguan', params, artis),
-    title: '教官：触发元素反应后，队伍中所有角色的元素精通提高[mastery]点',
+    title: '教官：触发元素反应后，队伍中所有角色的元素精通提高120点',
     data: {
       mastery: 120
     }    
   },
   { 
     check: ({ params, artis }) => artiEffectActive('fengtao', params, artis),
-    title: '翠绿之影：根据扩散的元素类型，降低受到影响的敌人[fykx]%的对应元素抗性',
+    title: '翠绿之影：根据扩散的元素类型，降低受到影响的敌人40%的对应元素抗性',
     data: {
       kx: 40
     }    
   },
   { 
     check: ({ params, artis }) => artiEffectActive('caotao', params, artis),
-    title: '深林的记忆：使命中目标的元素抗性降低[kx]%',
+    title: '深林的记忆：使命中目标的元素抗性降低30%',
     data: {
       kx: 30
     }    
   },
   { 
     check: ({ params, artis }) => artiEffectActive('qianyan', params, artis),
-    title: '千岩牢固：元素战技命中敌人后，使队伍中附近的所有角色攻击力提升[atkPct]%，护盾强效提升[shield]%',
+    title: '千岩牢固：元素战技命中敌人后，使队伍中附近的所有角色攻击力提升20%，护盾强效提升30%',
     data: {
       atkPct: 20,
       shield: 30
@@ -213,7 +221,7 @@ let TeamBuff = [
   },
   { 
     check: ({ params, artis }) => artiEffectActive('panyan', params, artis),
-    title: '悠古的磐岩：获得结晶反应形成的晶片时，队伍中所有角色获得[dmg]%对应元素伤害加成',
+    title: '悠古的磐岩：获得结晶反应形成的晶片时，队伍中所有角色获得35%对应元素伤害加成',
     data: {
       dmg: 35
     }    
@@ -222,7 +230,7 @@ let TeamBuff = [
     check: ({ params, artis }) => artiEffectActive('tianmei', params, artis),
     title: '天之美赐：施放元素战技后附近的所有角色获得[dmg]%元素伤害加成',
     data: {
-      dmg: ({ params }) => params.Hexenzirkel ? 40 : 0
+      dmg: ({ params }) => hexenCount(params) >= 2 ? 40 : 20
     }    
   },
 
@@ -452,6 +460,20 @@ let TeamBuff = [
       // 苍古被动去重
       atkPct: (ds) => getMutexPassiveValue('千年的大乐章', 'atkPct', 'Kazuha', ds.params, ds),
       dmg: ({ params }) => (params.Kazuha_best || params.Kazuha_mid) ? 72 : 56
+    }
+  },
+  {
+    check: ({ params }) => params.Sucrose_low || params.Sucrose_mid || params.Sucrose_best,
+    title: '砂糖',
+    // Hexenzirkel 魔导·秘仪队伍
+    // 实战充能为主
+    // 高配6+5默认800精通，中配2+1默认700，低配0+0默认600
+    data: {
+      mastery: ({ params }) => params.Sucrose_best ? 210 : params.Sucrose_mid ? 190 : 170,
+      dmg: ({ params }) => {
+        const c6 = params.Sucrose_best ? (params.Hexenzirkel ? 20 + 8.57 : 20) : 0
+        return c6 + (params.Hexenzirkel ? 5.71 + 7.14 : 5.71)
+      }
     }
   },
   {
