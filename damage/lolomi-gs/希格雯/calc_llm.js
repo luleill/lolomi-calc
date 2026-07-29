@@ -111,6 +111,9 @@ export const details = applyStandardTeam([
 export const mainAttr = 'hp,heal,cpct,cdmg'
 export const defDmgIdx = 3
 export const consDmgKey = 'EQ一轮总伤'
+// 谐律套判定，正常情况希格雯只会靠自产的两枚水滴吃到两层增伤效果
+// 希格雯主C，谐律套整体完全比不上绝缘套，曾有人跟我犟，所以把谐律套也加上作为对比
+export const defParams = { BondOfLifeGet: 2 }
 
 export const buffs = [
   ...TeamBuff,
