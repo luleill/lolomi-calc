@@ -85,7 +85,7 @@
 - 希格雯 Sigewinne ✅
 - 阿蕾奇诺 Arlecchino ✅
 - 赛索斯 Sethos
-- 克洛琳德 Clorinde
+- 克洛琳德 Clorinde ✅
 - 艾梅莉埃 Emilie
 - 卡齐娜 Kachina
 - 玛拉妮 Mualani ✅

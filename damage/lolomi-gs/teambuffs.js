@@ -291,11 +291,11 @@ let TeamBuff = [
     // Hexenzirkel 魔导·秘仪队伍
     data: {
       aPlus: ({ params }) => (params.Durin_best || params.Durin_mid) ? 1800: 0,
-      dmg: ({ params }) => (params.Durin_best && params.Durin_mid) ? 50 : 0,
+      dmg: ({ params }) => (params.Durin_best || params.Durin_mid) ? 50 : 0,
       enemyDef: ({ params }) => params.Durin_best ? 30 : 0,
       kx: ({ params, element }) => {
-        if ((params.Durin_best || params.Durin_mid || params.Durin_low) && params.Hexenzirkel && (element !== '水' || element !== '冰')) return 35
-        if ((params.Durin_best || params.Durin_mid || params.Durin_low) && (element !== '水' || element !== '冰')) return 20
+        if ((params.Durin_best || params.Durin_mid || params.Durin_low) && params.Hexenzirkel && (element !== '水' && element !== '冰')) return 35
+        if ((params.Durin_best || params.Durin_mid || params.Durin_low) && (element !== '水' && element !== '冰')) return 20
       },
       atkPct: ({ params }) => {
         if (params.Durin_best && params.Hexenzirkel) return 56
@@ -595,6 +595,7 @@ let TeamBuff = [
       mastery: ({ params }) => {
         if (params.Nahida_best) return 298;
         if (params.Nahida_mid) return 290;
+        if (params.Nahida_low) return 200;
         return 0;
       }
     }
@@ -632,8 +633,8 @@ let TeamBuff = [
     // 高6+5香韵 中6+1香韵 低 2+0西风
     data: {
       kx: 40,
-      atkPct: ({ params }) => params.Iansan_best ? 104 : params.Iansan_mid ? 72 : params.Iansan_low ? 40 : 0,
-      dmg: ({ params , element }) => (params.Iansan_best && element === '火' || element === '雷') ? 60 : 0,
+      atkPct: ({ params }) => params.Chevreuse_best ? 104 : params.Chevreuse_mid ? 72 : params.Chevreuse_low ? 40 : 0,
+      dmg: ({ params , element }) => (params.Chevreuse_best && (element === '火' || element === '雷')) ? 60 : 0,
     }
   },
   {

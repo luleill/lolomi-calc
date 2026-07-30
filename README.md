@@ -84,6 +84,7 @@ git clone --depth=1 https://gitee.com/land-route_lu/lolomi-calc.git ./plugins/lo
 - 千织
 - 希格雯
 - 阿蕾奇诺
+- 克洛琳德
 - 奥黛塔
 
 </details>
