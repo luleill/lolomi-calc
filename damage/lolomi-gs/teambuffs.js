@@ -111,7 +111,7 @@ const hexenCount = (params) => (params.Hexenzirkel ? 1 : 0) +
 /**
  * 辅助角色buff生效次数限制
  * Nicole    尼可4命：8次
- * Durin     杜林1命：20次
+ * Durin     杜林1命：基础20次，4命30%几率不消耗，期望约28次
  * Citlali   茜特菈莉1命：基础10次 + 后续触发3次 = 13次
  * Xilonen   希诺宁4命：6次
  * Escoffier 爱可菲2命：5次
@@ -129,7 +129,7 @@ const LIMITED_PLUS = {
   },
   Durin: {
     plus: ({ params }) => (params.Durin_best || params.Durin_mid) ? 1800 : 0,
-    limit: 20
+    limit: ({ params }) => params.Durin_best ? 28 : 20
   },
   Citlali: {
     plus: ({ params }) => params.Citlali_best ? 3000 : params.Citlali_mid ? 2600 : 0,
@@ -332,10 +332,9 @@ let TeamBuff = [
   {
     check: ({ params }) => params.Venti_best || params.Venti_mid || params.Venti_low || params.Hexenzirkel === false,
     title: '温迪',
-    // Hexenzirkel 魔导·秘仪队伍
     data: {
       dmg: ({ params, element }) => {
-        if (params.Hexenzirkel && element !== '风') return 50
+        if ((params.Venti_best || params.Venti_mid || params.Venti_low) && hexenCount(params) >= 2 && element !== '风') return 50
         if (params.Venti_best && element === '风') return 25
       },
       kx: ({ params, element }) => {
@@ -350,7 +349,7 @@ let TeamBuff = [
   {
     check: ({ params }) => params.Durin_best || params.Durin_mid || params.Durin_low || params.Hexenzirkel === false,
     title: '杜林',
-    // Hexenzirkel 魔导·秘仪队伍
+    // 专武加攻：精五32%/精一16%，魔导秘仪56%/28%
     data: {
       aPlus: LIMITED_PLUS.Durin.plus,
       a2Plus: LIMITED_PLUS.Durin.plus,
@@ -360,14 +359,13 @@ let TeamBuff = [
       dmg: ({ params }) => (params.Durin_best || params.Durin_mid) ? 50 : 0,
       enemyDef: ({ params }) => params.Durin_best ? 30 : 0,
       kx: ({ params, element }) => {
-        if ((params.Durin_best || params.Durin_mid || params.Durin_low) && params.Hexenzirkel && (element !== '水' && element !== '冰')) return 35
-        if ((params.Durin_best || params.Durin_mid || params.Durin_low) && (element !== '水' && element !== '冰')) return 20
+        if (!(params.Durin_best || params.Durin_mid || params.Durin_low)) return 0
+        if (element === '水' || element === '冰') return 0
+        return hexenCount(params) >= 2 ? 35 : 20
       },
       atkPct: ({ params }) => {
-        if (params.Durin_best && params.Hexenzirkel) return 56
-        if (params.Durin_best) return 32
-        if (params.Durin_mid && params.Hexenzirkel) return 28
-        if (params.Durin_mid) return 16
+        const base = params.Durin_best ? 32 : params.Durin_mid ? 16 : 0
+        return hexenCount(params) >= 2 ? base * 1.75 : base
       }
     }
   },
@@ -382,11 +380,11 @@ let TeamBuff = [
   },
   {
     check: ({ params }) => params.Fischl_best || params.Fischl_mid || params.Fischl_low || params.Hexenzirkel === false,
-    // 触发超载，全队加攻，触发感电，全队加精通，默认魔导队攻击和精通都吃
+    // 触发超载，全队加攻，触发感电，全队加精通
     title: '菲谢尔',
     data: {
-      atkPct: ({ params }) => (params.Fischl_best || params.Fischl_mid || (params.Fischl_low && params.Hexenzirkel)) ? 22.5 : 0,
-      mastery: ({ params }) => (params.Fischl_best || params.Fischl_mid || (params.Fischl_low && params.Hexenzirkel)) ? 90 : 0
+      atkPct: ({ params }) => (params.Fischl_best || params.Fischl_mid || (params.Fischl_low && hexenCount(params) >= 2)) ? 22.5 : 0,
+      mastery: ({ params }) => (params.Fischl_best || params.Fischl_mid || (params.Fischl_low && hexenCount(params) >= 2)) ? 90 : 0
     }
   },
   {

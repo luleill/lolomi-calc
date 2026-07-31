@@ -29,7 +29,7 @@ const plusOverflow = (ds, dmg) => {
   const plusA = dmg(0, 'a')
   const plusQ = dmg(0, 'q')
   const aOver = attr.a.plus
-    ? (nicolePlus * Math.max(aSegs - LIMITED_PLUS.Nicole.limit, 0) + durinPlus * Math.max(aSegs - LIMITED_PLUS.Durin.limit, 0)) / attr.a.plus
+    ? (nicolePlus * Math.max(aSegs - LIMITED_PLUS.Nicole.limit, 0) + durinPlus * Math.max(aSegs - LIMITED_PLUS.Durin.limit(ds), 0)) / attr.a.plus
     : 0
   const qOver = attr.q.plus ? (nicolePlus + durinPlus) * 5 / attr.q.plus : 0
   return {

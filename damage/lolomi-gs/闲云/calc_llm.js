@@ -22,7 +22,7 @@ const rushPlus = ({ attr, calc, cons }) => cons >= 2
   : Math.min(calc(attr.atk) * 200 / 100, 9000)
 
 // 队友buff期望次数拆分
-// 尼可4命效果8次、杜林1命效果20次
+// 尼可4命效果8次、杜林1命效果基础20次
 const plusOverflow = (ds, dmg, hits, eCount) => {
   const { attr } = ds
   const nicolePlus = LIMITED_PLUS.Nicole.plus(ds)
@@ -38,7 +38,7 @@ const plusOverflow = (ds, dmg, hits, eCount) => {
     return ret
   }
   const nicole = effCount(LIMITED_PLUS.Nicole.limit)
-  const durin = effCount(LIMITED_PLUS.Durin.limit)
+  const durin = effCount(LIMITED_PLUS.Durin.limit(ds))
   const total = { a3: hits + 1, e: eCount + 1, q: hits + 1 }
   const over = (key) => attr[key].plus
     ? (nicolePlus * (total[key] - nicole[key]) + durinPlus * (total[key] - durin[key])) / attr[key].plus

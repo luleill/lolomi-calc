@@ -11,7 +11,7 @@ const team_B = ['珐露珊', '莫娜', '尼可']
 const artifact_B = ['千岩', '宗室', '美赐']
 
 const config = Config.getConfig('user', 'config');
-const applyStandardTeam = withStdTeam(mainCharName, team, artifact_normal, config,{ cons_2: true, q: true, ssfr: true })
+const applyStandardTeam = withStdTeam(mainCharName, team, artifact_normal, config,{ q: true, ssfr: true })
 
 // 队友buff期望次数拆分
 // 尼可4命8次效果、杜林1命20次效果
@@ -39,7 +39,7 @@ const plusOverflow = (ds, dmg, colorFactor, dotHits) => {
     ret[key] += scale;
     return ret;
   }, { a: 0, e: 0, q: 0, qColor: 0 });
-  const total = effect(seq.length), nicole = effect(LIMITED_PLUS.Nicole.limit), durin = effect(LIMITED_PLUS.Durin.limit);
+  const total = effect(seq.length), nicole = effect(LIMITED_PLUS.Nicole.limit), durin = effect(LIMITED_PLUS.Durin.limit(ds));
   const colorUnit = dmg(0, 'q', 'coloringDmg');
   const plusUnit = {
     a: dmg(0, 'a'),
