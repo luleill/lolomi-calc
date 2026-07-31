@@ -1,4 +1,4 @@
-import { TeamBuff } from '../teambuffs.js'
+import { TeamBuff, LIMITED_PLUS } from '../teambuffs.js'
 import { teamConfig, withStdTeam } from '../util.js'
 import { Config } from '#lolomi'
 
@@ -13,12 +13,56 @@ const artifact_B = ['千岩', '宗室', '美赐']
 const config = Config.getConfig('user', 'config');
 const applyStandardTeam = withStdTeam(mainCharName, team, artifact_normal, config,{ cons_2: true, q: true, ssfr: true })
 
+// 队友buff期望次数拆分
+// 尼可4命8次效果、杜林1命20次效果
+const plusOverflow = (ds, dmg, colorFactor, dotHits) => {
+  const { attr, cons } = ds;
+  const nicolePlus = LIMITED_PLUS.Nicole.plus(ds);
+  const durinPlus = LIMITED_PLUS.Durin.plus(ds);
+  if (!nicolePlus && !durinPlus) return { dmg: 0, avg: 0 };
+  const aSeq = [];
+  const c1Scale = cons >= 1 ? 1.4 : 1;
+  for (let i = 0; i < (cons >= 2 ? 7 : 8); i++) {
+    aSeq.push(['a', c1Scale], ['a', 1], ['a', c1Scale]);
+  }
+  const seq = [['e', 1]];
+  if (cons >= 2) seq.push(['e', 3]);
+  for (let i = 0; i < dotHits; i++) {
+    seq.push(['q', 1], ['qColor', 1]);
+    if (aSeq.length) seq.push(aSeq.shift());
+    // 2命的第二次强化E穿插在半程
+    if (cons >= 2 && i === Math.floor(dotHits / 2)) seq.push(['e', 3]);
+  }
+  if (cons < 2) seq.push(['e', 1]);
+  seq.push(...aSeq);
+  const effect = (limit) => seq.slice(0, limit).reduce((ret, [key, scale]) => {
+    ret[key] += scale;
+    return ret;
+  }, { a: 0, e: 0, q: 0, qColor: 0 });
+  const total = effect(seq.length), nicole = effect(LIMITED_PLUS.Nicole.limit), durin = effect(LIMITED_PLUS.Durin.limit);
+  const colorUnit = dmg(0, 'q', 'coloringDmg');
+  const plusUnit = {
+    a: dmg(0, 'a'),
+    e: dmg(0, 'e'),
+    q: dmg(0, 'q'),
+    qColor: { dmg: colorUnit.dmg * colorFactor, avg: colorUnit.avg * colorFactor }
+  };
+  return Object.keys(plusUnit).reduce((acc, key) => {
+    const plus = attr[key === 'qColor' ? 'q' : key].plus;
+    const over = plus ? (nicolePlus * (total[key] - nicole[key]) + durinPlus * (total[key] - durin[key])) / plus : 0;
+    acc.dmg += plusUnit[key].dmg * over;
+    acc.avg += plusUnit[key].avg * over;
+    return acc;
+  }, { dmg: 0, avg: 0 });
+};
+
 // 一轮循环伤害计算
 // 默认先触发满buff，木桩自挂火元素
 // 2命以上 EQ + 强化E + 7轮3A普攻 穿插+ 一次强化E，2命以下EQ + 8轮3A + E
 // 一命的分裂箭默认1段和3段普攻触发
 // q和q的染色默认触发20次，实际应该21次，首段伤害吃不到部分buff，平衡一下，扩散约17次
-const calcRotation = ({ talent, cons, attr }, dmg) => {
+const calcRotation = (ds, dmg) => {
+  const { talent, cons, attr } = ds;
   const eNormal = dmg(talent.e['点按伤害'], 'e');
   const qDot = dmg(talent.q['持续伤害'], 'q');
   const qColorRaw = dmg(talent.q['附加元素伤害'], 'q', 'coloringDmg');
@@ -40,6 +84,7 @@ const calcRotation = ({ talent, cons, attr }, dmg) => {
     dmg: qDot.dmg * dotHits + qColor.dmg * colorHits + swirlUnit * swirlHits,
     avg: qDot.avg * dotHits + qColor.avg * colorHits + swirlUnit * swirlHits,
   };
+  const over = plusOverflow(ds, dmg, colorFactor, dotHits);
   // 飓风箭单轮3A
   const c1Shots = ['一', '三'];
   const one3A = '一二三'.split('').reduce((acc, num) => {
@@ -54,14 +99,14 @@ const calcRotation = ({ talent, cons, attr }, dmg) => {
     // EQ + 强化E + 7轮3A + 强化E
     const eEnhanced = { dmg: eNormal.dmg * 3, avg: eNormal.avg * 3 };
     return {
-      dmg: eNormal.dmg + qTotal.dmg + eEnhanced.dmg * 2 + one3A.dmg * 7,
-      avg: eNormal.avg + qTotal.avg + eEnhanced.avg * 2 + one3A.avg * 7,
+      dmg: eNormal.dmg + qTotal.dmg + eEnhanced.dmg * 2 + one3A.dmg * 7 - over.dmg,
+      avg: eNormal.avg + qTotal.avg + eEnhanced.avg * 2 + one3A.avg * 7 - over.avg,
     };
   } else {
     // EQ + 8轮3A + E
     return {
-      dmg: eNormal.dmg * 2 + qTotal.dmg + one3A.dmg * 8,
-      avg: eNormal.avg * 2 + qTotal.avg + one3A.avg * 8,
+      dmg: eNormal.dmg * 2 + qTotal.dmg + one3A.dmg * 8 - over.dmg,
+      avg: eNormal.avg * 2 + qTotal.avg + one3A.avg * 8 - over.avg,
     };
   }
 };
@@ -131,7 +176,7 @@ export const details = applyStandardTeam([
     params: ({ artis }) => ({ q: true, ssfr: true, fengtao: !!(artis?.['翠绿之影'] >= 4) }),
     dmg: (ds, dmg) => calcRotation(ds, dmg)
   }, {
-    // 队伍伤害，班尼特和莫娜buff覆盖率不够，移除一点风套染色伤害补偿，计算应该还是会偏高不少
+    // 队伍伤害 队友buff覆盖率偏差，移除风套染色伤害补偿，计算应该还是会偏高不少
     title: ({ cons }) => `${teamConfig(cons, team_B, artifact_B, mainCharName).title} 强化[E]伤害`,
     cons: 2,
     params: ({ cons }) => ({

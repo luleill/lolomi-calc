@@ -1,4 +1,4 @@
-import { TeamBuff } from '../teambuffs.js'
+import { TeamBuff, LIMITED_PLUS } from '../teambuffs.js'
 import { teamConfig, withStdTeam } from '../util.js'
 import { Config } from '#lolomi'
 
@@ -33,18 +33,19 @@ const applyStandardTeam = withStdTeam(mainCharName, team, artifact_normal, confi
 // 普攻aplus拆分生效次数
 // 希诺宁4命效果仅生效6次，尼可4命8次，茜特菈莉1命13次
 // 杜林20次效果默认全程生效
-const naPlusSum = ({ talent, attr, calc, params, cons }, plusHit, bond, hits, decaySum) => {
+const naPlusSum = (ds, plusHit, bond, hits, decaySum) => {
+  const { talent, attr, calc, cons } = ds
   const arleAPlus = calc(attr.atk) * bond / 100 *
     (cons >= 1 ? (talent.a['红死之宴提升'] + 100) : talent.a['红死之宴提升']) / 100
-  const xiloPlus = params.Xilonen_best ? 2600 : 0
-  const citlaliPlus = params.Citlali_best ? 3000 : params.Citlali_mid ? 2600 : 0
-  const nicolePlus = params.Nicole_best ? 3500 : 0
-  const durinPlus = (params.Durin_best || params.Durin_mid) ? 1800 : 0
+  const xiloPlus = LIMITED_PLUS.Xilonen.plus(ds)
+  const citlaliPlus = LIMITED_PLUS.Citlali.plus(ds)
+  const nicolePlus = LIMITED_PLUS.Nicole.plus(ds)
+  const durinPlus = LIMITED_PLUS.Durin.plus(ds)
   const caHits = cons >= 6 ? 2 : 1
   const naConsume = cons >= 6 ? 5 : 3
-  const xiloHits = Math.min(6 - caHits, hits)
-  const citlaliHits = Math.min(13 - naConsume, hits)
-  const nicoleHits = Math.min(8 - naConsume, hits)
+  const xiloHits = Math.min(LIMITED_PLUS.Xilonen.limit - caHits, hits)
+  const citlaliHits = Math.min(LIMITED_PLUS.Citlali.limit - naConsume, hits)
+  const nicoleHits = Math.min(LIMITED_PLUS.Nicole.limit - naConsume, hits)
   const factor = (arleAPlus * decaySum + xiloPlus * xiloHits + citlaliPlus * citlaliHits +
     nicolePlus * nicoleHits + durinPlus * hits) /
     (arleAPlus + xiloPlus + citlaliPlus + nicolePlus + durinPlus)

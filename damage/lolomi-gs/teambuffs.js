@@ -108,6 +108,68 @@ const HEXEN_TEAMMATES = ['Sucrose', 'Nicole', 'Durin', 'Venti', 'Mona', 'Klee', 
 const hexenCount = (params) => (params.Hexenzirkel ? 1 : 0) +
   HEXEN_TEAMMATES.filter(n => params[`${n}_best`] || params[`${n}_mid`] || params[`${n}_low`]).length
 
+/**
+ * 辅助角色buff生效次数限制
+ * Nicole    尼可4命：8次
+ * Durin     杜林1命：20次
+ * Citlali   茜特菈莉1命：基础10次 + 后续触发3次 = 13次
+ * Xilonen   希诺宁4命：6次
+ * Escoffier 爱可菲2命：5次
+ * XianYun   闲云Q「仙力助推」：8次
+ * ShenHe    申鹤「冰翎」：满命无限次、中配双E14次、低配7次
+ * QiQi      七七6命：4次
+ * Linnea    莉奈娅1命：18次
+ * Illuga    叶洛亚Q「夜莺之歌」：基础21次 + 额外15次 = 36次
+ * Lauma     菈乌玛Q：基础24层，6命机制默认视为无限次全程覆盖
+ */
+const LIMITED_PLUS = {
+  Nicole: {
+    plus: ({ params }) => params.Nicole_best ? 3500 : 0,
+    limit: 8
+  },
+  Durin: {
+    plus: ({ params }) => (params.Durin_best || params.Durin_mid) ? 1800 : 0,
+    limit: 20
+  },
+  Citlali: {
+    plus: ({ params }) => params.Citlali_best ? 3000 : params.Citlali_mid ? 2600 : 0,
+    limit: 13
+  },
+  Xilonen: {
+    plus: ({ params }) => params.Xilonen_best ? 2600 : 0,
+    limit: 6
+  },
+  Escoffier: {
+    plus: ({ params, element }) => (params.Escoffier_best && element === '冰') ? 9600 : (params.Escoffier_mid && element === '冰') ? 8400 : 0,
+    limit: 5
+  },
+  XianYun: {
+    plus: ({ params }) => (params.XianYun_best || params.XianYun_mid) ? 18000 : params.XianYun_low ? 7000 : 0,
+    limit: 8
+  },
+  ShenHe: {
+    plus: ({ params }) => params.ShenHe_best ? 5000 : params.ShenHe_mid ? 3500 : params.ShenHe_low ? 3000 : 0,
+    limit: ({ params }) => params.ShenHe_best ? Infinity : params.ShenHe_mid ? 14 : 7
+  },
+  QiQi: {
+    plus: ({ params }) => params.QiQi_best ? 18000 : 0,
+    limit: 4
+  },
+  Linnea: {
+    plus: ({ params }) => params.Linnea_best ? 10125 : params.Linnea_mid ? 3375 : 0,
+    limit: 18
+  },
+  Illuga: {
+    plus: ({ params }) => (params.Illuga_best || params.Illuga_mid) ? 950 : params.Illuga_low ? 850 : 0,
+    fyPlus: ({ params }) => (params.Illuga_best || params.Illuga_mid) ? 6400 : params.Illuga_low ? 5500 : 0,
+    limit: 36
+  },
+  Lauma: {
+    plus: ({ params }) => (params.Lauma_best || params.Lauma_mid) ? 9000 : params.Lauma_low ? 4800 : 0,
+    limit: ({ params }) => params.Lauma_best ? Infinity : 24
+  }
+}
+
 let TeamBuff = [
   // 纳塔地方传奇满层增伤+双药(20暴击20爆伤，属伤药)
   {
@@ -290,7 +352,11 @@ let TeamBuff = [
     title: '杜林',
     // Hexenzirkel 魔导·秘仪队伍
     data: {
-      aPlus: ({ params }) => (params.Durin_best || params.Durin_mid) ? 1800: 0,
+      aPlus: LIMITED_PLUS.Durin.plus,
+      a2Plus: LIMITED_PLUS.Durin.plus,
+      a3Plus: LIMITED_PLUS.Durin.plus,
+      ePlus: LIMITED_PLUS.Durin.plus,
+      qPlus: LIMITED_PLUS.Durin.plus,
       dmg: ({ params }) => (params.Durin_best || params.Durin_mid) ? 50 : 0,
       enemyDef: ({ params }) => params.Durin_best ? 30 : 0,
       kx: ({ params, element }) => {
@@ -383,11 +449,11 @@ let TeamBuff = [
       kx: ({ element }) => (element === '冰' || element === '水') ? 55 : 0,
       cdmg: ({ params, element }) => ((params.Escoffier_best || params.Escoffier_mid) && element === '冰') ? 60 : 0,
       // 爱可菲获得5层「冷煮」，除爱可菲外的附近的当前场上角色普通攻击、重击、下落攻击、元素战技和元素爆发对敌人造成冰元素伤害时，将消耗1层「冷煮」，提升造成的伤害
-      aPlus: ({ params, element }) => (params.Escoffier_best && element === '冰') ? 9600 : (params.Escoffier_mid && element === '冰') ? 8400 : 0,
-      a2Plus: ({ params, element }) => (params.Escoffier_best && element === '冰') ? 9600 : (params.Escoffier_mid && element === '冰') ? 8400 : 0,
-      a3Plus: ({ params, element }) => (params.Escoffier_best && element === '冰') ? 9600 : (params.Escoffier_mid && element === '冰') ? 8400 : 0,
-      ePlus: ({ params, element }) => (params.Escoffier_best && element === '冰') ? 9600 : (params.Escoffier_mid && element === '冰') ? 8400 : 0,
-      qPlus: ({ params, element }) => (params.Escoffier_best && element === '冰') ? 9600 : (params.Escoffier_mid && element === '冰') ? 8400 : 0,
+      aPlus: LIMITED_PLUS.Escoffier.plus,
+      a2Plus: LIMITED_PLUS.Escoffier.plus,
+      a3Plus: LIMITED_PLUS.Escoffier.plus,
+      ePlus: LIMITED_PLUS.Escoffier.plus,
+      qPlus: LIMITED_PLUS.Escoffier.plus,
       atkPct: ({ params }) => params.Escoffier_best ? 64 : params.Escoffier_mid ? 32 : 0
     }
   },
@@ -433,11 +499,11 @@ let TeamBuff = [
     title: '茜特菈莉',
     // 高配默认1500精通，中配1300精通
     data: {
-      aPlus: ({ params }) => params.Citlali_best ? 3000 : params.Citlali_mid ? 2600 : 0,
-      a2Plus: ({ params }) => params.Citlali_best ? 3000 : params.Citlali_mid ? 2600 : 0,
-      a3Plus: ({ params }) => params.Citlali_best ? 3000 : params.Citlali_mid ? 2600 : 0,
-      ePlus: ({ params }) => params.Citlali_best ? 3000 : params.Citlali_mid ? 2600 : 0,
-      qPlus: ({ params }) => params.Citlali_best ? 3000 : params.Citlali_mid ? 2600 : 0,
+      aPlus: LIMITED_PLUS.Citlali.plus,
+      a2Plus: LIMITED_PLUS.Citlali.plus,
+      a3Plus: LIMITED_PLUS.Citlali.plus,
+      ePlus: LIMITED_PLUS.Citlali.plus,
+      qPlus: LIMITED_PLUS.Citlali.plus,
       mastery: ({ params }) => (params.Citlali_best || params.Citlali_mid) ? 250 : 0,
       kx: ({ params, element }) => {
         // 考虑到可以通过附魔，其他元素角色也能打出蒸发和融化反应
@@ -481,11 +547,11 @@ let TeamBuff = [
     title: '申鹤',  
     // 高配默认5000攻击，中配4000，低配3500 
     data: { 
-      aPlus: ({ params }) => params.ShenHe_best ? 5000 : params.ShenHe_mid ? 3500 : params.ShenHe_low ? 3000 : 0,
-      a2Plus: ({ params }) => params.ShenHe_best ? 5000 : params.ShenHe_mid ? 3500 : params.ShenHe_low ? 3000 : 0,
-      a3Plus: ({ params }) => params.ShenHe_best ? 5000 : params.ShenHe_mid ? 3500 : params.ShenHe_low ? 3000 : 0,
-      ePlus: ({ params }) => params.ShenHe_best ? 5000 : params.ShenHe_mid ? 3500 : params.ShenHe_low ? 3000 : 0,
-      qPlus: ({ params }) => params.ShenHe_best ? 5000 : params.ShenHe_mid ? 3500 : params.ShenHe_low ? 3000 : 0,
+      aPlus: LIMITED_PLUS.ShenHe.plus,
+      a2Plus: LIMITED_PLUS.ShenHe.plus,
+      a3Plus: LIMITED_PLUS.ShenHe.plus,
+      ePlus: LIMITED_PLUS.ShenHe.plus,
+      qPlus: LIMITED_PLUS.ShenHe.plus,
       cdmg: ({ params }) => (params.ShenHe_best || params.ShenHe_mid) ? 15 : 0,
       kx: 15,
       dmg: 15,
@@ -502,7 +568,7 @@ let TeamBuff = [
     // 高配2+5 默认4500攻击 中配2+1 4500攻击 低配0+0 3500攻击
     // 天赋默认吃满+10暴击
     data: { 
-      a3Plus: ({ params }) => (params.XianYun_best || params.XianYun_mid) ? 18000 : params.XianYun_low ? 7000 : 0,
+      a3Plus: LIMITED_PLUS.XianYun.plus,
       cdmg: 10,
       a3Dmg: ({ params }) => params.XianYun_best ? 80 : params.XianYun_mid ? 28 : 0
     } 
@@ -557,9 +623,9 @@ let TeamBuff = [
       atkPct: ({ params }) => (params.Xilonen_pyro && (params.Xilonen_best || params.Xilonen_mid)) ? 45 : 0,
       dmg: ({ params }) => (params.Xilonen_geo && (params.Xilonen_best || params.Xilonen_mid)) ? 50 : 0,
       cdmg: ({ params }) => (params.Xilonen_cryo && (params.Xilonen_best || params.Xilonen_mid)) ? 60 : 0,
-      aPlus: ({ params }) => params.Xilonen_best ? 2600 : 0,
-      a2Plus: ({ params }) => params.Xilonen_best ? 2600 : 0,
-      a3Plus: ({ params }) => params.Xilonen_best ? 2600 : 0
+      aPlus: LIMITED_PLUS.Xilonen.plus,
+      a2Plus: LIMITED_PLUS.Xilonen.plus,
+      a3Plus: LIMITED_PLUS.Xilonen.plus
     }
   },
   {
@@ -651,7 +717,7 @@ let TeamBuff = [
     title: '菈乌玛',
     data: {
       kx: ({ params }) => params.Lauma_best ? 34 : (params.Lauma_mid || params.Lauma_low) ? 25 : 0,
-      fyPlus: ({ params }) => (params.Lauma_best || params.Lauma_mid) ? 9000 : params.Lauma_low ? 4800 : 0,
+      fyPlus: LIMITED_PLUS.Lauma.plus,
       lunarBloom: ({ params }) => {
         if (params.Lauma_best) return 120;
         if (params.Lauma_mid) return 80;
@@ -683,12 +749,12 @@ let TeamBuff = [
     title: '叶洛亚',
     // 默认千精，纯水岩队伍，提升月结晶反应基础值，天赋吃满额外提升160%
     data: {
-      fyplus: ({ params }) => (params.Illuga_best || params.Illuga_mid) ? 6400 : params.Illuga_low ? 5500 : 0,
-      aPlus: ({ params }) => (params.Illuga_best || params.Illuga_mid) ? 950 : params.Illuga_low ? 850 : 0,
-      a2Plus: ({ params }) => (params.Illuga_best || params.Illuga_mid) ? 950 : params.Illuga_low ? 850 : 0,
-      a3Plus: ({ params }) => (params.Illuga_best || params.Illuga_mid) ? 950 : params.Illuga_low ? 850 : 0,
-      ePlus: ({ params }) => (params.Illuga_best || params.Illuga_mid) ? 950 : params.Illuga_low ? 850 : 0,
-      qPlus: ({ params }) => (params.Illuga_best || params.Illuga_mid) ? 950 : params.Illuga_low ? 850 : 0,
+      fyplus: LIMITED_PLUS.Illuga.fyPlus,
+      aPlus: LIMITED_PLUS.Illuga.plus,
+      a2Plus: LIMITED_PLUS.Illuga.plus,
+      a3Plus: LIMITED_PLUS.Illuga.plus,
+      ePlus: LIMITED_PLUS.Illuga.plus,
+      qPlus: LIMITED_PLUS.Illuga.plus,
       defPlus: ({ params }) => params.Illuga_best ? 200 : 0,
       mastery: ({ params }) => params.Illuga_best ? 80 : 50,
       cpct: ({ params }) => params.Illuga_best ? 10 : 5,
@@ -710,7 +776,7 @@ let TeamBuff = [
         if (params.Linnea_mid) return 200
         return 175
       },
-      fyplus: ({ params }) => params.Linnea_best ? 10125 : (params.Linnea_mid ? 3375 : 0),
+      fyplus: LIMITED_PLUS.Linnea.plus,
       cdmg: ({ params, element }) => (element === '水' || element === '岩') && (params.Linnea_best || params.Linnea_mid) ? 40 : 0,
       defPct: ({ params }) => params.Linnea_best ? 25 : 0,
       elevated: ({ params }) => params.Linnea_best ? 25 : 0,
@@ -742,11 +808,11 @@ let TeamBuff = [
     data: {
       atkPlus: ({ params }) => params.Nicole_best ? 1248 : params.Nicole_mid ? 1140 : 900,
       kx: ({ params }) => (params.Nicole_best || params.Nicole_mid) ? 20 : 0,
-      aPlus: ({ params }) => params.Nicole_best ? 3500 : 0,
-      a2Plus: ({ params }) => params.Nicole_best ? 3500 : 0,
-      a3Plus: ({ params }) => params.Nicole_best ? 3500 : 0,
-      ePlus: ({ params }) => params.Nicole_best ? 3500 : 0,
-      qPlus: ({ params }) => params.Nicole_best ? 3500 : 0,
+      aPlus: LIMITED_PLUS.Nicole.plus,
+      a2Plus: LIMITED_PLUS.Nicole.plus,
+      a3Plus: LIMITED_PLUS.Nicole.plus,
+      ePlus: LIMITED_PLUS.Nicole.plus,
+      qPlus: LIMITED_PLUS.Nicole.plus,
       ignore: ({ params }) => params.Nicole_best ? 40 : 0,
       dmg: ({ params }) => params.Nicole_best ? 58 : params.Nicole_mid ? 26 : 0
     }
@@ -755,10 +821,10 @@ let TeamBuff = [
     check: ({ params }) => params.QiQi_low || params.QiQi_mid || params.QiQi_best,
     title: '七七',
     // E持续期间全队星超导增伤50%
-    // 6命提升星超导基础值，只生效4次，保守一点按七七实际3000攻击算
+    // 6命提升星超导基础值
     data: {
       stellarConduct: 50,
-      fyplus: ({ params }) => params.QiQi_best ? 18000 : 0
+      fyplus: LIMITED_PLUS.QiQi.plus
     }
   },
   {
@@ -804,4 +870,4 @@ let TeamBuff = [
   }
 ]
 
-export { TeamBuff }
+export { TeamBuff, LIMITED_PLUS }

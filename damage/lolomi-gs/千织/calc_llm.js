@@ -1,4 +1,4 @@
-import { TeamBuff } from '../teambuffs.js'
+import { TeamBuff, LIMITED_PLUS } from '../teambuffs.js'
 import { teamConfig, withStdTeam } from '../util.js'
 import { Config } from '#lolomi'
 
@@ -57,7 +57,8 @@ const physicalStationaryDmg = (geoConstruct, synergyHits) => ({ talent, attr, ca
 // 15s站场总伤计算
 // 6命手法：EQ + 两轮3A闪 + E + 两轮3A闪 + E + 两轮3A闪 全程岩附魔
 // 非6命手法：EQ + 两轮岩附魔3A闪  + 4轮物理伤害3A闪，应该还能多打几次普攻，忽略不计了
-const stationaryDmg = (geoConstruct) => ({ talent, attr, calc, cons }, calcApi) => {
+const stationaryDmg = (geoConstruct) => (ds, calcApi) => {
+  const { talent, attr, calc, cons } = ds
   const { basic } = calcApi
   const upper = basic(calc(attr.atk) * talent.e['上挑攻击伤害2'][0] / 100 + calc(attr.def) * talent.e['上挑攻击伤害2'][1] / 100, 'e')
   const sleeve = basic(calc(attr.atk) * talent.e['袖伤害2'][0] / 100 + calc(attr.def) * talent.e['袖伤害2'][1] / 100, 'e')
@@ -67,18 +68,23 @@ const stationaryDmg = (geoConstruct) => ({ talent, attr, calc, cons }, calcApi) 
   const juanHits = cons >= 4 ? 6 : cons >= 2 ? 3 : 0
   const juanDmg = sleeve.dmg * 1.7 * juanHits
   const juanAvg = sleeve.avg * 1.7 * juanHits
+  const xiloPlus = LIMITED_PLUS.Xilonen.plus(ds)
+  const plusA = calcApi(0, 'a')
+  const xiloOver = xiloPlus && attr.a.plus
+    ? xiloPlus * (24 - LIMITED_PLUS.Xilonen.limit) / attr.a.plus
+    : 0
   if (cons >= 6) {
     const geoA = aRound()
     return {
-      dmg: upper.dmg * 3 + sleeve.dmg * sleeveHits + geoA.dmg * 6 + q.dmg + juanDmg,
-      avg: upper.avg * 3 + sleeve.avg * sleeveHits + geoA.avg * 6 + q.avg + juanAvg
+      dmg: upper.dmg * 3 + sleeve.dmg * sleeveHits + geoA.dmg * 6 + q.dmg + juanDmg - plusA.dmg * xiloOver,
+      avg: upper.avg * 3 + sleeve.avg * sleeveHits + geoA.avg * 6 + q.avg + juanAvg - plusA.avg * xiloOver
     }
   }
   const phyA = aRound('phy')
   const geoA = aRound()
   return {
-    dmg: upper.dmg + sleeve.dmg * sleeveHits + geoA.dmg * 2 + q.dmg + phyA.dmg * 4 + juanDmg,
-    avg: upper.avg + sleeve.avg * sleeveHits + geoA.avg * 2 + q.avg + phyA.avg * 4 + juanAvg
+    dmg: upper.dmg + sleeve.dmg * sleeveHits + geoA.dmg * 2 + q.dmg + phyA.dmg * 4 + juanDmg - plusA.dmg * xiloOver,
+    avg: upper.avg + sleeve.avg * sleeveHits + geoA.avg * 2 + q.avg + phyA.avg * 4 + juanAvg - plusA.avg * xiloOver
   }
 }
 

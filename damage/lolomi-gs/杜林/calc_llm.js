@@ -1,4 +1,4 @@
-import { TeamBuff } from '../teambuffs.js'
+import { TeamBuff, LIMITED_PLUS } from '../teambuffs.js'
 import { teamConfig, withStdTeam } from '../util.js'
 import { Config } from '#lolomi'
 
@@ -22,30 +22,34 @@ const applyStandardTeam = withStdTeam(mainCharName, team, artifact_normal, confi
 // 切后台20秒总伤计算，仅计算元素爆发持续伤害20次
 // isBlack: 黑龙或白龙状态 → 天赋和1命是否生效
 // withMelt: 是否带融化反应
-const calcDragonTotal = (isBlack, withMelt) => ({ talent, attr, calc, cons }, { basic }) => {
+const calcDragonTotal = (isBlack, withMelt) => (ds, { basic }) => {
+  const { talent, attr, calc, cons } = ds
   const atk = calc(attr.atk)
   const dragonKey = isBlack ? '黑蚀之龙伤害' : '白焰之龙伤害'
   // 天赋和1命效果只有前10次持续伤害生效
   const qMultiBonus = 1 + Math.min(atk / 100 * 3, 75) / 100
   const qPlusValue = isBlack && cons >= 1 ? atk * 150 / 100 : 0
+  const nicolePlus = LIMITED_PLUS.Nicole.plus(ds)
+  const nicoleHits = Math.min(LIMITED_PLUS.Nicole.limit, 10)
 
   const dragonBase = atk * talent.q[dragonKey] / 100
   const dragonFire = basic(dragonBase, 'q')
-  // 后10次不吃天赋和1命的补偿系数
-  const rawFactor = dragonBase / (dragonBase + qPlusValue) / qMultiBonus
+  const frontFactor = (dragonBase + qPlusValue) / (dragonBase + qPlusValue + nicolePlus)
+  const backFactor = dragonBase / (dragonBase + qPlusValue + nicolePlus) / qMultiBonus
+  const ticks = nicoleHits + (10 - nicoleHits) * frontFactor + 10 * backFactor
 
   if (withMelt) {
     // 融化环境：默认10次融化 + 10次火伤
     const dragonMelt = basic(dragonBase, 'q', 'melt')
     return {
-      dmg: (dragonMelt.dmg + dragonFire.dmg) * 5 * (1 + rawFactor),
-      avg: (dragonMelt.avg + dragonFire.avg) * 5 * (1 + rawFactor),
+      dmg: (dragonMelt.dmg + dragonFire.dmg) * ticks / 2,
+      avg: (dragonMelt.avg + dragonFire.avg) * ticks / 2,
     }
   }
   // 非融化/蒸发环境，默认20次火伤，不考虑聚变反应伤害
   return {
-    dmg: dragonFire.dmg * 10 * (1 + rawFactor),
-    avg: dragonFire.avg * 10 * (1 + rawFactor),
+    dmg: dragonFire.dmg * ticks,
+    avg: dragonFire.avg * ticks,
   }
 }
 

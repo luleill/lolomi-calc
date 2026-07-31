@@ -1,4 +1,4 @@
-import { TeamBuff } from '../teambuffs.js'
+import { TeamBuff, LIMITED_PLUS } from '../teambuffs.js'
 import { teamConfig, withStdTeam } from '../util.js'
 import { Config } from '#lolomi'
 
@@ -20,15 +20,18 @@ const applyStandardTeam = withStdTeam(mainCharName, team, artifact_normal, confi
 
 // 队友buff期望次数拆分
 // 尼可4命生效8次，杜林1命生效20次
-const plusOverflow = ({ attr, params, cons }, dmg) => {
-  const nicolePlus = params.Nicole_best ? 3500 : 0
-  const durinPlus = (params.Durin_best || params.Durin_mid) ? 1800 : 0
+const plusOverflow = (ds, dmg) => {
+  const { attr, cons } = ds
+  const nicolePlus = LIMITED_PLUS.Nicole.plus(ds)
+  const durinPlus = LIMITED_PLUS.Durin.plus(ds)
   if (!nicolePlus && !durinPlus) return { dmg: 0, avg: 0 }
   const aSegs = 30 + (cons >= 1 ? 10 : 0) + (cons >= 6 ? 5 : 0)
   const plusA = dmg(0, 'a')
   const plusQ = dmg(0, 'q')
-  const aOver = (nicolePlus * Math.max(aSegs - 8, 0) + durinPlus * Math.max(aSegs - 20, 0)) / attr.a.plus
-  const qOver = nicolePlus * 5 / attr.q.plus
+  const aOver = attr.a.plus
+    ? (nicolePlus * Math.max(aSegs - LIMITED_PLUS.Nicole.limit, 0) + durinPlus * Math.max(aSegs - LIMITED_PLUS.Durin.limit, 0)) / attr.a.plus
+    : 0
+  const qOver = attr.q.plus ? (nicolePlus + durinPlus) * 5 / attr.q.plus : 0
   return {
     dmg: plusA.dmg * aOver + plusQ.dmg * qOver,
     avg: plusA.avg * aOver + plusQ.avg * qOver
