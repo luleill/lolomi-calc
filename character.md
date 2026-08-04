@@ -78,7 +78,7 @@
 - 夏洛蒂 Charlotte
 - 芙宁娜 Furina
 - 夏沃蕾 Chevreuse
-- 娜维娅 Navia
+- 娜维娅 Navia ✅
 - 嘉明 Gaming
 - 闲云 Xian_Yun ✅
 - 千织 Chiori ✅
