@@ -606,6 +606,15 @@ let TeamBuff = [
     }
   },
   {
+    check: ({ params }) => params.Flins_low || params.Flins_mid || params.Flins_best,
+    title: '菲林斯',
+    data: {
+      fypct: 14,
+      kx: ({ params }) => (params.Flins_best || params.Flins_mid) ? 25 : 0,
+      elevated: ({ params }) => params.Flins_best ? 10 : 0
+    }
+  },
+  {
     check: ({ params }) => 
       params.Xilonen_low || params.Xilonen_mid || params.Xilonen_best ||
       params.Xilonen_hydro === false || 

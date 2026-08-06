@@ -100,11 +100,11 @@
 - 伊安珊 Iansan
 - 瓦雷莎 Varesa
 - 爱可菲 Escoffier ✅
-- 伊法 Ifa
-- 塔利雅 Dahlia
+- 伊法 Ifa ✅
+- 塔利雅 Dahlia ✅
 - 丝柯克 Skirk ✅
 - 伊涅芙 Ineffa ✅
-- 爱诺 Aino
+- 爱诺 Aino ✅
 - 菈乌玛 Lauma ✅
 - 菲林斯 Flins ✅
 - 奈芙尔 Nefer ✅
