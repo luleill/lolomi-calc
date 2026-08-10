@@ -90,6 +90,8 @@ git clone --depth=1 https://gitee.com/land-route_lu/lolomi-calc.git ./plugins/lo
 - 爱诺
 - 塔利雅
 - 伊法
+- 瓦蕾莎
+- 伊安珊
 - 奥黛塔
 
-</details>
+</details> 
