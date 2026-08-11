@@ -95,7 +95,7 @@
 - 恰斯卡 Chasca ✅
 - 茜特菈莉 Citlali ✅
 - 玛薇卡 Mavuika ✅
-- 蓝砚 Lan_Yan
+- 蓝砚 Lan_Yan ✅
 - 梦见月瑞希 Mizuki
 - 伊安珊 Iansan ✅
 - 瓦雷莎 Varesa ✅
