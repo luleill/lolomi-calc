@@ -4,7 +4,7 @@ import { Config } from '#lolomi'
 
 const mainCharName = '奥黛塔'
 
-const team = ['桑多涅', '七七', '八重神子']
+const team = ['桑多涅', '七七', '阿罗夏']
 const artifact_normal = ['千岩']
 
 const config = Config.getConfig('user', 'config')
@@ -22,6 +22,7 @@ export const details = applyStandardTeam([
     dmg: ({ talent }, dmg) => dmg(talent.e['技能伤害'], 'e')
   }, {
     title: '「破晓终奏」星超导伤害',
+    params: { q: true },
     dmg: ({ attr, calc, talent }, { basic }) => {
       const multi = calcStarDmgMulti(calc, attr)
       const r = basic(calc(attr.atk) * talent.e['破晓终奏星超导/星扩散伤害'][0] / 100, '', 'stellarConduct')
@@ -29,6 +30,7 @@ export const details = applyStandardTeam([
     }
   }, {
     title: '「拂羽舞步」星超导伤害',
+    params: { q: true },
     dmg: ({ attr, calc, talent }, { basic }) => {
       const multi = calcStarDmgMulti(calc, attr)
       const r = basic(calc(attr.atk) * talent.e['拂羽舞步星超导/星扩散伤害'][0] / 100, '', 'stellarConduct')
@@ -51,16 +53,18 @@ export const details = applyStandardTeam([
       const fuyu   = dmg(talent.e['拂羽舞步伤害'], 'e')
       const xuanyi = dmg(talent.e['旋翼舞步伤害'], 'e')
       const fuyuStar = applyStar(basic(calc(attr.atk) * talent.e['拂羽舞步星超导/星扩散伤害'][0] / 100, '', 'stellarConduct'))
-      const shadowDmg = fuyu.dmg * 2 + xuanyi.dmg * 2 + fuyuStar.dmg * 2
-      const shadowAvg = fuyu.avg * 2 + xuanyi.avg * 2 + fuyuStar.avg * 2
+      const xuanyiStar = applyStar(basic(calc(attr.atk) * talent.e['旋翼舞步星超导/星扩散伤害'][0] / 100, '', 'stellarConduct'))
+      // 辉映状态下拂羽/旋翼两种舞步各额外一次星烁伤害
+      const shadowDmg = fuyu.dmg * 2 + xuanyi.dmg * 2 + fuyuStar.dmg * 2 + xuanyiStar.dmg * 2
+      const shadowAvg = fuyu.avg * 2 + xuanyi.avg * 2 + fuyuStar.avg * 2 + xuanyiStar.avg * 2
       const qSlash = dmg(talent.q['斩击伤害'], 'q')
       const qFinal = dmg(talent.q['斩击最终段伤害'], 'q')
       const c1Extra = cons >= 1
-        ? applyStar(basic(calc(attr.atk) * 2, '', 'stellarConduct'))
+        ? applyStar(basic(calc(attr.atk) * 3, '', 'stellarConduct'))
         : { dmg: 0, avg: 0 }
-      // 4命默认2次
+      // 4命协同默认2次
       const c4Extra = cons >= 4
-        ? applyStar(basic(calc(attr.atk) * 0.5, '', 'stellarConduct'))
+        ? applyStar(basic(calc(attr.atk) * 0.66, '', 'stellarConduct'))
         : { dmg: 0, avg: 0 }
       return {
         dmg: eSkill.dmg + eStar.dmg + shadowDmg + qSlash.dmg + qFinal.dmg + c1Extra.dmg + c4Extra.dmg * 2,
@@ -72,7 +76,8 @@ export const details = applyStandardTeam([
     title: ({ cons }) => `${teamConfig(cons, team, artifact_normal, mainCharName).title}「破晓终奏」星超导`,
     params: ({ cons }) => ({
       ...teamConfig(cons, team, artifact_normal).params,
-      cryo_two: true
+      cryo_two: true,
+      q: true
     }),
     dmg: ({ attr, calc, talent }, { basic }) => {
       const multi = calcStarDmgMulti(calc, attr)
@@ -99,14 +104,29 @@ export const buffs = [
       fypct: ({ attr, calc }) => Math.min(calc(attr.atk) / 100 * 0.7, 14)
     }
   }, {
-    title: ({ params }) => {
-      const stacks = params.huacai ?? 4
+    title: ({ params, cons }) => {
+      const stacks = (params.huacai ?? 4) + (cons >= 1 ? 2 : 0)
+      return `天赋「获选者的春祭」：${stacks}层华彩提升星烁反应伤害[stellarConduct]%`
+    },
+    sort: 9,
+    data: {
+      stellarConduct: ({ params, cons }) => ((params.huacai ?? 4) + (cons >= 1 ? 2 : 0)) * 15
+    }
+  }, {
+    check: ({ params }) => params.q === true,
+    title: '「雪鹄之梦」：提升星烁反应伤害[stellarConduct]%',
+    data: {
+      stellarConduct: ({ talent }) => talent.q['雪鹄之梦星烁反应伤害提升']
+    }
+  }, {
+    title: ({ params, cons }) => {
+      const stacks = (params.huacai ?? 4) + (cons >= 1 ? 2 : 0)
       return `2命「她想，我要见证雪鹄未见之梦」：${stacks}层华彩提升攻击力[atkPct]%`
     },
     sort: 9,
     cons: 2,
     data: {
-      atkPct: ({ params }) => (params.huacai ?? 4) * 7
+      atkPct: ({ params, cons }) => ((params.huacai ?? 4) + (cons >= 1 ? 2 : 0)) * 7
     }
   }, {
     title: '2命「她想，我要见证雪鹄未见之梦」：独舞倒影附近敌人冰/雷抗性降低20%',

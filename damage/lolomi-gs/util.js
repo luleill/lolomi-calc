@@ -147,6 +147,7 @@
     'Prune': '布伦妮',
     'Marionettenew': '桑多涅',
     'Odette': '奥黛塔',
+    'Alyosha': '阿罗夏',
   };
 
   // 角色简称 - 常用辅助
