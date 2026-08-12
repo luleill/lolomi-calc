@@ -12,7 +12,7 @@ const artifact_B = ['千岩', '天美']
 
 const config = Config.getConfig('user', 'config')
 const applyStandardTeam = withStdTeam(mainCharName, team, artifact_normal, config,
-  ({ artis }) => ({ nightsoul_self: 40, nightsoul_team: 45, luna_times: 2, fengtao: !!(artis?.['翠绿之影'] >= 4) }))
+  { nightsoul_self: 40, nightsoul_team: 45, luna_times: 2 })
 
 // 尼可4命基础提升生效8次
 const plusOverflow = (ds, dmg) => {
@@ -62,23 +62,22 @@ export const details = applyStandardTeam([
     dmg: ({ talent }, dmg) => dmg(talent.q['技能伤害'], 'q,nightsoul')
   }, {
     title: '「镇静标记」爆发伤害',
-    params: ({ artis }) => ({ fengtao: !!(artis?.['翠绿之影'] >= 4) }),
     dmg: ({ talent }, dmg) => dmg(talent.q['镇静标记伤害'], 'q,nightsoul', 'coloringDmg')
   }, {
     title: '扩散反应伤害',
     dmg: ({}, { reaction }) => reaction('swirl')
   }, {
     title: 'EQ站场总伤',
-    params: ({ artis }) => ({ nightsoul_self: 40, fengtao: !!(artis?.['翠绿之影'] >= 4) }),
+    params: { nightsoul_self: 40 },
     dmg: rotationDmg
   }, {
     title: ({ cons }) => `${teamConfig(cons, team_B, artifact_B, mainCharName).title} 站场总伤`,
-    params: ({ cons, artis }) => ({ ...teamConfig(cons, team_B, artifact_B).params, nightsoul_self: 40, nightsoul_team: 0, fengtao: !!(artis?.['翠绿之影'] >= 4) }),
+    params: ({ cons }) => ({ ...teamConfig(cons, team_B, artifact_B).params, nightsoul_self: 40, nightsoul_team: 0 }),
     dmg: rotationDmg
   }, {
     title: ({ cons }) => `${teamConfig(cons, team, artifact_normal, mainCharName).title} 站场总伤`,
     // 希诺宁夜魂上限90，不清楚救援要义队友层数判定具体逻辑，默认希诺宁提供45夜魂
-    params: ({ cons, artis }) => ({ ...teamConfig(cons, team, artifact_normal).params, nightsoul_self: 40, nightsoul_team: 45, luna_times: 2, fengtao: !!(artis?.['翠绿之影'] >= 4) }),
+    params: ({ cons }) => ({ ...teamConfig(cons, team, artifact_normal).params, nightsoul_self: 40, nightsoul_team: 45, luna_times: 2 }),
     dmg: rotationDmg
   }, {
     title: '当前圣遗物套装',

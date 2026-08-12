@@ -49,7 +49,6 @@ export const details = applyStandardTeam([
     dmg: ({ talent }, dmg) => dmg(talent.e['猫猫球伤害'], 'e')
   }, {
     title: '「秘藏瓶」染色伤害',
-    params: ({ artis }) => ({ fengtao: !!(artis?.['翠绿之影'] >= 4) }),
     dmg: ({ talent }, dmg) => dmg(talent.e['猫猫球伤害'], 'e', 'coloringDmg')
   }, {
     title: '「秘器·猎人的七道具」伤害',
@@ -62,7 +61,6 @@ export const details = applyStandardTeam([
     dmg: ({}, { reaction }) => reaction('lunarCharged')
   }, {
     title: '「猫型协调器」染色伤害',
-    params: ({ artis }) => ({ fengtao: !!(artis?.['翠绿之影'] >= 4) }),
     dmg: ({ talent }, dmg) => dmg(talent.q['猫型家用互助协调器伤害'], 'q', 'coloringDmg')
   }, {
     // 默认仅满辉，不触发额外月反应
@@ -71,7 +69,6 @@ export const details = applyStandardTeam([
     // Q两秒攻击一次，默认吃到天赋共14次，实际本身也没多少伤害
     // 两次重击维持风套减抗，共4次扩散
     title: 'EQ单人15秒总伤',
-    params: ({ artis }) => ({ fengtao: !!(artis?.['翠绿之影'] >= 4) }),
     dmg: ({ talent, cons }, dmg) => {
       const a2 = dmg(talent.a['重击伤害'], 'a2')
       const eHit = dmg(talent.e['秘藏瓶装满伤害'], 'e')

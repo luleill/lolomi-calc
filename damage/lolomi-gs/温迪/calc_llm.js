@@ -152,7 +152,7 @@ export const details = applyStandardTeam([
     dmg: ({ talent }, dmg) => dmg(talent.q['持续伤害'], 'q')
   }, {
     title: '「风神之诗」染色附加伤害',
-    params: ({ artis }) => ({ q: true, ssfr: true, iscoloring: true, fengtao: !!(artis?.['翠绿之影'] >= 4) }),
+    params: { q: true, ssfr: true, iscoloring: true },
     dmg: ({ talent }, dmg) => dmg(talent.q['附加元素伤害'], 'q', 'coloringDmg')
   }, {
     title: '后台「风神之诗」总伤',
@@ -160,7 +160,7 @@ export const details = applyStandardTeam([
     // 「魔女的前夜礼·颂时风若」只持续4秒，默认前台队友木桩不主动触发，不加这个buff
     // q的染色伤害不吃2命和4命，平衡一下
     // q和染色附加20次，扩散7次
-    params: ({ artis }) => ({ q: true, fengtao: !!(artis?.['翠绿之影'] >= 4) }),
+    params: { q: true },
     dmg: ({ talent }, dmg) => {
       const qDot = dmg(talent.q['持续伤害'], 'q');
       const qColor = dmg(talent.q['附加元素伤害'], 'q', 'coloringDmg');
@@ -173,7 +173,7 @@ export const details = applyStandardTeam([
     }
   }, {
     title: '伪单人一轮站场总伤',
-    params: ({ artis }) => ({ q: true, ssfr: true, fengtao: !!(artis?.['翠绿之影'] >= 4) }),
+    params: { q: true, ssfr: true },
     dmg: (ds, dmg) => calcRotation(ds, dmg)
   }, {
     // 队伍伤害 队友buff覆盖率偏差，移除风套染色伤害补偿，计算应该还是会偏高不少

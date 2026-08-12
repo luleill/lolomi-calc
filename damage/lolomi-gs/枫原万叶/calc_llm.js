@@ -14,7 +14,7 @@ const team_C = ['珐露珊', '闲云', '芙宁娜']
 const artifact_C = ['千岩', '宗室']
 
 const config = Config.getConfig('user', 'config');
-const applyStandardTeam = withStdTeam(mainCharName, team, artifact_normal, config, ({ artis }) => ({ fwzsy : true, fengtao: !!(artis?.['翠绿之影'] >= 4) }))
+const applyStandardTeam = withStdTeam(mainCharName, team, artifact_normal, config, { fwzsy: true })
 
 export const details = applyStandardTeam([
   {
@@ -32,8 +32,7 @@ export const details = applyStandardTeam([
     dmg: ({ talent }, dmg) => dmg(talent.a['低空/高空坠地冲击伤害'][1], 'a3')
   }, {
     title: '「乱岚拨止」染色附加伤害',
-    // 自身带风套减抗染色伤害应用不上，手动传进去
-    params: ({ artis }) => ({ fwzsy: true, fengtao: !!(artis?.['翠绿之影'] >= 4) }),
+    params: { fwzsy: true },
     dmg: ({ attr, calc }, {basic} ) => basic(calc(attr.atk) * 200 / 100, 'a3', 'coloringDmg')
   }, {
     title: '「万叶之一刀」斩击伤害',
@@ -43,7 +42,7 @@ export const details = applyStandardTeam([
     dmg: ({ talent }, dmg) => dmg(talent.q['持续伤害'], 'q')
   }, {
     title: '「万叶之一刀」染色附加伤害',
-    params: ({ artis }) => ({ fwzsy: true, isQ: true, fengtao: !!(artis?.['翠绿之影'] >= 4) }),
+    params: { fwzsy: true, isQ: true },
     dmg: ({ talent }, dmg) => dmg(talent.q['附加元素伤害'], 'q', 'coloringDmg')
   }, {
     title: '染色站场13秒总伤',
@@ -51,7 +50,7 @@ export const details = applyStandardTeam([
     // E次数：基础2次；1命直接默认+1次，祭礼剑根据精炼等级+期望次数
     // 扩散次数：首次E扩散2次，后续E在Q中默认只扩散1次，Q扩散5次
     // 普攻伤害：六命实际情况吃不满buff，也默认全附魔2轮5A，基础3次E
-    params: ({ artis }) => ({ isQ: true, fengtao: !!(artis?.['翠绿之影'] >= 4) }),
+    params: { isQ: true },
     dmg: ({ talent, calc, attr, cons, weapon, refine }, dmg) => {
       // 针对2命开Q时加200精通做个区分，首次E不吃2命加成
       const masteryQ = calc(attr.mastery);
@@ -99,16 +98,16 @@ export const details = applyStandardTeam([
     dmg: ({ talent }, dmg) => dmg(talent.a['低空/高空坠地冲击伤害'][1], 'a3')
   }, {
     title: ({ cons }) => `${teamConfig(cons, team_B, artifact_B, mainCharName).title} 下落蒸发`,
-    params: ({cons, artis}) => ({
+    params: ({cons}) => ({
       ...teamConfig(cons, team_B, artifact_B).params,
-      fwzsy : true, fengtao: !!(artis?.['翠绿之影'] >= 4)
+      fwzsy : true
     }),
     dmg: ({ talent }, dmg) => dmg(talent.a['低空/高空坠地冲击伤害'][1], 'a3', 'vaporize')
   }, {
     title: ({ cons }) => `${teamConfig(cons, team, artifact_normal, mainCharName).title} 下落融化`,
-    params: ({cons, artis}) => ({
+    params: ({cons}) => ({
       ...teamConfig(cons, team, artifact_normal).params,
-      fwzsy : true, fengtao: !!(artis?.['翠绿之影'] >= 4)
+      fwzsy : true
     }),
     // miao框架定义的融化限制了火和冰角色，是火元素角色才返回2.0系数
     // 万叶本身风元素，打的融化被判断为冰打火，返回的是1.5

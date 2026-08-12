@@ -50,7 +50,7 @@ const MUTEX_ARTI_PASSIVES = [
   { artiName: '', paramKey: 'yege'     }, // 夜歌 - 精通120+月曜10%
   { artiName: '', paramKey: 'qianyan'  }, // 千岩 - 战技命中后加攻20%
   { artiName: '', paramKey: 'panyan'   }, // 磐岩 - 结晶元素增伤35%
-  { artiName: '', paramKey: 'fengtao'  }, // 风套 - 扩散减抗40%
+  { artiName: '翠绿之影', paramKey: 'fengtao'  }, // 风套 - 对应元素减抗40
   { artiName: '', paramKey: 'caotao'   }, // 草套 - 减草抗30%
   { artiName: '', paramKey: 'tianmei'  }, // 天之美赐 - 魔导队伍伤害提升40%
 ]

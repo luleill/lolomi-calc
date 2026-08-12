@@ -10,14 +10,6 @@ const artifact_normal = ['千岩', '天美']
 const config = Config.getConfig('user', 'config')
 const applyStandardTeam = withStdTeam(mainCharName, team, artifact_normal, config, { c4: true, pyro_two: true })
 
-// 风套只减对应扩散元素抗性，翦月环本身风伤吃不到风套减抗，手动传入减抗系数给染色伤害
-const kNum = (res) => res >= 75 ? 1 / (1 + 3 * res / 100) : res >= 0 ? (100 - res) / 100 : 1 - res / 200
-const vvRatio = ({ attr, artis }) => {
-  if (!(artis?.['翠绿之影'] >= 4)) return 1
-  const base = 10 - (attr.kx || 0)
-  return kNum(base - 40) / kNum(base)
-}
-
 // 普攻一轮，倍率不高，带楼阁应该也打不了什么伤害，没什么实际意义
 const aRound = (talent, dmg) => [
   dmg(talent.a['一段伤害'], 'a'),
@@ -39,10 +31,7 @@ const rotationDmg = (ds, dmg) => {
   const qOne = dmg(talent.q['技能伤害2'][0], 'q')
   const q = { dmg: qOne.dmg * 3, avg: qOne.avg * 3 }
   const ring = dmg(talent.e['翦月环伤害'], 'e')
-  // 风套减抗系数，只对被扩散元素生效，也就是翦月环染色伤害生效
-  const vv = vvRatio(ds)
-  const cRaw = dmg(talent.e['翦月环伤害'] * 50 / 100, 'e', 'coloringDmg')
-  const conv = { dmg: cRaw.dmg * vv, avg: cRaw.avg * vv }
+  const conv = dmg(talent.e['翦月环伤害'] * 50 / 100, 'e', 'coloringDmg')
   // 翦月环基础 3 段伤害
   const hitsPerRing = 3
   const baseE = cons >= 6 ? 2 : 1
@@ -117,7 +106,7 @@ export const details = applyStandardTeam([
     dmg: ({ talent }, dmg) => dmg(talent.e['翦月环伤害'], 'e')
   }, {
     title: '「翦月环」染色单段伤害',
-    params: ({ artis }) => ({ fengtao: !!(artis?.['翠绿之影'] >= 4), c4: true }),
+    params: { c4: true },
     dmg: ({ talent }, dmg) => dmg(talent.e['翦月环伤害'] * 50 / 100, 'e', 'coloringDmg')
   }, {
     title: '染色环境「翦月环」总伤',
@@ -125,9 +114,7 @@ export const details = applyStandardTeam([
     dmg: (ds, dmg) => {
       const { talent, cons } = ds
       const ring = dmg(talent.e['翦月环伤害'], 'e')
-      const vv = vvRatio(ds)
-      const cRaw = dmg(talent.e['翦月环伤害'] * 50 / 100, 'e', 'coloringDmg')
-      const conv = { dmg: cRaw.dmg * vv, avg: cRaw.avg * vv }
+      const conv = dmg(talent.e['翦月环伤害'] * 50 / 100, 'e', 'coloringDmg')
       const ringTimes = cons >= 1 ? 2 : 1
       const swirl = dmg.reaction('swirl').avg * ringTimes
       return {
