@@ -827,11 +827,27 @@ let TeamBuff = [
   {
     check: ({ params }) => params.QiQi_low || params.QiQi_mid || params.QiQi_best,
     title: '七七',
-    // E持续期间全队星超导增伤50%
-    // 6命提升星超导基础值
     data: {
       stellarConduct: 50,
+      stellarVortex: 50,
+      starSwirlAnemo: 50,
+      starSwirlCryo: 50,
       fyplus: LIMITED_PLUS.QiQi.plus
+    }
+  },
+  {
+    check: ({ params }) => params.Odette_low || params.Odette_mid || params.Odette_best,
+    title: '奥黛塔',
+    // 华彩效果默认满层转给队友
+    data: {
+      fypct: 14,
+      stellarConduct: ({ params, cons }) => 60 + (params.Odette_best && cons >= 4 ? 31 : 0),
+      stellarVortex: ({ params, cons }) => 60 + (params.Odette_best && cons >= 4 ? 31 : 0),
+      starSwirlAnemo: ({ params, cons }) => 60 + (params.Odette_best && cons >= 4 ? 31 : 0),
+      starSwirlCryo: ({ params, cons }) => 60 + (params.Odette_best && cons >= 4 ? 31 : 0),
+      atkPct: ({ params }) => (params.Odette_mid || params.Odette_best) ? 42 : 0,
+      kx: ({ params }) => (params.Odette_mid || params.Odette_best) ? 20 : 0,
+      elevated: ({ params }) => params.Odette_best ? 25 : 0
     }
   },
   {
