@@ -54,7 +54,7 @@ export const details = applyStandardTeam([
   }
 ])
 
-export const defDmgIdx = 8
+export const defDmgIdx = 4
 export const consDmgKey = 'EQ后台一轮总伤'
 export const mainAttr = 'atk,cpct,cdmg,recharge'
 
