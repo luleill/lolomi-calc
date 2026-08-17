@@ -6,6 +6,8 @@
 import ProfileDmg from '../../miao-plugin/models/ProfileDmg.js'
 import Config from './Config.js'
 import ConsCompare from './Constellation.js'
+import LlmDataIndex from '../llm-models/LlmDataIndex.js'
+import ProfileDmgLite from '../llm-models/ProfileDmgLite.js'
 import fs from 'node:fs'
 
 const basePath = process.cwd()
@@ -24,14 +26,67 @@ const Start = {
     logger.mark('[lolomi-calc] 计算状态 - lolomicalc:', cfg.lolomicalc)
     logger.mark('[lolomi-calc] 标配预设 - templateteam:', cfg.templateteam)
     logger.mark('[lolomi-calc] 命座对比 - conscompare:', cfg.conscompare)
+    logger.mark('[lolomi-calc] 计算框架 - engineMode:', cfg.engineMode || 'auto')
 
     this.originalDmgRulePath = ProfileDmg.dmgRulePath
     this.originalCalcData = ProfileDmg.prototype.calcData
     
     this.initialization()
+    this.initLlmData()
     this.setupPrioritySystem()
+    this.setupRuleGuard()
     this.setConsCalc()
     this.startMonitoring()
+  },
+
+  initLlmData() {
+    this.llmDataReady = LlmDataIndex.init()
+      .then((stat) => {
+        logger.mark(`[lolomi-calc] 自有数据加载完成 - 已写角色:${stat.char}`)
+        return true
+      })
+      .catch((e) => {
+        logger.warn(logger.red(`[lolomi-calc] 自有数据加载失败，计算回落 miao: ${e.message}`))
+        return false
+      })
+  },
+
+  async calcByLlmEngine(pd, params) {
+    const mode = cfg.engineMode || 'auto'
+    if (mode === 'miao' || !pd.isGs) {
+      return { handled: false }
+    }
+    const charName = pd.char?.name || pd.profile?.name
+    try {
+      // 等待数据注册写入完成，启动后首次计算可能早于写入
+      const ready = await this.llmDataReady
+      if (!ready || !charName || !LlmDataIndex.hasCharDetail(charName)) {
+        if (mode === 'lolomi') {
+          logger.warn(logger.red(`[lolomi-calc] ${charName || '未知角色'} lolomi数据未收录`))
+          return { handled: true, error: new Error('lolomi数据未收录') }
+        }
+        return { handled: false }
+      }
+      const lite = new ProfileDmgLite(pd.profile, 'gs')
+      const result = await lite.calcData(params || {})
+      if (result === false) {
+        if (mode === 'lolomi') {
+          logger.warn(logger.red(`[lolomi-calc] ${charName} lolomi计算无结果`))
+          return { handled: true, error: new Error('lolomi计算无结果') }
+        }
+        return { handled: false }
+      }
+      return { handled: true, result }
+    } catch (error) {
+      if (error?.constructor?.name === 'MiaoError') {
+        return { handled: true, error }
+      }
+      if (mode === 'lolomi') {
+        return { handled: true, error }
+      }
+      logger.warn(`[lolomi-calc] ${charName || '未知角色'} lolomi计算异常，回落 miao: ${error.message}`)
+      return { handled: false }
+    }
   },
   /**
    * 初始化极限面板数据并复制到云崽的数据目录
@@ -246,6 +301,30 @@ const Start = {
   },
 
   /**
+   * defDmgIdx 伤害索引越界处理
+   */
+  setupRuleGuard() {
+    const self = this
+    const originalGetCalcRule = ProfileDmg.prototype.getCalcRule
+    ProfileDmg.prototype.getCalcRule = async function() {
+      const rule = await originalGetCalcRule.call(this)
+      if (rule && Array.isArray(rule.details) && rule.defDmgIdx >= rule.details.length) {
+        const oobIdx = rule.defDmgIdx
+        const name = this.char?.name || '未知角色'
+        const logKey = `defdmgidx_oob_${name}`
+        const now = Date.now()
+        const last = self.logCache.get(logKey)
+        if (!last || now - last > LOG_DEBOUNCE_MS) {
+          logger.mark(logger.red(`[lolomi-calc] ${name} defDmgIdx=${oobIdx} 伤害索引异常，跳过该角色计算，请联系源作者`))
+          self.logCache.set(logKey, now)
+        }
+        return false
+      }
+      return rule
+    }
+  },
+
+  /**
    * 命座对比计算
    */
   setConsCalc() {
@@ -256,8 +335,40 @@ const Start = {
       if (this.isCalculatingCons) {
         return await originalCalcData.call(this, params)
       }
-      const result = await originalCalcData.call(this, params)
-      if (!result || !this.char || !this.profile) {
+      const engineRet = await self.calcByLlmEngine(this, params)
+      let result
+      if (engineRet.handled) {
+        if (engineRet.error) {
+          if (engineRet.error?.constructor?.name === 'MiaoError') {
+            throw engineRet.error
+          }
+          logger.warn(logger.red(`[lolomi-calc] ${this.char?.name || '未知角色'} lolomi计算失败: ${engineRet.error.message}`))
+          return null
+        }
+        result = engineRet.result
+      } else {
+        try {
+          result = await originalCalcData.call(this, params)
+        } catch (error) {
+          if (error?.constructor?.name === 'MiaoError') {
+            throw error
+          }
+          logger.warn(logger.red(`[lolomi-calc] ${this.char?.name || '未知角色'} 计算出错，跳过本次计算: ${error.message}`))
+          return null
+        }
+      }
+      if (params?.mode === 'single' && result && !Number.isFinite(result.avg)) {
+        const name = this.char?.name || '未知角色'
+        const logKey = `dmgidx_nonnum_${name}`
+        const now = Date.now()
+        const last = self.logCache.get(logKey)
+        if (!last || now - last > LOG_DEBOUNCE_MS) {
+          logger.mark(logger.red(`[lolomi-calc] ${name} defDmgIdx 伤害索引异常，指向非数值伤害条目`))
+          self.logCache.set(logKey, now)
+        }
+        return null
+      }
+      if (!result || !this.profile) {
         return result
       }
       
@@ -267,9 +378,15 @@ const Start = {
       }
       
       try {
-        const characterName = this.char.name
+        const characterName = this.char?.name || this.profile.name
         const currentCons = Number(this.profile.cons)
-        const calcRule = await this.getCalcRule()
+        let calcRule = await this.getCalcRule()
+        if ((!calcRule || !calcRule.details) && LlmDataIndex.hasCharDetail(characterName)) {
+          try {
+            calcRule = await new ProfileDmgLite(this.profile, 'gs').getCalcRule()
+          } catch (e) {
+          }
+        }
         
         if (calcRule?.defDmgIdx !== undefined && calcRule.defDmgIdx >= 0) {
           const calcKey = `constellation_calc_${characterName}_${currentCons}`

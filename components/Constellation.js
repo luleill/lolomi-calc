@@ -8,6 +8,9 @@ import ProfileDmg from '../../miao-plugin/models/ProfileDmg.js'
 import lodash from 'lodash'
 import Character from '../../miao-plugin/models/Character.js'
 import CharTalent from '../../miao-plugin/models/character/CharTalent.js'
+import ProfileDmgLite from '../llm-models/ProfileDmgLite.js'
+import LlmCharMeta from '../llm-models/LlmCharMeta.js'
+import LlmDataIndex from '../llm-models/LlmDataIndex.js'
 
 const cfg = Config.getConfig('user', 'config')
 
@@ -171,7 +174,16 @@ const ConsCompare = {
       tempProfile.cons = cons
       
       if (tempProfile.talent && tempProfile.id && tempProfile.elem) {
-        const char = Character.get({ id: tempProfile.id, elem: tempProfile.elem })
+        // 原神角色表优先查lolomi数据，使用 miao 兜底
+        let char = null
+        const llmChar = LlmCharMeta.getData(tempProfile.id) || LlmCharMeta.getData(tempProfile.name || characterName)
+        if (llmChar) {
+          char = { ...llmChar, game: 'gs', isGs: true }
+        }
+        const miaoChar = Character.get({ id: tempProfile.id, elem: tempProfile.elem })
+        if (!char) {
+          char = miaoChar
+        }
         
         if (char) {
           const originalTalent = {}
@@ -221,7 +233,8 @@ const ConsCompare = {
       const targetDetail = details?.[targetIdx]
       const targetDmgKey = targetDetail?.dmgKey || null
       
-      const tempDmg = new ProfileDmg(tempProfile, 'gs')
+      const useLlm = (cfg.engineMode || 'auto') !== 'miao' && LlmDataIndex.hasCharDetail(characterName)
+      const tempDmg = useLlm ? new ProfileDmgLite(tempProfile, 'gs') : new ProfileDmg(tempProfile, 'gs')
       tempDmg.isCalculatingCons = true
       
       const originalGetCalcRule = tempDmg.getCalcRule.bind(tempDmg)

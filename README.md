@@ -10,7 +10,8 @@ git clone --depth=1 https://gitee.com/land-route_lu/lolomi-calc.git ./plugins/lo
 复用liangshi-calc基础框架模版，组队和计算逻辑已重构
 * 梁氏源地址 https://gitee.com/liangshi233/liangshi-calc/tree/master
 * 计算只适配了梁氏和喵喵，原神角色计算优先级会高于梁氏和喵喵
-* 会提前更新下版本的角色计算，要提前用的话需要自己在miao-plugin里更新对应数据，一般只以V1测试数据写伤害计算，正式服上线后再做对应调整
+* 由于miao-plugin更新实在过慢，原神7.0版本迁移miao框架的计算逻辑至lolomi，同时迁移miao-plugin的LICENSE许可文件，相关迁移文件附有注释来源说明
+* 原神7.0版本新反应公式及后续计算逻辑lolomi自行维护，计算不再依赖miao-plugin，lolomi未写角色依旧由梁氏和喵喵基础计算兜底，更新后可直接使用jx命令查看下个版本角色面板，前提是lolomi有写
 # 相关依赖
 建议用 TRSS-Yunzai
 * TRSS-Yunzai   https://github.com/TimeRainStarSky/Yunzai
@@ -93,5 +94,7 @@ git clone --depth=1 https://gitee.com/land-route_lu/lolomi-calc.git ./plugins/lo
 - 伊安珊
 - 蓝砚
 - 奥黛塔
+- 阿罗夏
+- 薇斯纳
 
 </details> 

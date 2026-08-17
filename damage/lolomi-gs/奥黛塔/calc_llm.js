@@ -18,57 +18,126 @@ export const details = applyStandardTeam([
     title: '触发特效后攻击力',
     dmg: ({ attr, calc }) => ({ avg: calc(attr.atk) })
   }, {
-    title: '「柔板·幻灵夜舞」伤害',
-    dmg: ({ talent }, dmg) => dmg(talent.e['技能伤害'], 'e')
-  }, {
     title: '「破晓终奏」星超导伤害',
-    params: { q: true },
     dmg: ({ attr, calc, talent }, { basic }) => {
       const multi = calcStarDmgMulti(calc, attr)
       const r = basic(calc(attr.atk) * talent.e['破晓终奏星超导/星扩散伤害'][0] / 100, '', 'stellarConduct')
       return { dmg: r.dmg * multi, avg: r.avg * multi }
     }
   }, {
+    title: '「破晓终奏」星扩散伤害',
+    dmg: ({ attr, calc, talent }, { basic }) => {
+      const multi = calcStarDmgMulti(calc, attr)
+      const raw = talent.e['破晓终奏星超导/星扩散伤害']
+      const mult = Array.isArray(raw) ? raw[1] : raw
+      const r = basic(calc(attr.atk) * mult / 100, '', 'stellarVortex')
+      return { dmg: r.dmg * multi, avg: r.avg * multi }
+    }
+  }, {
+    title: '反应星扩散(风)伤害',
+    dmg: ({}, { reaction }) => reaction('starSwirlAnemo')
+  }, {
+    title: '反应星扩散(冰)伤害',
+    dmg: ({}, { reaction }) => reaction('starSwirlCryo')
+  }, {
+    title: '反应星扩散(冰)低阶伤害',
+    params: { starSwirlWindLV: 1 },
+    dmg: ({}, { reaction }) => reaction('starSwirlCryo')
+  }, {
     title: '「拂羽舞步」星超导伤害',
-    params: { q: true },
     dmg: ({ attr, calc, talent }, { basic }) => {
       const multi = calcStarDmgMulti(calc, attr)
       const r = basic(calc(attr.atk) * talent.e['拂羽舞步星超导/星扩散伤害'][0] / 100, '', 'stellarConduct')
       return { dmg: r.dmg * multi, avg: r.avg * multi }
     }
   }, {
-    title: '「疾板·苍羽一梦」尾段伤害',
-    params: { q: true },
-    dmg: ({ talent }, dmg) => dmg(talent.q['斩击最终段伤害'], 'q')
+    title: '「拂羽舞步」星扩散伤害',
+    dmg: ({ attr, calc, talent }, { basic }) => {
+      const multi = calcStarDmgMulti(calc, attr)
+      const raw = talent.e['拂羽舞步星超导/星扩散伤害']
+      const mult = Array.isArray(raw) ? raw[1] : raw
+      const r = basic(calc(attr.atk) * mult / 100, '', 'stellarVortex')
+      return { dmg: r.dmg * multi, avg: r.avg * multi }
+    }
   }, {
-    title: '一轮循环总伤',
-    params: { q: true },
-    dmg: ({ attr, calc, talent, cons }, calcApi) => {
+    title: '「旋翼舞步」星超导伤害',
+    dmg: ({ attr, calc, talent }, { basic }) => {
+      const multi = calcStarDmgMulti(calc, attr)
+      const r = basic(calc(attr.atk) * talent.e['旋翼舞步星超导/星扩散伤害'][0] / 100, '', 'stellarConduct')
+      return { dmg: r.dmg * multi, avg: r.avg * multi }
+    }
+  }, {
+    title: '「旋翼舞步」星扩散伤害',
+    dmg: ({ attr, calc, talent }, { basic }) => {
+      const multi = calcStarDmgMulti(calc, attr)
+      const raw = talent.e['旋翼舞步星超导/星扩散伤害']
+      const mult = Array.isArray(raw) ? raw[1] : raw
+      const r = basic(calc(attr.atk) * mult / 100, '', 'stellarVortex')
+      return { dmg: r.dmg * multi, avg: r.avg * multi }
+    }
+  }, {
+    title: '「旋翼舞步」后台星扩散',
+    // 六命切后台自身保留华彩效果，非六命切后台默认0层
+    params: ({ cons }) => (cons >= 6 ? {} : { huacai: 0 }),
+    dmg: ({ attr, calc, talent }, { basic }) => {
+      const multi = calcStarDmgMulti(calc, attr)
+      const raw = talent.e['旋翼舞步星超导/星扩散伤害']
+      const mult = Array.isArray(raw) ? raw[1] : raw
+      const r = basic(calc(attr.atk) * mult / 100, '', 'stellarVortex')
+      return { dmg: r.dmg * multi, avg: r.avg * multi }
+    }
+  }, {
+    title: '「疾板·苍羽一梦」总伤',
+    dmg: ({ talent }, dmg) => {
+      const slash = dmg(talent.q['斩击伤害'], 'q')
+      const final = dmg(talent.q['斩击最终段伤害'], 'q')
+      return { dmg: slash.dmg + final.dmg, avg: slash.avg + final.avg }
+    }
+  }, {
+    title: '15秒站场星扩散总伤',
+    // 木桩自挂风元素
+    // 默认手法：EQE + 站场等待拂羽舞步和旋翼舞步分别攻击3次，不考虑普攻，没伤害
+    // 总计默认触发12次反应星扩散风，3次反应星扩散冰
+    dmg: ({ attr, calc, talent }, calcApi) => {
+      const dmg = calcApi
+      const { basic, reaction } = calcApi
+      const starMulti = calcStarDmgMulti(calc, attr)
+      const applyStar = (r) => ({ dmg: r.dmg * starMulti, avg: r.avg * starMulti })
+      const eSkill = dmg(talent.e['技能伤害'], 'e')
+      const eCont = dmg(talent.e['破晓终奏持续伤害'], 'e')
+      const eStar = applyStar(basic(calc(attr.atk) * talent.e['破晓终奏星超导/星扩散伤害'][1] / 100, '', 'stellarVortex'))
+      const fuyu   = dmg(talent.e['拂羽舞步伤害'], 'e')
+      const xuanyi = dmg(talent.e['旋翼舞步伤害'], 'e')
+      const fuyuStar = applyStar(basic(calc(attr.atk) * talent.e['拂羽舞步星超导/星扩散伤害'][1] / 100, '', 'stellarVortex'))
+      const xuanyiStar = applyStar(basic(calc(attr.atk) * talent.e['旋翼舞步星超导/星扩散伤害'][1] / 100, '', 'stellarVortex'))
+      const qSlash = dmg(talent.q['斩击伤害'], 'q')
+      const qFinal = dmg(talent.q['斩击最终段伤害'], 'q')
+      const swirlAnemo = reaction('starSwirlAnemo')
+      const swirlCryo = reaction('starSwirlCryo')
+      return {
+        dmg: eSkill.dmg + swirlAnemo.dmg * 12 + qSlash.dmg + qFinal.dmg + eCont.dmg * 3 + swirlCryo.dmg * 3 + eStar.dmg + fuyu.dmg * 3 + fuyuStar.dmg * 3 + xuanyi.dmg * 3 + xuanyiStar.dmg * 3,
+        avg: eSkill.avg + swirlAnemo.avg * 12 + qSlash.avg + qFinal.avg + eCont.avg * 3 + swirlCryo.avg * 3 + eStar.avg + fuyu.avg * 3 + fuyuStar.avg * 3 + xuanyi.avg * 3 + xuanyiStar.avg * 3
+      }
+    }
+  }, {
+    title: '15秒站场星超导总伤',
+    dmg: ({ attr, calc, talent }, calcApi) => {
       const dmg = calcApi
       const { basic } = calcApi
       const starMulti = calcStarDmgMulti(calc, attr)
       const applyStar = (r) => ({ dmg: r.dmg * starMulti, avg: r.avg * starMulti })
       const eSkill = dmg(talent.e['技能伤害'], 'e')
+      const eCont = dmg(talent.e['破晓终奏持续伤害'], 'e')
       const eStar = applyStar(basic(calc(attr.atk) * talent.e['破晓终奏星超导/星扩散伤害'][0] / 100, '', 'stellarConduct'))
       const fuyu   = dmg(talent.e['拂羽舞步伤害'], 'e')
       const xuanyi = dmg(talent.e['旋翼舞步伤害'], 'e')
       const fuyuStar = applyStar(basic(calc(attr.atk) * talent.e['拂羽舞步星超导/星扩散伤害'][0] / 100, '', 'stellarConduct'))
       const xuanyiStar = applyStar(basic(calc(attr.atk) * talent.e['旋翼舞步星超导/星扩散伤害'][0] / 100, '', 'stellarConduct'))
-      // 辉映状态下拂羽/旋翼两种舞步各额外一次星烁伤害
-      const shadowDmg = fuyu.dmg * 2 + xuanyi.dmg * 2 + fuyuStar.dmg * 2 + xuanyiStar.dmg * 2
-      const shadowAvg = fuyu.avg * 2 + xuanyi.avg * 2 + fuyuStar.avg * 2 + xuanyiStar.avg * 2
       const qSlash = dmg(talent.q['斩击伤害'], 'q')
       const qFinal = dmg(talent.q['斩击最终段伤害'], 'q')
-      const c1Extra = cons >= 1
-        ? applyStar(basic(calc(attr.atk) * 3, '', 'stellarConduct'))
-        : { dmg: 0, avg: 0 }
-      // 4命协同默认2次
-      const c4Extra = cons >= 4
-        ? applyStar(basic(calc(attr.atk) * 0.66, '', 'stellarConduct'))
-        : { dmg: 0, avg: 0 }
       return {
-        dmg: eSkill.dmg + eStar.dmg + shadowDmg + qSlash.dmg + qFinal.dmg + c1Extra.dmg + c4Extra.dmg * 2,
-        avg: eSkill.avg + eStar.avg + shadowAvg + qSlash.avg + qFinal.avg + c1Extra.avg + c4Extra.avg * 2
+        dmg: eSkill.dmg + qSlash.dmg + qFinal.dmg + eCont.dmg * 3 + eStar.dmg + fuyu.dmg * 3 + fuyuStar.dmg * 3 + xuanyi.dmg * 3 + xuanyiStar.dmg * 3,
+        avg: eSkill.avg + qSlash.avg + qFinal.avg + eCont.avg * 3 + eStar.avg + fuyu.avg * 3 + fuyuStar.avg * 3 + xuanyi.avg * 3 + xuanyiStar.avg * 3
       }
     }
   }, {
@@ -77,11 +146,23 @@ export const details = applyStandardTeam([
     params: ({ cons }) => ({
       ...teamConfig(cons, team, artifact_normal).params,
       cryo_two: true,
-      q: true
     }),
     dmg: ({ attr, calc, talent }, { basic }) => {
       const multi = calcStarDmgMulti(calc, attr)
       const r = basic(calc(attr.atk) * talent.e['破晓终奏星超导/星扩散伤害'][0] / 100, '', 'stellarConduct')
+      return { dmg: r.dmg * multi, avg: r.avg * multi }
+    }
+  }, {
+    title: ({ cons }) => `${teamConfig(cons, team, artifact_normal, mainCharName).title}「破晓终奏」星扩散`,
+    params: ({ cons }) => ({
+      ...teamConfig(cons, team, artifact_normal).params,
+      cryo_two: true,
+    }),
+    dmg: ({ attr, calc, talent }, { basic }) => {
+      const multi = calcStarDmgMulti(calc, attr)
+      const raw = talent.e['破晓终奏星超导/星扩散伤害']
+      const mult = Array.isArray(raw) ? raw[1] : raw
+      const r = basic(calc(attr.atk) * mult / 100, '', 'stellarVortex')
       return { dmg: r.dmg * multi, avg: r.avg * multi }
     }
   }, {
@@ -90,15 +171,15 @@ export const details = applyStandardTeam([
   }
 ])
 
-export const mainAttr = 'atk,mastery,atkcpct,cdmg'
+export const mainAttr = 'atk,mastery,cpct,cdmg'
 export const defDmgIdx = 2
-export const consDmgKey = '一轮循环总伤'
+export const consDmgKey = '15秒站场星扩散总伤'
 export const defParams = { huacai: 4 }
 
 export const buffs = [
   ...TeamBuff,
   {
-    title: '「星耀祝礼·银晓之舞」：基于攻击力提升星超导基础伤害[fypct]%',
+    title: '「星耀祝礼·银晓之舞」：基于攻击力提升星烁反应基础伤害[fypct]%',
     sort: 9,
     data: {
       fypct: ({ attr, calc }) => Math.min(calc(attr.atk) / 100 * 0.7, 14)
@@ -110,13 +191,19 @@ export const buffs = [
     },
     sort: 9,
     data: {
-      stellarConduct: ({ params, cons }) => ((params.huacai ?? 4) + (cons >= 1 ? 2 : 0)) * 15
+      stellarConduct: ({ params, cons }) => ((params.huacai ?? 4) + (cons >= 1 ? 2 : 0)) * 15,
+      stellarVortex: ({ params, cons }) => ((params.huacai ?? 4) + (cons >= 1 ? 2 : 0)) * 15,
+      starSwirlAnemo: ({ params, cons }) => ((params.huacai ?? 4) + (cons >= 1 ? 2 : 0)) * 15,
+      starSwirlCryo: ({ params, cons }) => ((params.huacai ?? 4) + (cons >= 1 ? 2 : 0)) * 15,
     }
   }, {
-    check: ({ params }) => params.q === true,
     title: '「雪鹄之梦」：提升星烁反应伤害[stellarConduct]%',
     data: {
-      stellarConduct: ({ talent }) => talent.q['雪鹄之梦星烁反应伤害提升']
+      stellarConduct: ({ talent }) => talent.q['雪鹄之梦星烁反应伤害提升'],
+      stellarVortex: ({ talent }) => talent.q['雪鹄之梦星烁反应伤害提升'],
+      starSwirlAnemo: ({ talent }) => talent.q['雪鹄之梦星烁反应伤害提升'],
+      starSwirlCryo: ({ talent }) => talent.q['雪鹄之梦星烁反应伤害提升'],
+
     }
   }, {
     title: ({ params, cons }) => {

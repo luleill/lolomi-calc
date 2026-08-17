@@ -50,7 +50,7 @@ export const helpList = [
       {
         icon: 81,
         title: '#标配计算启用',
-        desc: '计算面板展示2+1和6+5队友'
+        desc: '计算面板额外展示2+1和6+5队友'
       },
       {
         icon: 81,
@@ -70,7 +70,7 @@ export const helpList = [
       {
         icon: 81,
         title: '#命座对比启用',
-        desc: '开启命座对比，重启生效，返回图片会变慢几秒'
+        desc: '开启前后命座提升对比，重启生效'
       },
       {
         icon: 81,
@@ -81,6 +81,11 @@ export const helpList = [
         icon: 81,
         title: '#强制更新洛洛米',
         desc: '强制更新'
+      },
+      {
+        icon: 81,
+        title: '#洛洛米版本',
+        desc: '查看近期更新日志'
       }
     ]
   }

@@ -120,5 +120,8 @@
 - 布伦妮 Prune ✅
 - 桑多涅 Marionettenew ✅
 - 奥黛塔 Odette ✅
+- 阿罗夏 Alyosha ✅
+- 薇斯纳 Vesna ✅
+- 沃雅妮莎 Vodyanitsa 
 
 </details>

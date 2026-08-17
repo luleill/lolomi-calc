@@ -34,6 +34,19 @@ export const details = applyStandardTeam([
     params: { condense: 3 },
     dmg: ({ attr, calc, talent }, { basic }) => basic(calc(attr.atk) * talent.a['重击冷凝射线星超导伤害'] / 100, 'a2', 'stellarConduct')
   }, {
+    title: '重击「冷凝射线」星扩散伤害',
+    dmg: ({ attr, calc, talent }, { basic }) => basic(calc(attr.atk) * talent.a['重击冷凝射线星扩散伤害'] / 100, 'a2', 'stellarVortex')
+  }, {
+    title: '反应星扩散(冰)伤害',
+    dmg: ({}, { reaction }) => reaction('starSwirlCryo')
+  }, {
+    title: '反应星扩散(冰)低阶伤害',
+    params: { starSwirlWindLV: 1 },
+    dmg: ({}, { reaction }) => reaction('starSwirlCryo')
+  }, {
+    title: '反应星扩散(风)伤害',
+    dmg: ({}, { reaction }) => reaction('starSwirlAnemo')
+  }, {
     title: '「棱晶弹」星超导伤害',
     params: { ispower: true },
     dmg: ({ attr, calc, talent }, { basic }) => basic(calc(attr.atk) * talent.e['棱晶弹星超导伤害'] / 100, 'e', 'stellarConduct')
@@ -160,7 +173,7 @@ export const details = applyStandardTeam([
 export const mainAttr = 'atk,cpct,cdmg,mastery'
 export const defDmgIdx = 3
 export const consDmgKey = '站场一轮总伤'
-export const defParams = { tactic: 10, condense: 2, time: 15, ispower: true }
+export const defParams = { tactic: 10, condense: 2, time: 15, ispower: true, stellarConductLV: 4 }
 
 export const buffs = [
   ...TeamBuff,
@@ -183,10 +196,13 @@ export const buffs = [
       mastery: ({ attr, calc }) => Math.min(calc(attr.atk) / 100 * 8, 160)
     }
   }, {
-    title: '1命「鎏金未凋，夕暮已远」：星超导反应伤害提升30%',
+    title: '1命「鎏金未凋，夕暮已远」：星烁反应伤害提升30%',
     cons: 1,
     data: {
-      stellarConduct: 30
+      stellarConduct: 30,
+      stellarVortex: 30,
+      starSwirlAnemo: 30,
+      starSwirlCryo: 30
     }
   }, {
     // 增伤单次递增，默认平均吃到两层效果

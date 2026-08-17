@@ -148,6 +148,7 @@
     'Marionettenew': '桑多涅',
     'Odette': '奥黛塔',
     'Alyosha': '阿罗夏',
+    'Vesna': '薇斯纳',
   };
 
   // 角色简称 - 常用辅助
