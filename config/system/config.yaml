@@ -2,5 +2,5 @@ lolomicalc: true
 lolomiartis: true
 templateteam: false
 panelmodel: 1
-conscompare: false
+conscompare: true
 engineMode: auto

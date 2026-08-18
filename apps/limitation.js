@@ -1,3 +1,8 @@
+/*
+* 和梁氏极限命令有冲突，lolomi换为字母简写
+* 极限面板数据沿用老数据，目前仅更新新角色的极限面板数据用于计算测试
+* 核爆和辅助面板没时间搞，有个别角色需要单独加的可提
+* */
 import { Character } from '../../miao-plugin/models/index.js'
 const replace_list = [
   'jx',

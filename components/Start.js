@@ -372,6 +372,11 @@ const Start = {
         return result
       }
       
+      // 命座对比功能仅在lolomi计算原神角色时触发
+      if (!engineRet.handled) {
+        return result
+      }
+      
       const enableConstellation = cfg.conscompare ?? true
       if (!enableConstellation) {
         return result
