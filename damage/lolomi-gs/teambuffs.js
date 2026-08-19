@@ -53,6 +53,7 @@ const MUTEX_ARTI_PASSIVES = [
   { artiName: '翠绿之影', paramKey: 'fengtao'  }, // 风套 - 对应元素减抗40
   { artiName: '', paramKey: 'caotao'   }, // 草套 - 减草抗30%
   { artiName: '', paramKey: 'tianmei'  }, // 天之美赐 - 魔导队伍伤害提升40%
+  { artiName: '炉火融炼之心', paramKey: 'luhuo' }, // 炉火 - 队伍星烁反应伤害提升50%
 ]
 
 /**
@@ -293,6 +294,16 @@ let TeamBuff = [
     title: '天之美赐：施放元素战技后附近的所有角色获得[dmg]%元素伤害加成',
     data: {
       dmg: ({ params }) => hexenCount(params) >= 2 ? 40 : 20
+    }    
+  },
+  { 
+    check: ({ params, artis }) => artiEffectActive('luhuo', params, artis),
+    title: '炉火融炼之心：队伍中附近的所有角色造成的星烁反应伤害提升50%',
+    data: {
+      stellarConduct: 50,
+      stellarVortex: 50,
+      starSwirlAnemo: 50,
+      starSwirlCryo: 50
     }    
   },
 
@@ -853,9 +864,12 @@ let TeamBuff = [
   {
     check: ({ params }) => params.Diona_low || params.Diona_mid || params.Diona_best,
     title: '迪奥娜',
-    // 6命Q领域内精通+200，星超导增伤40
+    // Q领域内星烁增伤40，6命领域内精通加200，
     data: {
-      stellarConduct: ({ params }) => params.Diona_best ? 40 : 0,
+      stellarConduct: 40,
+      starSwirlAnemo: 40,
+      starSwirlCryo: 40,
+      stellarVortex: 40,
       mastery: ({ params }) => params.Diona_best ? 200 : 0
     }
   },
@@ -889,6 +903,38 @@ let TeamBuff = [
     data: {
       kx: ({ params, element }) => (params.BeiDou_best) && (element === '冰' || element === '雷') ? 15 : 0,
       mastery: ({ params }) => (params.BeiDou_best) ? 200 : 0
+    }
+  },
+  {
+    check: ({ params }) => params.Alyosha_low || params.Alyosha_mid || params.Alyosha_best,
+    title: '阿罗夏',
+    // 天赋：星超导增伤20%
+    // E猎者之准加攻：10级21.2%攻击力，3命加3级E，13级25.02%，6命可叠2层
+    // 6命2层猎者之准精通加100
+    data: {
+      stellarConduct: 20,
+      atkPct: ({ params }) => params.Alyosha_best ? 50.04 : (params.Alyosha_mid ? 25.02 : 21.2),
+      mastery: ({ params }) => params.Alyosha_best ? 100 : 0
+    }
+  },
+  {
+    check: ({ params }) => params.Vodyanitsa_low || params.Vodyanitsa_mid || params.Vodyanitsa_best,
+    title: '沃雅妮莎',
+    // E：降低敌人水/冰抗性，10级26.0%，13级30.7%
+    // 天赋：星扩散降低风扩30
+    // 天赋：领唱buff，暂时没数据，后续出了再加
+    // 1命基于生命值提升攻击力，默认高配7万血，中6万
+    // 2命水冰暴伤加50%、星扩散暴伤加60%
+    // 6命星扩散擢升25%、水冰增伤50%
+    data: {
+      kx: ({ element }) => (element === '水' || element === '冰') ? 20.8 : 0,
+      atkPlus: ({ params }) => params.Vodyanitsa_best ? 490 : params.Vodyanitsa_mid ? 420 : 0,
+      cdmg: ({ params, element }) => (params.Vodyanitsa_best || params.Vodyanitsa_mid) && (element === '水' || element === '冰') ? 50 : 0,
+      stellarVortexCdmg: ({ params }) => (params.Vodyanitsa_best || params.Vodyanitsa_mid) ? 60 : 0,
+      starSwirlAnemoCdmg: ({ params }) => (params.Vodyanitsa_best || params.Vodyanitsa_mid) ? 60 : 0,
+      starSwirlCryoCdmg: ({ params }) => (params.Vodyanitsa_best || params.Vodyanitsa_mid) ? 60 : 0,
+      elevated: ({ params }) => params.Vodyanitsa_best ? 25 : 0,
+      dmg: ({ params, element }) => params.Vodyanitsa_best && (element === '水' || element === '冰') ? 50 : 0
     }
   }
 ]

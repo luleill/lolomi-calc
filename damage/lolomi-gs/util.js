@@ -9,6 +9,7 @@
     'panyan': '悠古的磐岩',
     'zongshi': '昔日宗室之仪',
     'tianmei': '天之美赐',
+    'luhuo': '炉火融炼之心',
   };
 
   // 圣遗物别名
@@ -26,6 +27,7 @@
     '宗室': 'zongshi',
     '天美': 'tianmei',
     '美赐': 'tianmei',
+    '炉火': 'luhuo',
   };
 
   // 角色映射
@@ -148,6 +150,7 @@
     'Marionettenew': '桑多涅',
     'Odette': '奥黛塔',
     'Alyosha': '阿罗夏',
+    'Vodyanitsa': '沃雅妮莎',
     'Vesna': '薇斯纳',
   };
 

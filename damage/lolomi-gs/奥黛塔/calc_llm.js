@@ -4,8 +4,8 @@ import { Config } from '#lolomi'
 
 const mainCharName = '奥黛塔'
 
-const team = ['桑多涅', '七七', '阿罗夏']
-const artifact_normal = ['千岩']
+const team = ['迪奥娜', '七七', '阿罗夏']
+const artifact_normal = ['千岩', '炉火']
 
 const config = Config.getConfig('user', 'config')
 const applyStandardTeam = withStdTeam(mainCharName, team, artifact_normal, config, { cryo_two: true })
@@ -98,7 +98,8 @@ export const details = applyStandardTeam([
     // 木桩自挂风元素
     // 默认手法：EQE + 站场等待拂羽舞步和旋翼舞步分别攻击3次，不考虑普攻，没伤害
     // 总计默认触发12次反应星扩散风，3次反应星扩散冰
-    dmg: ({ attr, calc, talent }, calcApi) => {
+    // 1命破晓终奏额外一次星烁伤害；4命协同默认触发4次
+    dmg: ({ attr, calc, talent, cons }, calcApi) => {
       const dmg = calcApi
       const { basic, reaction } = calcApi
       const starMulti = calcStarDmgMulti(calc, attr)
@@ -114,14 +115,16 @@ export const details = applyStandardTeam([
       const qFinal = dmg(talent.q['斩击最终段伤害'], 'q')
       const swirlAnemo = reaction('starSwirlAnemo')
       const swirlCryo = reaction('starSwirlCryo')
+      const c1Extra = cons >= 1 ? applyStar(basic(calc(attr.atk) * 4.5, '', 'stellarVortex')) : { dmg: 0, avg: 0 }
+      const c4Synergy = cons >= 4 ? applyStar(basic(calc(attr.atk) * 0.99 * 4, '', 'stellarVortex')) : { dmg: 0, avg: 0 }
       return {
-        dmg: eSkill.dmg + swirlAnemo.dmg * 12 + qSlash.dmg + qFinal.dmg + eCont.dmg * 3 + swirlCryo.dmg * 3 + eStar.dmg + fuyu.dmg * 3 + fuyuStar.dmg * 3 + xuanyi.dmg * 3 + xuanyiStar.dmg * 3,
-        avg: eSkill.avg + swirlAnemo.avg * 12 + qSlash.avg + qFinal.avg + eCont.avg * 3 + swirlCryo.avg * 3 + eStar.avg + fuyu.avg * 3 + fuyuStar.avg * 3 + xuanyi.avg * 3 + xuanyiStar.avg * 3
+        dmg: eSkill.dmg + swirlAnemo.dmg * 12 + qSlash.dmg + qFinal.dmg + eCont.dmg * 3 + swirlCryo.dmg * 3 + eStar.dmg + fuyu.dmg * 3 + fuyuStar.dmg * 3 + xuanyi.dmg * 3 + xuanyiStar.dmg * 3 + c1Extra.dmg + c4Synergy.dmg,
+        avg: eSkill.avg + swirlAnemo.avg * 12 + qSlash.avg + qFinal.avg + eCont.avg * 3 + swirlCryo.avg * 3 + eStar.avg + fuyu.avg * 3 + fuyuStar.avg * 3 + xuanyi.avg * 3 + xuanyiStar.avg * 3 + c1Extra.avg + c4Synergy.avg
       }
     }
   }, {
     title: '15秒站场星超导总伤',
-    dmg: ({ attr, calc, talent }, calcApi) => {
+    dmg: ({ attr, calc, talent, cons }, calcApi) => {
       const dmg = calcApi
       const { basic } = calcApi
       const starMulti = calcStarDmgMulti(calc, attr)
@@ -135,9 +138,11 @@ export const details = applyStandardTeam([
       const xuanyiStar = applyStar(basic(calc(attr.atk) * talent.e['旋翼舞步星超导/星扩散伤害'][0] / 100, '', 'stellarConduct'))
       const qSlash = dmg(talent.q['斩击伤害'], 'q')
       const qFinal = dmg(talent.q['斩击最终段伤害'], 'q')
+      const c1Extra = cons >= 1 ? applyStar(basic(calc(attr.atk) * 3, '', 'stellarConduct')) : { dmg: 0, avg: 0 }
+      const c4Synergy = cons >= 4 ? applyStar(basic(calc(attr.atk) * 0.66 * 4, '', 'stellarConduct')) : { dmg: 0, avg: 0 }
       return {
-        dmg: eSkill.dmg + qSlash.dmg + qFinal.dmg + eCont.dmg * 3 + eStar.dmg + fuyu.dmg * 3 + fuyuStar.dmg * 3 + xuanyi.dmg * 3 + xuanyiStar.dmg * 3,
-        avg: eSkill.avg + qSlash.avg + qFinal.avg + eCont.avg * 3 + eStar.avg + fuyu.avg * 3 + fuyuStar.avg * 3 + xuanyi.avg * 3 + xuanyiStar.avg * 3
+        dmg: eSkill.dmg + qSlash.dmg + qFinal.dmg + eCont.dmg * 3 + eStar.dmg + fuyu.dmg * 3 + fuyuStar.dmg * 3 + xuanyi.dmg * 3 + xuanyiStar.dmg * 3 + c1Extra.dmg + c4Synergy.dmg,
+        avg: eSkill.avg + qSlash.avg + qFinal.avg + eCont.avg * 3 + eStar.avg + fuyu.avg * 3 + fuyuStar.avg * 3 + xuanyi.avg * 3 + xuanyiStar.avg * 3 + c1Extra.avg + c4Synergy.avg
       }
     }
   }, {
@@ -197,6 +202,12 @@ export const buffs = [
       starSwirlCryo: ({ params, cons }) => ((params.huacai ?? 4) + (cons >= 1 ? 2 : 0)) * 15,
     }
   }, {
+    title: ({ attr, calc }) => {
+      const bonus = Math.min(Math.max(calc(attr.atk) - 1000, 0) / 100 * 1.5, 30)
+      return `天赋「赤忱者的悲歌」：基于攻击力星烁反应造成原本${bonus.toFixed(1)}%的伤害`
+    },
+    sort: 9,
+  }, {
     title: '「雪鹄之梦」：提升星烁反应伤害[stellarConduct]%',
     data: {
       stellarConduct: ({ talent }) => talent.q['雪鹄之梦星烁反应伤害提升'],
@@ -222,7 +233,7 @@ export const buffs = [
       kx: 20
     }
   }, {
-    title: '4命「向上，坠往恍惚、燃烧的蓝空」：3.5秒频率额外一次协同攻击',
+    title: '4命「向上，坠往恍惚、燃烧的蓝空」：3.5秒间隔触发一次星烁协同攻击',
     cons: 4,
   }, {
     title: '6命「伸出手，触及苍穹永恒的面容」：自身星烁反应伤害擢升45%',

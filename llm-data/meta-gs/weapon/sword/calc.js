@@ -314,7 +314,7 @@ export default function (step, staticStep) {
       }
     }],
     白湖冬羽: {
-      title: '攻击力提升[atkPct]%，至多叠加3层；星烁反应的暴击伤害提升[stellarConductCdmg]%',
+      title: '攻击力提升[atkPct]%，星烁反应的暴击伤害提升[stellarConductCdmg]%',
       refine: {
         atkPct: step(8 * 3),
         stellarConductCdmg: step(50),

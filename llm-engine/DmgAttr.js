@@ -214,10 +214,13 @@ let DmgAttr = {
 
         title = title.replace(`[${key}]`, Format.comma(val, 1))
 
-        // 技能提高
-        let tRet = /^(a|a2|a3|e|e2|q|q2|q3|t|t2|me|xe|xe2|mt|dot|break|nightsoul)(Def|Ignore|Dmg|Enemydmg|Plus|Pct|Cpct|Cdmg|Multi|Elevated|Merrymakes)$/.exec(key)
+        let tRet = /^(a|a2|a3|e|e2|q|q2|q3|t|t2|me|xe|xe2|mt|dot|break|nightsoul|stellarConduct|stellarVortex|starSwirlAnemo|starSwirlCryo|lunarCharged|lunarBloom|lunarCrystallize)(Def|Ignore|Dmg|Enemydmg|Plus|Pct|Cpct|Cdmg|Multi|Elevated|Merrymakes)$/.exec(key)
         if (tRet) {
-          attr[tRet[1]][tRet[2].toLowerCase()] += val * 1 || 0
+          let slot = attr[tRet[1]]
+          if (!lodash.isPlainObject(slot)) {
+            slot = attr[tRet[1] + 'Attr'] = attr[tRet[1] + 'Attr'] || {}
+          }
+          slot[tRet[2].toLowerCase()] = (slot[tRet[2].toLowerCase()] || 0) + (val * 1 || 0)
           return
         }
 

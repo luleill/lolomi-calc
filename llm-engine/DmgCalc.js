@@ -116,6 +116,16 @@ let DmgCalc = {
       })
     }
 
+    // 月曜/星烁反应乘区
+    if (attr[ele + 'Attr']) {
+      let rds = attr[ele + 'Attr']
+      pctNum += (rds.pct || 0) / 100
+      multiNum += (rds.multi || 0) / 100
+      plusNum += rds.plus || 0
+      cpctNum += (rds.cpct || 0) / 100
+      cdmgNum += (rds.cdmg || 0) / 100
+    }
+
     // TODO
     if (ele === 'superBreak') {
       enemyIgnore += attr.superBreak.ignore / 100
@@ -248,9 +258,11 @@ let DmgCalc = {
         } else {
           eleNum = 1
         }
+        // 月曜/星烁反应增伤并入乘区
+        const rDmgNum = attr[ele + 'Attr'] ? (attr[ele + 'Attr'].dmg || 0) / 100 : 0
         ret = {
-          avg: ((lunarBase * (1 + fypct) + fybase) * eleBase * eleNum + (lunarBase * fyinc) + fyplus) * (1 + elevatedNum) * kNum * (1 + cpctNum * cdmgNum),
-          dmg: ((lunarBase * (1 + fypct) + fybase) * eleBase * eleNum + (lunarBase * fyinc) + fyplus) * (1 + elevatedNum) * kNum * (1 + cdmgNum)
+          avg: ((lunarBase * (1 + fypct + rDmgNum) + fybase) * eleBase * eleNum + (lunarBase * fyinc) + fyplus) * (1 + elevatedNum) * kNum * (1 + cpctNum * cdmgNum),
+          dmg: ((lunarBase * (1 + fypct + rDmgNum) + fybase) * eleBase * eleNum + (lunarBase * fyinc) + fyplus) * (1 + elevatedNum) * kNum * (1 + cdmgNum)
         }
         if (!dmgBase && (ele === 'starSwirlAnemo' || ele === 'starSwirlCryo')) {
           // 反应星扩散伤害分配占比：默认单人0.6系数，第二占比0.3，第三/第四占比0.05
