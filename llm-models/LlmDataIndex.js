@@ -2,7 +2,7 @@ import lodash from 'lodash'
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { Data } from '../../miao-plugin/components/index.js'
+import { Data, Meta } from '../../miao-plugin/components/index.js'
 import LlmMeta from './LlmMeta.js'
 
 const pluginName = 'lolomi-calc'
@@ -54,6 +54,23 @@ let LlmDataIndex = {
       })
     })
     meta.addAlias(extraChars)
+
+    let miaoChar = Meta.create('gs', 'char')
+    let existingIds = new Set(miaoChar.getIds())
+    let missingData = {}
+    let missingAlias = {}
+    lodash.forEach(data, (ds) => {
+      if (!existingIds.has(ds.id + '')) {
+        missingData[ds.id] = ds
+        if (alias[ds.name]) {
+          missingAlias[ds.name] = alias[ds.name]
+        }
+      }
+    })
+    if (!lodash.isEmpty(missingData)) {
+      miaoChar.addData(missingData)
+      miaoChar.addAlias(missingAlias)
+    }
   },
 
   async regWeapon () {
@@ -108,6 +125,16 @@ let LlmDataIndex = {
     meta.addMeta({
       weaponType, weaponSet, weaponBuffs, descFix
     })
+
+    let miaoWeapon = Meta.create('gs', 'weapon')
+    miaoWeapon.addData(data)
+    miaoWeapon.addAlias(alias)
+    miaoWeapon.addAbbr(abbr)
+    let miaoWeaponCfg = miaoWeapon.getMeta()
+    miaoWeapon.addMeta({
+      weaponBuffs: lodash.assign({}, miaoWeaponCfg.weaponBuffs, weaponBuffs),
+      descFix: lodash.assign({}, miaoWeaponCfg.descFix, descFix)
+    })
   },
 
   async regArti () {
@@ -156,6 +183,11 @@ let LlmDataIndex = {
 
     setMeta.addMeta({
       artiBuffs: calc
+    })
+
+    let miaoArti = Meta.create('gs', 'arti')
+    miaoArti.addMeta({
+      usefulAttr: lodash.assign({}, miaoArti.getMeta('usefulAttr'), usefulAttr)
     })
   }
 }

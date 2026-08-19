@@ -122,6 +122,6 @@
 - 奥黛塔 Odette ✅
 - 阿罗夏 Alyosha ✅
 - 薇斯纳 Vesna ✅
-- 沃雅妮莎 Vodyanitsa 
+- 沃雅妮莎 Vodyanitsa ✅
 
 </details>
