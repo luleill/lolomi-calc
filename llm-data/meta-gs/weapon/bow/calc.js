@@ -327,6 +327,31 @@ export default function (step, staticStep) {
         dmg: step(40),
         lunarCrystallize: step(40)
       }
-    }]
+    }],
+    柔风游弦: {
+      // 默认特效触发，辅助弓，全队星烁增伤
+      title: '元素充能提升[recharge]%，全队星烁反应伤害提升[stellarConduct]%',
+      refine: {
+        recharge: step(20),
+        stellarConduct: step(24),
+        stellarVortex: step(24),
+        starSwirlAnemo: step(24),
+        starSwirlCryo: step(24),
+      }
+    },
+    悬黎千钧: {
+      // 默认1名同元素队友叠一层精通，2名异色队友叠两层攻击
+      title: '元素精通提升[mastery]点，攻击力提升[atkPct]%',
+      refine: {
+        mastery: step(64),
+        atkPct: step(12 * 2),
+      }
+    },
+    霜雪誓约: {
+      title: '施放元素战技后，元素精通提升[mastery]点',
+      refine: {
+        mastery: step(120),
+      }
+    }
   }
 }

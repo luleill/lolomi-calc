@@ -1,11 +1,11 @@
-import { TeamBuff } from '../teambuffs.js'
+import { TeamBuff, LIMITED_PLUS } from '../teambuffs.js'
 import { teamConfig, withStdTeam } from '../util.js'
 import { Config } from '#lolomi'
 
 const mainCharName = '薇斯纳'
 
-const team = ['奥黛塔', '七七', '砂糖']
-const artifact_normal = ['']
+const team = ['奥黛塔', '七七', '沃雅妮莎']
+const artifact_normal = ['炉火', '千岩']
 
 const config = Config.getConfig('user', 'config')
 const applyStandardTeam = withStdTeam(mainCharName, team, artifact_normal, config, { teamAtkLv: 4 })
@@ -19,6 +19,17 @@ const congrongMult = (params, cons) => 1 + congrongStacks(params, cons) * 10 / 1
 const withCongrong = (ret, params, cons) => {
   const mult = congrongMult(params, cons)
   return { dmg: (ret.dmg ?? ret.avg) * mult, avg: ret.avg * mult }
+}
+
+// 七七6命生效4次
+const QiQiFyplusOver = ({ params, sHits, swirlHits, mult }) => {
+  const plus = LIMITED_PLUS.QiQi.plus({ params })
+  if (!plus) return 0
+  const limit = LIMITED_PLUS.QiQi.limit
+  const num = typeof limit === 'function' ? limit({ params }) : limit
+  const starShare = Number(params?.starShare)
+  const share = Number.isFinite(starShare) ? starShare : 0.6
+  return plus * (Math.max(sHits - num, 0) * mult + Math.max(swirlHits - Math.max(num - sHits, 0), 0) * share)
 }
 
 /**
@@ -76,11 +87,13 @@ const calcStarRotation = ({ talent, cons, params }, dmg) => {
   // 反应星扩散，先默认风扩散5次，冰扩散2次，具体多少等正式服上线看了再调
   const swirlAnemoUnit = dmg.reaction('starSwirlAnemo').avg
   const swirlCryoUnit = dmg.reaction('starSwirlCryo').avg
+  const swirlHits = 5 + 2
   const mult = congrongMult(params, cons)
+  const qiQiOver = QiQiFyplusOver({ params, sHits: 1 + 2 * wuTimes + 1 + taHits, swirlHits, mult })
   const total = eStart.avg + aSet * normalSets + feather.avg * featherHits
     + ci.avg * mult + luo.avg + luoStar.avg * mult + (wuStar.avg + wuEndStar.avg) * mult * wuTimes
     + qStar.avg * mult + taStar.avg * mult * taHits
-    + swirlAnemoUnit * 5 + swirlCryoUnit * 2
+    + swirlAnemoUnit * 5 + swirlCryoUnit * 2 - qiQiOver
   return { dmg: total, avg: total }
 }
 

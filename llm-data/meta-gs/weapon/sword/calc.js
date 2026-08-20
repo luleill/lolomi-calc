@@ -317,10 +317,55 @@ export default function (step, staticStep) {
       title: '攻击力提升[atkPct]%，星烁反应的暴击伤害提升[stellarConductCdmg]%',
       refine: {
         atkPct: step(8 * 3),
-        stellarConductCdmg: step(50),
-        stellarVortexCdmg: step(50),
-        starSwirlAnemoCdmg: step(50),
-        starSwirlCryoCdmg: step(50),
+        stellarConductCdmg: step(50, 15),
+        stellarVortexCdmg: step(50, 15),
+        starSwirlAnemoCdmg: step(50, 15),
+        starSwirlCryoCdmg: step(50, 15),
+      }
+    },
+    新枝: {
+      // 默认辉映·星烁，普通环境下的加精通不计入，20精通叠三层 = 60精通
+      title: '辉映·星烁状态攻击力提升[atkPct]%，星烁伤害提升[stellarConduct]%',
+      buffCount: 3,
+      refine: {
+        atkPct: step(6),
+        stellarConduct: step(8),
+        stellarVortex: step(8),
+        starSwirlAnemo: step(8),
+        starSwirlCryo: step(8),
+      }
+    },
+    蝶变: {
+      title: '暴击伤害提升[cdmg]%，星扩散伤害提升[stellarVortex]%',
+      refine: {
+        cdmg: step(48, 14),
+        stellarVortex: step(28),
+        starSwirlAnemo: step(28),
+        starSwirlCryo: step(28),
+      }
+    },
+    银釭: {
+      title: '元素精通提升[mastery]点',
+      buffCount: 2,
+      refine: {
+        mastery: step(52),
+      }
+    },
+    熔猎异端之刃: {
+      // 默认满层计算
+      title: '基于记录的移动距离，攻击力最高提升[atkPct]%',
+      refine: {
+        atkPct: step(36),
+      }
+    },
+    引火之源: {
+      title: '攻击力提升[atkPct]%，星烁反应伤害提升[stellarConduct]%',
+      refine: {
+        atkPct: step(16),
+        stellarConduct: step(16),
+        stellarVortex: step(16),
+        starSwirlAnemo: step(16),
+        starSwirlCryo: step(16),
       }
     },
   }

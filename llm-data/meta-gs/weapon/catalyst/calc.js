@@ -288,6 +288,35 @@ export default function (step, staticStep) {
           return Math.min(per * 3, step(8, 2)[refine] * 3)
         }
       }
-    }]
+    }],
+    凝雪沉心: {
+      // 默认辉映·星烁，按4位冰/雷队友计算
+      title: '辉映·星烁纯冰雷队伍，元素精通提升[mastery]点，星烁伤害提升[stellarConduct]%',
+      buffCount: 4,
+      refine: {
+        mastery: step(20),
+        stellarConduct: step(6),
+        stellarVortex: step(6),
+        starSwirlAnemo: step(6),
+        starSwirlCryo: step(6),
+      }
+    },
+    群王局戏: {
+      title: '攻击力提升[atkPct]%，元素精通提升[mastery]点',
+      refine: {
+        atkPct: step(20),
+        mastery: step(100),
+      }
+    },
+    寸心余响: {
+      title: '元素精通提升[mastery]点，星烁反应伤害提升[stellarConduct]%',
+      refine: {
+        mastery: step(60),
+        stellarConduct: step(16),
+        stellarVortex: step(16),
+        starSwirlAnemo: step(16),
+        starSwirlCryo: step(16),
+      }
+    }
   }
 }

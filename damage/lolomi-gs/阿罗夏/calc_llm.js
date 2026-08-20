@@ -66,7 +66,7 @@ export const buffs = [
       stellarConduct: 20
     }
   }, {
-    title: '被动「猎者之准」：攻击力提升[atk]%',
+    title: '被动「猎者之准」：攻击力提升[atkpct]%',
     data: {
       atkpct: ({ talent, cons }) => talent.e['猎者之准攻击力提升'] * (cons >= 6 ? 2 : 1),
     }

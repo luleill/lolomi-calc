@@ -243,5 +243,24 @@ export default function (step, staticStep) {
         stellarConduct: step(16 * 3)
       }
     }],
+    金律铸影: {
+      // 每10秒产生 加攻，加精通，加星烁增伤buff，单buff只有10秒持续时间，一般只能生效其一
+      // 默认同时触发加攻和星烁一层增伤，不触发加精通，另一种情况就是只触发星烁*2，不考虑
+      title: '攻击力提升[atkPct]%，星烁反应伤害提升[stellarConduct]%',
+      refine: {
+        atkPct: step(18),
+        stellarConduct: step(28),
+        stellarVortex: step(28),
+        starSwirlAnemo: step(28),
+        starSwirlCryo: step(28),
+      }
+    },
+    救赎之斩: {
+      title: '元素精通提升[mastery]点，攻击力提升[atkPct]%',
+      refine: {
+        mastery: step(64),
+        atkPct: step(16),
+      }
+    },
   }
 }
