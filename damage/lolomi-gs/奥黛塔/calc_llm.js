@@ -221,7 +221,6 @@ export const buffs = [
       const stacks = (params.huacai ?? 4) + (cons >= 1 ? 2 : 0)
       return `2命「她想，我要见证雪鹄未见之梦」：${stacks}层华彩提升攻击力[atkPct]%`
     },
-    sort: 9,
     cons: 2,
     data: {
       atkPct: ({ params, cons }) => ((params.huacai ?? 4) + (cons >= 1 ? 2 : 0)) * 7
