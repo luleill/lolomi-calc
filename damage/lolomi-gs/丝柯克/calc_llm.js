@@ -113,7 +113,7 @@ export const buffs = [
     }
   }, {
     check: ({ params }) => params.mie === true,
-    title: '「极恶技·灭」：每点蛇之狡谋提升本次元素爆发造成的伤害 [qPlus]',
+    title: '「极恶技·灭」：每点蛇之狡谋使元素爆发造成的伤害提升[qPct]%',
     data: {
       qPct: ({ talent, cons }) => {
         return talent.q['蛇之狡谋加成'] * (cons > 1 ? 22 : 12)

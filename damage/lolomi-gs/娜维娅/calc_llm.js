@@ -15,7 +15,7 @@ const artifact_B = ['烬城', '宗室']
 
 const config = Config.getConfig('user', 'config')
 const applyStandardTeam = withStdTeam(mainCharName, team, artifact_normal, config,
-  ({ cons }) => ({ geo_two: true, pyro_two: true, Xilonen_geo: true, shrapnel: cons >= 6 ? 6 : 3 }))
+  ({ cons }) => ({ geo_two: true, pyro_two: true, shrapnel: cons >= 6 ? 6 : 3 }))
 
 // 岩附魔普攻一轮4A总伤
 const aRound = ({ talent }, dmg) => '一二三四'.split('').reduce((acc, num) => {
@@ -83,7 +83,7 @@ const teamEntry = (teamNames, artifact, extraParams = {}) => [{
   title: ({ cons }) => `${teamConfig(cons, teamNames, artifact, mainCharName).title} 满晶片伤害`,
   params: ({ cons }) => ({
     ...teamConfig(cons, teamNames, artifact).params,
-    geo_two: true, Xilonen_geo: true, shrapnel: cons >= 6 ? 6 : 3,
+    geo_two: true, shrapnel: cons >= 6 ? 6 : 3,
     ...extraParams
   }),
   dmg: ({ talent }, dmg) => dmg(talent.e['玫瑰晶弹基础伤害'] * 2, 'e')
@@ -91,7 +91,7 @@ const teamEntry = (teamNames, artifact, extraParams = {}) => [{
   title: ({ cons }) => `${teamConfig(cons, teamNames, artifact, mainCharName).title} 6秒站场总伤`,
   params: ({ cons }) => ({
     ...teamConfig(cons, teamNames, artifact).params,
-    geo_two: true, Xilonen_geo: true, shrapnel: cons >= 6 ? 6 : 3,
+    geo_two: true, shrapnel: cons >= 6 ? 6 : 3,
     ...extraParams
   }),
   dmg: rotationDmg

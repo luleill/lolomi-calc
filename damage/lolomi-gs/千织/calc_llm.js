@@ -14,7 +14,7 @@ const team_B = ['希诺宁', '夜兰', '芙宁娜']
 const artifact_B = ['千岩']
 
 const config = Config.getConfig('user', 'config')
-const applyStandardTeam = withStdTeam(mainCharName, team, artifact_normal, config, {geo_two: true, Xilonen_geo: true})
+const applyStandardTeam = withStdTeam(mainCharName, team, artifact_normal, config, {geo_two: true})
 
 // 普攻一轮总伤，站场输出手法默认为3A闪/走/跳，不打第四段普攻
 const segsRound = (calcApi, elem, talent, attr, calc, segs = '一二三') => {
@@ -164,9 +164,9 @@ export const details = applyStandardTeam([
     params: ({ cons }) => ({ geoConstruct: cons >= 1 }),
     dmg: stationaryDmg(true)
   },
-  ...stationaryEntry(team_A, artifact_A, true, '', { geo_two: true, Xilonen_geo: true }),
-  ...stationaryEntry(team_B, artifact_B, true, '', { geo_two: true, Xilonen_geo: true }),
-  ...stationaryEntry(team, artifact_normal, true, '', { geo_two: true, Xilonen_geo: true }),
+  ...stationaryEntry(team_A, artifact_A, true, '', { geo_two: true }),
+  ...stationaryEntry(team_B, artifact_B, true, '', { geo_two: true }),
+  ...stationaryEntry(team, artifact_normal, true, '', { geo_two: true }),
   {
     title: '当前圣遗物套装',
     dmg: ({ artis }) => ({ avg: artis, type: 'text' })
