@@ -73,7 +73,7 @@
 - 琳妮特 Lynette
 - 林尼 Lyney
 - 菲米尼 Freminet
-- 莱欧斯利 Wriothesley
+- 莱欧斯利 Wriothesley ✅
 - 那维莱特 Neuvillette
 - 夏洛蒂 Charlotte
 - 芙宁娜 Furina
