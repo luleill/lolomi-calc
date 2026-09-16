@@ -97,6 +97,7 @@ git clone --depth=1 https://gitee.com/land-route_lu/lolomi-calc.git ./plugins/lo
 - 阿罗夏
 - 梦见月瑞希
 - 莱欧斯利
+- 希诺宁
 - 薇斯纳
 - 沃雅妮莎
 

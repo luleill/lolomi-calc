@@ -90,7 +90,7 @@
 - 卡齐娜 Kachina
 - 玛拉妮 Mualani ✅
 - 基尼奇 Kinich
-- 希诺宁 Xilonen
+- 希诺宁 Xilonen ✅
 - 欧洛伦 Ororon
 - 恰斯卡 Chasca ✅
 - 茜特菈莉 Citlali ✅
