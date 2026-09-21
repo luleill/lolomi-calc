@@ -204,7 +204,7 @@ let DmgCalc = {
       }
     }
 
-    let dmgBase = (mode === 'basic') ? basicNum * (1 + multiNum) + plusNum : atkNum * pctNum * (1 + multiNum) + plusNum
+    let dmgBase = (mode === 'basic') ? basicNum * (1 + multiNum) + plusNum : atkNum * pctNum * (1 + multiNum) + basicNum + plusNum
     let ret = {}
 
     switch (ele) {
@@ -368,6 +368,11 @@ let DmgCalc = {
       return DmgCalc.calcRet({ pctNum, talent, ele, basicNum, mode, dynamicData }, data)
     }
 
+    dmgFn.withAttr = function (overrides = {}) {
+      const nextAttr = lodash.merge(lodash.cloneDeep(attr), lodash.cloneDeep(overrides))
+      return DmgCalc.getDmgFn({ ...data, attr: nextAttr, ds: { ...ds, attr: nextAttr } })
+    }
+
     dmgFn.basic = function (basicNum = 0, talent = false, ele = false, dynamicData = false) {
       return dmgFn(0, talent, ele, basicNum, 'basic', dynamicData)
     }
@@ -400,8 +405,9 @@ let DmgCalc = {
       return dmgFn(0, talent, ele, 0, 'basic')
     }
 
-    dmgFn.dynamic = function (pctNum = 0, talent = false, dynamicData = false, ele = false) {
-      return dmgFn(pctNum, talent, ele, 0, 'talent', dynamicData)
+    // basicNum：某些基础值增伤buff单轮循环仅生效一次，自行传入对应buff参数作为本次伤害加算
+    dmgFn.dynamic = function (pctNum = 0, talent = false, dynamicData = false, ele = false, basicNum = 0) {
+      return dmgFn(pctNum, talent, ele, basicNum, 'talent', dynamicData)
     }
 
     // 计算治疗

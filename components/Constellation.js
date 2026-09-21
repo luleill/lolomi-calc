@@ -3,6 +3,7 @@
  * @description 计算面板添加角色命座与前后命座的伤害对比
  */
 
+import { createHash } from 'node:crypto'
 import Config from './Config.js'
 import ProfileDmg from '../../miao-plugin/models/ProfileDmg.js'
 import lodash from 'lodash'
@@ -37,10 +38,11 @@ const ConsCompare = {
    * @param {number} calcData.defDmgIdx - 标题伤害索引
    * @param {string} [calcData.consDmgKey] - 命座对比标题关键词（优先使用）
    * @param {Array} calcData.details - 伤害详情
+   * @param {Object} [calcData.ruleSnapshot] - 正文规则快照
    * @param {Object} profile - 角色面板
    */
   async getConsComparison(characterName, currentCons, calcData, profile) {
-    const { defDmgIdx, consDmgKey, details } = calcData
+    const { defDmgIdx, consDmgKey, details, ruleSnapshot } = calcData
     
     if (!cfg.conscompare) {
       return null
@@ -71,7 +73,8 @@ const ConsCompare = {
       return null
     }
     
-    const cacheKey = `${characterName}_${currentCons}_${targetIdx}_${consDmgKey || ''}`
+    const profileKey = createHash('sha256').update(JSON.stringify(profile)).digest('hex')
+    const cacheKey = JSON.stringify([characterName, currentCons, targetIdx, consDmgKey || '', ruleSnapshot?.ruleVersion || '', profileKey])
     const cached = this.cache.get(cacheKey)
     if (cached && Date.now() - cached.time < CACHE_TTL) {
       return cached.data
@@ -95,7 +98,8 @@ const ConsCompare = {
       currentCons, 
       targetIdx, 
       details,
-      profile
+      profile,
+      ruleSnapshot
     )
     
     if (!currentDmgResult.valid) {
@@ -109,7 +113,8 @@ const ConsCompare = {
         0,
         targetIdx,
         details,
-        profile
+        profile,
+        ruleSnapshot
       )
     }
     
@@ -131,7 +136,8 @@ const ConsCompare = {
         cons,
         targetIdx,
         details,
-        profile
+        profile,
+        ruleSnapshot
       )
       
       if (!simResult.valid) {
@@ -167,8 +173,9 @@ const ConsCompare = {
    * @param {number} defDmgIdx - 伤害计算索引
    * @param {Array} details - 伤害详情配置
    * @param {Object} originalProfile - 原始角色面板
+   * @param {Object} [ruleSnapshot] - 本次计算快照
    */
-  async calcuDamageCons(characterName, cons, targetIdx, details, originalProfile) {
+  async calcuDamageCons(characterName, cons, targetIdx, details, originalProfile, ruleSnapshot) {
     try {
       const tempProfile = JSON.parse(JSON.stringify(originalProfile))
       tempProfile.cons = cons
@@ -239,14 +246,8 @@ const ConsCompare = {
       
       const originalGetCalcRule = tempDmg.getCalcRule.bind(tempDmg)
       tempDmg.getCalcRule = async function() {
-        const rule = await originalGetCalcRule()
-        if (rule) {
-          rule.defDmgIdx = targetIdx
-          if (targetDmgKey) {
-            rule.defDmgKey = targetDmgKey
-          }
-        }
-        return rule
+        const rule = ruleSnapshot || await originalGetCalcRule()
+        return rule ? { ...rule, defDmgIdx: targetIdx, defDmgKey: targetDmgKey || '' } : rule
       }
       
       const result = await tempDmg.calcData({

@@ -1,3 +1,6 @@
+import fs from 'node:fs'
+import { basename, isAbsolute, relative, sep } from 'node:path'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 import lodash from 'lodash'
 import { MiaoError } from '../../miao-plugin/components/index.js'
 import ProfileDmg from '../../miao-plugin/models/ProfileDmg.js'
@@ -11,6 +14,7 @@ const elemNameMap = {
   cryo: '冰', anemo: '风', geo: '岩', electro: '雷', dendro: '草', hydro: '水', pyro: '火'
 }
 const travelerIds = [10000005, 10000007, 20000000]
+const lolomiRuleDir = fileURLToPath(new URL('../damage/lolomi-gs/', import.meta.url))
 
 export default class ProfileDmgLite {
   constructor (profile = {}, game = 'gs') {
@@ -90,11 +94,23 @@ export default class ProfileDmgLite {
     const cfgPath = ProfileDmg.dmgRulePath(ruleName, this.char?.game)
     let cfg = {}
     if (cfgPath) {
-      cfg = await import(`file://${cfgPath.path}`)
+      const ruleUrl = pathToFileURL(cfgPath.path)
+      const rulePath = relative(lolomiRuleDir, cfgPath.path)
+      // lolomi 的 calc_llm.js 计算文件支持热加载，改动后即可生效，不需要重启
+      // 本质是按新版本重新加载并执行模块，公共依赖仍沿用缓存
+      // Node 会保留旧版本模块，短时间内频繁修改还是建议重启一次释放内存
+      if (this.isGs && cfgPath.createdBy === 'lolomi-calc' && basename(rulePath) === 'calc_llm.js' &&
+          !isAbsolute(rulePath) && !rulePath.startsWith(`..${sep}`)) {
+        const stat = fs.statSync(cfgPath.path, { bigint: true })
+        ruleUrl.searchParams.set('v', `${stat.mtimeNs}_${stat.ctimeNs}_${stat.size}`)
+      }
+      cfg = await import(ruleUrl.href)
       let createdBy = cfg.createdBy || cfgPath.createdBy || '喵喵'
       createdBy = createdBy.slice(0, 15)
       return {
         createdBy,
+        ruleVersion: ruleUrl.href,
+        consDmgKey: cfg.consDmgKey || '',
         details: cfg.details || false, // 计算详情
         buffs: cfg.buffs || [], // 角色buff
         defParams: cfg.defParams || {}, // 默认参数，一般为空
@@ -114,6 +130,8 @@ export default class ProfileDmgLite {
     let { profile } = this
     let { game } = this.char
     let charCalcData = await this.getCalcRule()
+    // 正文与本次命座对比共用这一版规则，避免计算期间保存文件后混用版本
+    this.ruleSnapshot = charCalcData
 
     if (!charCalcData) {
       return false

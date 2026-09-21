@@ -8,93 +8,167 @@ const team = ['奥黛塔', '七七', '沃雅妮莎']
 const artifact_normal = ['炉火', '千岩']
 
 const config = Config.getConfig('user', 'config')
-const applyStandardTeam = withStdTeam(mainCharName, team, artifact_normal, config, { teamAtkLv: 4 })
+const teamParams = { cryo_two: true, rotation: true }
+const applyStandardTeam = withStdTeam(mainCharName, team, artifact_normal, config, { ...teamParams })
 
-// 「从容」：每层使灵剑造成比原本高 10% 的伤害
-// 默认层数：2命以下默认3层，2命以上进入灵剑武装即满层6层
-const congrongStacks = (params, cons) => Math.min(params?.congrong ?? (cons >= 2 ? 6 : 3), 6)
-const congrongMult = (params, cons) => 1 + congrongStacks(params, cons) * 10 / 100
-
-// 「从容」乘区
-const withCongrong = (ret, params, cons) => {
-  const mult = congrongMult(params, cons)
-  return { dmg: (ret.dmg ?? ret.avg) * mult, avg: ret.avg * mult }
+// 整肃，2命以下默认4层，2命以上满层6层
+const zhengsuStacks = (params, cons) => {
+  const value = Number(params?.zhengsu ?? (cons >= 2 ? 6 : 4))
+  return Number.isFinite(value) ? Math.max(0, Math.min(value, 6)) : (cons >= 2 ? 6 : 4)
+}
+const hitCount = (value, fallback) => Number.isFinite(Number(value ?? fallback))
+  ? Math.max(0, Math.floor(Number(value ?? fallback))) : fallback
+const addDmg = (total, ret) => {
+  total.dmg += ret.dmg ?? ret.avg
+  total.avg += ret.avg
+  return total
 }
 
-// 七七6命生效4次
-const QiQiFyplusOver = ({ params, sHits, swirlHits, mult }) => {
-  const plus = LIMITED_PLUS.QiQi.plus({ params })
-  if (!plus) return 0
+// 某个技能实际为多段的优先取 技能伤害2 进行计算
+const talentHits = (talent, key) => {
+  const pair = talent[`${key}2`]
+  return Array.isArray(pair) ? pair : [talent[key], 1]
+}
+
+// 循环伤害构成
+const createHitCalc = (ds, dmg) => {
+  const { attr, cons, params = {} } = ds
+  const qiQiPlus = LIMITED_PLUS.QiQi.plus({ params })
   const limit = LIMITED_PLUS.QiQi.limit
-  const num = typeof limit === 'function' ? limit({ params }) : limit
-  const starShare = Number(params?.starShare)
-  const share = Number.isFinite(starShare) ? starShare : 0.6
-  return plus * (Math.max(sHits - num, 0) * mult + Math.max(swirlHits - Math.max(num - sHits, 0), 0) * share)
+  let qiQiRemain = typeof limit === 'function' ? limit(ds) : limit
+  const baseC1 = cons >= 1 ? 20 : 0
+  const variants = new Map()
+  return (pct, slot, { sword = false, stacks = zhengsuStacks(params, cons), inStance = true, reaction = false } = {}) => {
+    // 是否为星扩散伤害
+    const ele = reaction || (sword && (params.Stellar ?? true) ? 'stellarVortex' : false)
+    // 七七加成生效次数是否覆盖
+    const covered = qiQiPlus > 0 && ele === 'stellarVortex' && qiQiRemain > 0
+    if (covered) qiQiRemain--
+    const c1Delta = (cons >= 1 && inStance ? 20 : 0) - baseC1
+    const removeQiQi = !!ele && qiQiPlus > 0 && !covered
+    const key = `${c1Delta}:${removeQiQi}`
+    if (!variants.has(key)) {
+      const patch = {}
+      if (c1Delta) {
+        for (const channel of ['stellarVortex', 'starSwirlAnemo', 'starSwirlCryo']) {
+          patch[channel] = (attr[channel] ?? 0) + c1Delta
+        }
+      }
+      if (removeQiQi) patch.fyplus = (attr.fyplus ?? 0) - qiQiPlus
+      variants.set(key, Object.keys(patch).length ? dmg.withAttr(patch) : dmg)
+    }
+    const fn = variants.get(key)
+    const ret = reaction ? fn.reaction(reaction) : fn(pct, slot, ele)
+    const mult = sword ? 1 + stacks / 10 : 1
+    return { dmg: (ret.dmg ?? ret.avg) * mult, avg: ret.avg * mult }
+  }
+}
+
+// 「翔风剑」伤害
+const swordDamage = (ds, dmg, keys, slot = 'e') => {
+  const hit = createHitCalc(ds, dmg)
+  const total = { dmg: 0, avg: 0 }
+  for (const key of keys) {
+    const [pct, count] = talentHits(ds.talent[slot], key)
+    for (let i = 0; i < count; i++) addDmg(total, hit(pct, slot, { sword: true }))
+  }
+  return total
+}
+
+// 6命「翔风剑·变移」伤害构成
+const taDamage = (ds, dmg, swordOnly = false) => {
+  const hit = createHitCalc(ds, dmg)
+  const slot = ds.params?.ta_talent ?? 'e'
+  const total = hit(200, slot, { sword: true })
+  if (!swordOnly) {
+    addDmg(total, hit(150, slot))
+    addDmg(total, hit(ds.talent.e['风翎伤害'], 'e'))
+  }
+  return total
 }
 
 /**
- * 单人灵剑武装一轮总伤，普通风伤，无辉映环境
- * 基础手法：E + 3套6A + 特殊E 刺 + 落 + 舞*3 + Q + 灵羽*15
+ * 默认手法：开E → 一阶E → 二阶E → Q → 普攻与三阶E穿插，6命每次三阶接1次变移
+ * q_at_end = true                  ：可把Q调到最后收尾
+ * normal_sets                      : 默认普通环境3套普攻，星扩散环境2套普攻
+ * wind_plume_hits                  : 默认触发18次风翎
+ * zhengsu_before_hit = false       ：2命以下从0层整肃叠起
  */
-const calcNormalRotation = ({ talent, cons, params }, dmg) => {
-  const normalSets = 3
-  const a1 = dmg(talent.a['一段伤害'], 'a')
-  const a2 = dmg(talent.a['二段伤害'], 'a')
-  const a3 = dmg(talent.a['三段伤害'], 'a')
-  const a4 = dmg(talent.a['四段伤害'], 'a')
-  const a5 = dmg(talent.a['五段伤害'], 'a')
-  const a6 = dmg(talent.a['六段伤害'], 'a')
-  const aSet = a1.avg + a2.avg + a3.avg + a4.avg + a5.avg + a6.avg
-  const feather = dmg(talent.e['灵羽伤害'], 'e')
-  const featherHits = 15
-  const eStart = dmg(talent.e['技能伤害'], 'e')
-  const ci = dmg(talent.e['灵剑·刺伤害'], 'e')
-  const luo = dmg(talent.e['灵剑·落伤害'], 'e')
-  const luoSword = dmg(talent.e['灵剑·落中灵剑/星灵剑伤害'][0], 'e')
-  const wuHits = dmg(talent.e['灵剑·舞中灵剑/星灵剑伤害'][0], 'e')
-  const wuEnd = dmg(talent.e['灵剑·舞中灵剑/星灵剑终结伤害'][0], 'e')
-  const wuTimes = cons >= 1 ? 4 : 3
-  const qHit = dmg(talent.q['元素爆发灵剑/星灵剑伤害'][0], 'q')
-  const ta = cons >= 6 ? dmg(150, 'e') : { avg: 0 }
-  const taHits = cons >= 6 ? 3 : 0
-  const mult = congrongMult(params, cons)
-  const total = eStart.avg + aSet * normalSets + feather.avg * featherHits
-    + ci.avg * mult + luo.avg + luoSword.avg * mult + (wuHits.avg + wuEnd.avg) * mult * wuTimes
-    + qHit.avg * mult + ta.avg * mult * taHits
-  return { dmg: total, avg: total }
-}
+const calcRotation = (ds, dmg) => {
+  const { talent, cons, params = {} } = ds
+  const star = params.Stellar ?? true
+  const cap = cons >= 1 ? 4 : 3
+  const cfg = {
+    normalSets: hitCount(params.normal_sets, star ? 2 : 3),
+    windPlumeHits: hitCount(params.wind_plume_hits, 18),
+    sanJieTimes: Math.min(hitCount(params.san_jie_times, cap), cap),
+    anemoHits: star ? hitCount(params.swirl_anemo_hits, 5) : 0,
+    cryoHits: star ? hitCount(params.swirl_cryo_hits, 2) : 0
+  }
+  const taHits = cons >= 6 ? Math.min(hitCount(params.ta_hits, cfg.sanJieTimes), cfg.sanJieTimes) : 0
+  const actions = [{ type: 'start' }, { type: 'yi' }, { type: 'er' }]
+  if (!(params.q_at_end ?? false)) actions.push({ type: 'q' })
+  const groups = Math.max(cfg.sanJieTimes, 1)
+  const portion = (count, i) => Math.ceil(count * (i + 1) / groups) - Math.ceil(count * i / groups)
+  for (let i = 0; i < groups; i++) {
+    actions.push({ type: 'normal', count: portion(cfg.normalSets, i) }, { type: 'plume', count: portion(cfg.windPlumeHits, i) })
+    actions.push({ type: 'reaction', ele: 'starSwirlAnemo', count: portion(cfg.anemoHits, i) },
+      { type: 'reaction', ele: 'starSwirlCryo', count: portion(cfg.cryoHits, i) })
+    if (i < cfg.sanJieTimes) actions.push({ type: 'san' })
+    if (i < taHits) actions.push({ type: 'ta' })
+  }
+  if (params.q_at_end ?? false) actions.push({ type: 'q' })
 
-/**
- * 灵剑武装一轮总伤·星扩散
- */
-const calcStarRotation = ({ talent, cons, params }, dmg) => {
-  const normalSets = 3
-  const aSet = dmg(talent.a['一段伤害'], 'a').avg + dmg(talent.a['二段伤害'], 'a').avg
-    + dmg(talent.a['三段伤害'], 'a').avg + dmg(talent.a['四段伤害'], 'a').avg
-    + dmg(talent.a['五段伤害'], 'a').avg + dmg(talent.a['六段伤害'], 'a').avg
-  const feather = dmg(talent.e['灵羽伤害'], 'e')
-  const featherHits = 15
-  const eStart = dmg(talent.e['技能伤害'], 'e')
-  const ci = dmg(talent.e['灵剑·刺伤害'], 'e')
-  const luo = dmg(talent.e['灵剑·落伤害'], 'e')
-  const luoStar = dmg(talent.e['灵剑·落中灵剑/星灵剑伤害'][1], 'e', 'stellarVortex')
-  const wuStar = dmg(talent.e['灵剑·舞中灵剑/星灵剑伤害'][1], 'e', 'stellarVortex')
-  const wuEndStar = dmg(talent.e['灵剑·舞中灵剑/星灵剑终结伤害'][1], 'e', 'stellarVortex')
-  const wuTimes = cons >= 1 ? 4 : 3
-  const qStar = dmg(talent.q['元素爆发灵剑/星灵剑伤害'][1], 'q', 'stellarVortex')
-  const taStar = cons >= 6 ? dmg(200, 'e', 'stellarVortex') : { avg: 0 }
-  const taHits = cons >= 6 ? 3 : 0
-  // 反应星扩散，先默认风扩散5次，冰扩散2次，具体多少等正式服上线看了再调
-  const swirlAnemoUnit = dmg.reaction('starSwirlAnemo').avg
-  const swirlCryoUnit = dmg.reaction('starSwirlCryo').avg
-  const swirlHits = 5 + 2
-  const mult = congrongMult(params, cons)
-  const qiQiOver = QiQiFyplusOver({ params, sHits: 1 + 2 * wuTimes + 1 + taHits, swirlHits, mult })
-  const total = eStart.avg + aSet * normalSets + feather.avg * featherHits
-    + ci.avg * mult + luo.avg + luoStar.avg * mult + (wuStar.avg + wuEndStar.avg) * mult * wuTimes
-    + qStar.avg * mult + taStar.avg * mult * taHits
-    + swirlAnemoUnit * 5 + swirlCryoUnit * 2 - qiQiOver
-  return { dmg: total, avg: total }
+  const hit = createHitCalc(ds, dmg)
+  const total = { dmg: 0, avg: 0 }
+  let stacks = cons >= 2 ? 6 : 0
+  let inStance = true
+  let sanUsed = 0
+  const gainBefore = params.zhengsu_before_hit ?? true
+  for (const action of actions) {
+    const gainsStack = ['yi', 'er', 'san', 'q'].includes(action.type)
+    if (gainsStack && gainBefore) stacks = Math.min(stacks + 1, 6)
+    const state = { stacks, inStance }
+    const strike = (key, slot = 'e', sword = false) => {
+      const [pct, count] = talentHits(talent[slot], sword && star ? key.replace(/伤害$/, '星扩散伤害') : key)
+      for (let i = 0; i < count; i++) addDmg(total, hit(pct, slot, { ...state, sword }))
+    }
+    switch (action.type) {
+      case 'start': strike('技能伤害'); break
+      case 'yi': strike('翔风剑一阶伤害'); break
+      case 'er':
+        strike('翔风剑二阶伤害')
+        strike('翔风剑二阶灵剑伤害', 'e', true)
+        break
+      case 'q': strike('灵剑伤害', 'q', true); break
+      case 'normal':
+        for (let i = 0; i < action.count; i++) {
+          for (const stage of '一二三四五六') strike(`${stage}段伤害`, 'a')
+        }
+        break
+      case 'plume':
+        for (let i = 0; i < action.count; i++) strike('风翎伤害')
+        break
+      case 'san':
+        strike('翔风剑三阶灵剑伤害', 'e', true)
+        strike('翔风剑三阶灵剑最终段伤害', 'e', true)
+        if (++sanUsed === cap) inStance = false
+        break
+      case 'ta': {
+        state.inStance = inStance || (params.last_ta_in_stance ?? false)
+        const slot = params.ta_talent ?? 'e'
+        addDmg(total, hit(150, slot, state))
+        addDmg(total, hit(200, slot, { ...state, sword: true }))
+        if (state.inStance) strike('风翎伤害')
+        break
+      }
+      case 'reaction':
+        for (let i = 0; i < action.count; i++) addDmg(total, hit(0, 'fy', { ...state, reaction: action.ele }))
+        break
+    }
+    if (gainsStack && !gainBefore) stacks = Math.min(stacks + 1, 6)
+  }
+  return total
 }
 
 export const details = applyStandardTeam([
@@ -102,88 +176,106 @@ export const details = applyStandardTeam([
     title: '触发特效后攻击力',
     dmg: ({ attr, calc }) => ({ avg: calc(attr.atk) })
   }, {
-    title: '「灵剑·起」伤害',
+    title: '「操典·制胜有道」伤害',
     dmg: ({ talent }, dmg) => dmg(talent.e['技能伤害'], 'e')
   }, {
-    title: '灵剑武装普攻单段伤害',
+    title: '「巡风列装」普攻单段伤害',
     dmg: ({ talent }, dmg) => dmg(talent.a['一段伤害'], 'a')
   }, {
-    title: '灵羽伤害',
-    dmg: ({ talent }, dmg) => dmg(talent.e['灵羽伤害'], 'e')
+    title: '风翎伤害',
+    dmg: ({ talent }, dmg) => dmg(talent.e['风翎伤害'], 'e')
   }, {
-    title: '「灵剑·刺」伤害',
-    dmg: ({ talent, params, cons }, dmg) => withCongrong(dmg(talent.e['灵剑·刺伤害'], 'e'), params, cons)
+    title: '「翔风剑·一阶」伤害',
+    dmg: ({ talent }, dmg) => dmg(talent.e['翔风剑一阶伤害'], 'e')
   }, {
-    title: '「灵剑·落」伤害',
-    dmg: ({ talent }, dmg) => dmg(talent.e['灵剑·落伤害'], 'e')
+    title: '「翔风剑·二阶」伤害',
+    dmg: ({ talent }, dmg) => dmg(talent.e['翔风剑二阶伤害'], 'e')
   }, {
-    title: '「灵剑·落」星扩散伤害',
-    dmg: ({ talent, params, cons }, dmg) => withCongrong(dmg(talent.e['灵剑·落中灵剑/星灵剑伤害'][1], 'e', 'stellarVortex'), params, cons)
+    title: '「翔风剑·二阶」星扩散伤害',
+    dmg: (ds, dmg) => swordDamage(ds, dmg, ['翔风剑二阶灵剑星扩散伤害'])
   }, {
-    title: '「灵剑·舞」星扩散伤害',
-    dmg: ({ talent, params, cons }, dmg) => withCongrong(dmg(talent.e['灵剑·舞中灵剑/星灵剑终结伤害'][1], 'e', 'stellarVortex'), params, cons)
+    title: '「翔风剑·三阶」前四段星扩散总伤',
+    dmg: (ds, dmg) => swordDamage(ds, dmg, ['翔风剑三阶灵剑星扩散伤害'])
   }, {
-    title: '「灵剑·爆」伤害',
-    dmg: ({ talent, params, cons }, dmg) => withCongrong(dmg(talent.q['元素爆发灵剑/星灵剑伤害'][0], 'q'), params, cons)
+    title: '「翔风剑·三阶」尾段星扩散伤害',
+    dmg: (ds, dmg) => swordDamage(ds, dmg, ['翔风剑三阶灵剑最终段星扩散伤害'])
   }, {
-    title: '「灵剑·爆」星扩散伤害',
-    dmg: ({ talent, params, cons }, dmg) => withCongrong(dmg(talent.q['元素爆发灵剑/星灵剑伤害'][1], 'q', 'stellarVortex'), params, cons)
+    title: '「翔风剑·三阶」星扩散总伤',
+    dmg: (ds, dmg) => swordDamage(ds, dmg, ['翔风剑三阶灵剑星扩散伤害', '翔风剑三阶灵剑最终段星扩散伤害'])
   }, {
-    title: '6命「灵剑·踏」星扩散伤害',
+    title: '「致礼·献予女皇陛下」灵剑伤害',
+    params: { Stellar: false },
+    dmg: (ds, dmg) => swordDamage(ds, dmg, ['灵剑伤害'], 'q')
+  }, {
+    title: '「致礼·献予女皇陛下」星扩散伤害',
+    dmg: (ds, dmg) => swordDamage(ds, dmg, ['灵剑星扩散伤害'], 'q')
+  }, {
+    title: '6命「翔风剑·变移」星扩散伤害',
     cons: 6,
-    dmg: ({ params, cons }, dmg) => withCongrong(dmg(200, 'e', 'stellarVortex'), params, cons)
+    dmg: (ds, dmg) => taDamage(ds, dmg, true)
   }, {
     title: '反应星扩散(风)伤害',
-    dmg: ({}, { reaction }) => reaction('starSwirlAnemo')
+    dmg: (ds, dmg) => createHitCalc(ds, dmg)(0, 'fy', { reaction: 'starSwirlAnemo' })
   }, {
     title: '反应星扩散(冰)伤害',
-    dmg: ({}, { reaction }) => reaction('starSwirlCryo')
+    dmg: (ds, dmg) => createHitCalc(ds, dmg)(0, 'fy', { reaction: 'starSwirlCryo' })
   }, {
-    title: '单人灵剑武装一轮总伤',
-    dmg: (ds, dmg) => calcNormalRotation(ds, dmg)
+    title: '「巡风列装」常规总伤',
+    params: { Stellar: false, rotation: true, teamAtkLv: 1, teamMasteryLv: 0 },
+    dmg: calcRotation
   }, {
-    title: '灵剑武装星扩散总伤',
-    dmg: (ds, dmg) => calcStarRotation(ds, dmg)
+    // 木桩自挂冰
+    title: '「巡风列装」星扩散总伤',
+    params: { Stellar: true, rotation: true, teamAtkLv: 1, teamMasteryLv: 0 },
+    dmg: calcRotation
   }, {
-    title: ({ cons }) => `${teamConfig(cons, team, artifact_normal, mainCharName).title} 「灵剑·舞」星扩散`,
-    params: ({ cons }) => ({ ...teamConfig(cons, team, artifact_normal).params, teamAtkLv: 4 }),
-    dmg: ({ talent, params, cons }, dmg) => withCongrong(dmg(talent.e['灵剑·舞中灵剑/星灵剑终结伤害'][1], 'e', 'stellarVortex'), params, cons)
+    title: ({ cons }) => `${teamConfig(cons, team, artifact_normal, mainCharName).title} 「翔风剑·三阶」`,
+    params: ({ cons }) => ({ ...teamConfig(cons, team, artifact_normal).params, ...teamParams }),
+    dmg: (ds, dmg) => swordDamage(ds, dmg, ['翔风剑三阶灵剑最终段星扩散伤害'])
   }, {
-    title: ({ cons }) => `${teamConfig(cons, team, artifact_normal, mainCharName).title} 灵剑武装总伤`,
-    params: ({ cons }) => ({ ...teamConfig(cons, team, artifact_normal).params, teamAtkLv: 4 }),
-    dmg: (ds, dmg) => calcStarRotation(ds, dmg)
+    title: ({ cons }) => `${teamConfig(cons, team, artifact_normal, mainCharName).title} 「巡风列装」总伤`,
+    params: ({ cons }) => ({ ...teamConfig(cons, team, artifact_normal).params, ...teamParams, rotation: true }),
+    dmg: calcRotation
   }, {
     title: '当前圣遗物套装',
     dmg: ({ artis }) => ({ avg: artis, type: 'text' })
   }
 ])
-
-export const defDmgIdx = 7
-export const consDmgKey = '灵剑武装星扩散总伤'
+/**
+ * Stellar : 辉映·星扩散状态
+ * teamAtkLv : 根据队伍角色冰风元素类型加攻击力，默认3
+ * teamMasteryLv : 根据队伍角色元素类型加攻击力，默认1
+ * 默认三名冰风元素角色，薇斯纳自身算一名，测试木桩自行调整 teamAtkLv 和 teamMasteryLv
+ */
+export const defParams = { Stellar: true, teamAtkLv: 3, teamMasteryLv: 1 }
+export const defDmgIdx = 8
+export const consDmgKey = '「巡风列装」星扩散总伤'
 export const mainAttr = 'atk,mastery,cpct,cdmg'
 
 export const buffs = [
   ...TeamBuff,
   {
     title: ({ params, cons }) => {
-      const stacks = congrongStacks(params, cons)
-      return `天赋「从容」：${stacks}层从容，灵剑与星灵剑造成原本${100 + stacks * 10}%的伤害`
+      if (params.rotation) return `天赋「仪典·春之行列」：${cons >= 2 ? '入模式满6层' : '从0层叠层'}`
+      const stacks = zhengsuStacks(params, cons)
+      return `天赋「仪典·春之行列」：${stacks}层整肃，灵剑造成原本${100 + stacks * 10}%的伤害`
     },
   }, {
-    title: '天赋「游刃」：攻击力提升[atkPct]%，精通提升[mastery]',
+    title: '天赋「理典·冬之凯风」：攻击力提升[atkPct]%，精通提升[mastery]',
+    check: ({ params }) => params.Stellar ?? true,
     sort: 9,
     data: {
-      atkPct: ({ params, cons }) => (params?.teamAtkLv ?? 2) * 6 * (cons >= 4 ? 3 : 1),
-      mastery: ({ params, cons }) => (params?.teamMasteryLv ?? 0) * 25 * (cons >= 4 ? 3 : 1)
+      atkPct: ({ params, cons }) => (params?.teamAtkLv ?? 3) * 6 * (cons >= 4 ? 3 : 1),
+      mastery: ({ params, cons }) => (params?.teamMasteryLv ?? 1) * 25 * (cons >= 4 ? 3 : 1)
     }
   }, {
-    title: '天赋「星耀祝礼」：基于攻击力提升星扩散反应基础伤害[fypct]%',
+    title: '天赋「星耀祝礼·散华序饰」：基于攻击力提升星扩散反应基础伤害[fypct]%',
     sort: 9,
     data: {
       fypct: ({ attr, calc }) => Math.min(calc(attr.atk) / 100 * 0.7, 14)
     }
   }, {
-    title: '1命：灵剑·舞可用次数加一，星扩散反应伤害提升20%',
+    title: '1命「送冬的华宴」：可施放4次三阶翔风剑且首次三阶不耗剑气，星扩散反应伤害提升20%',
     cons: 1,
     data: {
       stellarVortex: 20,
@@ -191,14 +283,18 @@ export const buffs = [
       starSwirlCryo: 20
     }
   }, {
-    title: '2命：「从容」满层时攻击力提升[atkPct]%',
+    title: '2命「迎春的轮舞」：进入巡风列装模式直接获得满层整肃，满层时攻击力提升[atkPct]%',
     cons: 2,
+    check: ({ params }) => params.rotation || !Number.isFinite(Number(params.zhengsu ?? 6)) || Number(params.zhengsu ?? 6) >= 6,
     data: {
       atkPct: 60
     }
   }, {
-
-    title: '6命：星扩散反应伤害擢升[elevated]%',
+    title: '4命「先代的荣膺」：「理典·冬之凯风」的攻击力与精通提升效果变为三倍',
+    cons: 4,
+    check: ({ params }) => params.Stellar ?? true,
+  }, {
+    title: '6命「不移的赤忱」：三阶翔风剑后可施放「翔风剑·变移」，星扩散伤害擢升[elevated]%',
     cons: 6,
     data: {
       elevated: 20

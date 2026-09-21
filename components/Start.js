@@ -8,6 +8,7 @@ import Config from './Config.js'
 import ConsCompare from './Constellation.js'
 import LlmDataIndex from '../llm-models/LlmDataIndex.js'
 import ProfileDmgLite from '../llm-models/ProfileDmgLite.js'
+import { patchMiaoDynamic } from '../llm-models/MiaoDynamicCompat.js'
 import fs from 'node:fs'
 
 const basePath = process.cwd()
@@ -35,6 +36,8 @@ const Start = {
     this.initLlmData()
     this.setupPrioritySystem()
     this.setupRuleGuard()
+    // 如果回落miao计算框架，传入lolomi的新加参数
+    patchMiaoDynamic()
     this.setConsCalc()
     this.startMonitoring()
   },
@@ -76,7 +79,7 @@ const Start = {
         }
         return { handled: false }
       }
-      return { handled: true, result }
+      return { handled: true, result, ruleSnapshot: lite.ruleSnapshot }
     } catch (error) {
       if (error?.constructor?.name === 'MiaoError') {
         return { handled: true, error }
@@ -283,24 +286,6 @@ const Start = {
   },
 
   /**
-   * 从calc_llm.js文件中获取 consDmgKey
-   */
-  getConsDmgKey(characterName) {
-    try {
-      const normalizedName = this.normalizeName(characterName)
-      const filePath = `${pluginPath}/damage/lolomi-gs/${normalizedName}/calc_llm.js`
-      if (!fs.existsSync(filePath)) {
-        return null
-      }
-      const content = fs.readFileSync(filePath, 'utf8')
-      const match = content.match(/export\s+const\s+consDmgKey\s*=\s*['"`]([^'"`]+)['"`]/)
-      return match ? match[1].trim() : null
-    } catch (error) {
-      return null
-    }
-  },
-
-  /**
    * defDmgIdx 伤害索引越界处理
    */
   setupRuleGuard() {
@@ -385,26 +370,15 @@ const Start = {
       try {
         const characterName = this.char?.name || this.profile.name
         const currentCons = Number(this.profile.cons)
-        let calcRule = await this.getCalcRule()
-        if ((!calcRule || !calcRule.details) && LlmDataIndex.hasCharDetail(characterName)) {
-          try {
-            calcRule = await new ProfileDmgLite(this.profile, 'gs').getCalcRule()
-          } catch (e) {
-          }
-        }
-        
+        const calcRule = engineRet.ruleSnapshot
         if (calcRule?.defDmgIdx !== undefined && calcRule.defDmgIdx >= 0) {
-          const calcKey = `constellation_calc_${characterName}_${currentCons}`
-          if (!this[calcKey]) {
-            this[calcKey] = true
-            const consDmgKey = self.getConsDmgKey(characterName)
-            const consCalcData = {
-              defDmgIdx: calcRule.defDmgIdx,
-              consDmgKey: consDmgKey,
-              details: calcRule.details
-            }
-            await self.calcConsDiff(characterName, currentCons, consCalcData, this.profile, result)
+          const consCalcData = {
+            defDmgIdx: calcRule.defDmgIdx,
+            consDmgKey: calcRule.consDmgKey,
+            details: calcRule.details,
+            ruleSnapshot: calcRule
           }
+          await self.calcConsDiff(characterName, currentCons, consCalcData, this.profile, result)
         }
       } catch (error) {
         logger.debug(`[lolomi-calc] 命座计算出错: ${error.message}`)
