@@ -1,17 +1,17 @@
-import { TeamBuff } from '../teambuffs.js'
+import { TeamBuff, LIMITED_PLUS } from '../teambuffs.js'
 import { teamConfig, withStdTeam } from '../util.js'
 import { Config } from '#lolomi'
 
 const mainCharName = '梦见月瑞希'
-// 星扩散作为主流玩法，瑞希自身不能直接触发星扩散，必须带奥黛塔
-const team = ['奥黛塔', '迪奥娜', '七七']
+// 星扩散作为主流配队
+const team = ['奥黛塔', '沃雅妮莎', '珐露珊']
 const artifact_normal = ['炉火', '千岩']
-// 沃雅妮莎主要还是水冰传统增伤，加入瑞希队伍的星扩散提升貌似不算大
-const team_B = ['奥黛塔', '迪奥娜', '沃雅妮莎']
+
+const team_B = ['奥黛塔', '沃雅妮莎', '七七']
 const artifact_B = ['炉火']
 
 const config = Config.getConfig('user', 'config')
-const applyStandardTeam = withStdTeam(mainCharName, team, artifact_normal, config, { cryo_two: true })
+const applyStandardTeam = withStdTeam(mainCharName, team, artifact_normal, config)
 
 // 6命：常规扩散可暴击，暴击率固定30%、暴击伤害固定100%
 const withSwirlCrit = (r, cons) => cons >= 6
@@ -72,13 +72,21 @@ const calcNormalRotation = ({ talent, cons, attr, calc }, dmg) => {
  * 伤害构成
  * E + 星扩散风*8 + 被动额外风*3 + 1命额外星扩散*3 + 1命反应星扩散*3 + 被动星扩散*3 + E持续*10 + Q + Q梦念冲击波*5 + 星扩散冰*3
  */
-const calcStarRotation = ({ talent, cons, attr, calc }, dmg) => {
+const calcStarRotation = ({ talent, cons, attr, calc, params = {} }, dmg) => {
   const eHit = dmg(talent.e['技能伤害'], 'e')
   const eDot = dmg(talent.e['持续攻击伤害'], 'e')
   const qHit = dmg(talent.q['技能伤害'], 'q')
   const qSnack = dmg(talent.q['梦念冲击波伤害'], 'q')
-  // 反应星扩散(风)
-  const starSwirlUnit = dmg.reaction('starSwirlAnemo')
+  // 七七6命生效4次直伤星扩散
+  const qiQiPlus = LIMITED_PLUS.QiQi.plus({ params })
+  const noQiQi = qiQiPlus > 0 ? dmg.withAttr({ fyplus: (attr.fyplus || 0) - qiQiPlus }) : dmg
+  let qiQiRemain = qiQiPlus > 0 ? LIMITED_PLUS.QiQi.limit : 0
+  const starDirect = (multi) => {
+    const fn = qiQiRemain > 0 ? dmg : noQiQi
+    if (qiQiRemain > 0) qiQiRemain--
+    return fn.basic(calc(attr.mastery) * multi / 100, '', 'stellarVortex')
+  }
+  const starSwirlUnit = noQiQi.reaction('starSwirlAnemo')
   // 1命触发3次
   const c1Triggers = cons >= 1 ? 3 : 0
   // 1命反应星扩散(风)
@@ -90,29 +98,36 @@ const calcStarRotation = ({ talent, cons, attr, calc }, dmg) => {
     dmg: starSwirlUnit.dmg + boostBase * (1 + cdmgStar),
     avg: starSwirlUnit.avg + boostBase * (1 + cpctStar * cdmgStar)
   }
-  // 1命额外星扩散
-  const c1ExtraStar = cons >= 1
-    ? dmg.basic(calc(attr.mastery) * 400 / 100, '', 'stellarVortex')
-    : { dmg: 0, avg: 0 }
+  const passiveStar = { dmg: 0, avg: 0 }
+  for (let i = 0; i < 3; i++) {
+    const r = starDirect(1000)
+    passiveStar.dmg += r.dmg
+    passiveStar.avg += r.avg
+  }
+  const c1ExtraStar = { dmg: 0, avg: 0 }
+  if (cons >= 1) {
+    for (let i = 0; i < 3; i++) {
+      const r = starDirect(400)
+      c1ExtraStar.dmg += r.dmg
+      c1ExtraStar.avg += r.avg
+    }
+  }
   // 被动额外风伤
   const passiveExtra = dmg.basic(calc(attr.mastery) * 1000 / 100, 'e')
-  // 被动星扩散
-  const passiveStar = dmg.basic(calc(attr.mastery) * 1000 / 100, '', 'stellarVortex')
-  // 反应星扩散(冰)
   const cryoKx = (attr.kx || 0) + (attr.fykx || 0)
   const cryoScale = cons >= 2 ? kNumOf(cryoKx - 20) / kNumOf(cryoKx) : 1
   const cryoSwirlUnit = {
-    dmg: dmg.reaction('starSwirlCryo').dmg * cryoScale,
-    avg: dmg.reaction('starSwirlCryo').avg * cryoScale
+    dmg: noQiQi.reaction('starSwirlCryo').dmg * cryoScale,
+    avg: noQiQi.reaction('starSwirlCryo').avg * cryoScale
   }
   return {
     dmg: eHit.dmg + starSwirlUnit.dmg * 8 + passiveExtra.dmg * 3
-         + c1ExtraStar.dmg * c1Triggers + c1StarUnit.dmg * c1Triggers
-         + passiveStar.dmg * 3 + eDot.dmg * 10 + qHit.dmg + qSnack.dmg * 5
+         + c1ExtraStar.dmg + c1StarUnit.dmg * c1Triggers
+         + passiveStar.dmg + eDot.dmg * 10 + qHit.dmg + qSnack.dmg * 5
          + cryoSwirlUnit.dmg * 3,
     avg: eHit.avg + starSwirlUnit.avg * 8 + passiveExtra.avg * 3
-         + c1ExtraStar.avg * c1Triggers + c1StarUnit.avg * c1Triggers
-         + passiveStar.avg * 3 + eDot.avg * 10 + qHit.avg + qSnack.avg * 5
+         + c1ExtraStar.avg + c1StarUnit.avg * c1Triggers
+         + passiveStar.avg + eDot.avg * 10 + qHit.avg + qSnack.avg * 5
          + cryoSwirlUnit.avg * 3,
   }
 }
@@ -204,14 +219,12 @@ export const details = applyStandardTeam([
     title: ({ cons }) => `${teamConfig(cons, team, artifact_normal, mainCharName).title} 强化星扩散`,
     params: ({ cons }) => ({
       ...teamConfig(cons, team, artifact_normal).params,
-      cryo_two: true
     }),
     dmg: ({ attr, calc }, dmg) => dmg.basic(calc(attr.mastery) * 1000 / 100, '', 'stellarVortex')
   }, {
     title: ({ cons }) => `${teamConfig(cons, team, artifact_normal, mainCharName).title} 星扩散总伤`,
     params: ({ cons }) => ({
       ...teamConfig(cons, team, artifact_normal).params,
-      cryo_two: true
     }),
     dmg: (ds, dmg) => calcStarRotation(ds, dmg)
   }, {
@@ -247,7 +260,7 @@ export const buffs = [
       mastery: 100
     }
   }, {
-    title: '「梦浮」：扩散伤害提升[swirl]，星扩散伤害提升[stellarVortex]',
+    title: '「梦浮」：扩散伤害提升[swirl]%，星扩散伤害提升[stellarVortex]%',
     sort: 9,
     data: {
       swirl: ({ attr, calc, talent }) => calc(attr.mastery) * parseFloat(talent.e['每100点精通提升扩散伤害百分比']) / 100,
@@ -273,8 +286,8 @@ export const buffs = [
     }
   }, {
     // 火水冰雷增伤瑞希自己的扩散伤害吃不到
-    // 2命的减抗在反应扩散和常会扩散使用 fykx ，常态减风抗使用 kx
-    title: '2命「缠忆君影梦相见」：梦浮期间降低敌人[fykx]火水雷冰抗性',
+    // 2命的减抗在反应扩散和常规扩散使用 fykx ，常态减风抗使用 kx
+    title: '2命「缠忆君影梦相见」：梦浮期间降低敌人[fykx]%火水雷冰抗性',
     cons: 2,
     data: {
       fykx: 20
@@ -287,7 +300,7 @@ export const buffs = [
       kx: 20
     }
   }, {
-    title: '6命「慕念萦心间」：扩散可暴击，星扩散暴击提升10%，暴伤提升20%；基于精通提升暴击[cpct], 暴伤[cdmg]',
+    title: '6命「慕念萦心间」：扩散可暴击，星扩散暴击提升10%，暴伤提升20%；基于精通提升暴击[cpct]%, 暴伤[cdmg]%',
     cons: 6,
     data: {
       stellarVortexCpct: 10,

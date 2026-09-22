@@ -4,8 +4,11 @@ import { Config } from '#lolomi'
 
 const mainCharName = '薇斯纳'
 
-const team = ['奥黛塔', '七七', '沃雅妮莎']
+const team = ['奥黛塔', '沃雅妮莎', '珐露珊']
 const artifact_normal = ['炉火', '千岩']
+
+const team_A = ['奥黛塔', '沃雅妮莎', '七七']
+const artifact_A = ['炉火', '千岩']
 
 const config = Config.getConfig('user', 'config')
 const teamParams = { cryo_two: true, rotation: true }
@@ -36,6 +39,8 @@ const createHitCalc = (ds, dmg) => {
   const qiQiPlus = LIMITED_PLUS.QiQi.plus({ params })
   const limit = LIMITED_PLUS.QiQi.limit
   let qiQiRemain = typeof limit === 'function' ? limit(ds) : limit
+  const vodyaPlus = LIMITED_PLUS.Vodyanitsa.fyPlus({ params, element: '风' })
+  let vodyaRemain = LIMITED_PLUS.Vodyanitsa.limit
   const baseC1 = cons >= 1 ? 20 : 0
   const variants = new Map()
   return (pct, slot, { sword = false, stacks = zhengsuStacks(params, cons), inStance = true, reaction = false } = {}) => {
@@ -44,9 +49,13 @@ const createHitCalc = (ds, dmg) => {
     // 七七加成生效次数是否覆盖
     const covered = qiQiPlus > 0 && ele === 'stellarVortex' && qiQiRemain > 0
     if (covered) qiQiRemain--
+    // 沃雅妮莎加成生效次数是否覆盖
+    const vodyaCovered = vodyaPlus > 0 && !!ele && vodyaRemain > 0
+    if (vodyaCovered) vodyaRemain--
     const c1Delta = (cons >= 1 && inStance ? 20 : 0) - baseC1
     const removeQiQi = !!ele && qiQiPlus > 0 && !covered
-    const key = `${c1Delta}:${removeQiQi}`
+    const removeVodya = !!ele && vodyaPlus > 0 && !vodyaCovered
+    const key = `${c1Delta}:${removeQiQi}:${removeVodya}`
     if (!variants.has(key)) {
       const patch = {}
       if (c1Delta) {
@@ -54,7 +63,9 @@ const createHitCalc = (ds, dmg) => {
           patch[channel] = (attr[channel] ?? 0) + c1Delta
         }
       }
-      if (removeQiQi) patch.fyplus = (attr.fyplus ?? 0) - qiQiPlus
+      if (removeQiQi || removeVodya) {
+        patch.fyplus = (attr.fyplus ?? 0) - (removeQiQi ? qiQiPlus : 0) - (removeVodya ? vodyaPlus : 0)
+      }
       variants.set(key, Object.keys(patch).length ? dmg.withAttr(patch) : dmg)
     }
     const fn = variants.get(key)
@@ -229,6 +240,14 @@ export const details = applyStandardTeam([
     params: { Stellar: true, rotation: true, teamAtkLv: 1, teamMasteryLv: 0 },
     dmg: calcRotation
   }, {
+    title: ({ cons }) => `${teamConfig(cons, team_A, artifact_A, mainCharName).title} 「翔风剑·三阶」`,
+    params: ({ cons }) => ({ ...teamConfig(cons, team_A, artifact_A).params, ...teamParams }),
+    dmg: (ds, dmg) => swordDamage(ds, dmg, ['翔风剑三阶灵剑最终段星扩散伤害'])
+  }, {
+    title: ({ cons }) => `${teamConfig(cons, team_A, artifact_A, mainCharName).title} 「巡风列装」总伤`,
+    params: ({ cons }) => ({ ...teamConfig(cons, team_A, artifact_A).params, ...teamParams, rotation: true }),
+    dmg: calcRotation
+  }, {
     title: ({ cons }) => `${teamConfig(cons, team, artifact_normal, mainCharName).title} 「翔风剑·三阶」`,
     params: ({ cons }) => ({ ...teamConfig(cons, team, artifact_normal).params, ...teamParams }),
     dmg: (ds, dmg) => swordDamage(ds, dmg, ['翔风剑三阶灵剑最终段星扩散伤害'])
@@ -237,6 +256,7 @@ export const details = applyStandardTeam([
     params: ({ cons }) => ({ ...teamConfig(cons, team, artifact_normal).params, ...teamParams, rotation: true }),
     dmg: calcRotation
   }, {
+
     title: '当前圣遗物套装',
     dmg: ({ artis }) => ({ avg: artis, type: 'text' })
   }

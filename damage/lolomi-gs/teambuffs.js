@@ -149,6 +149,7 @@ const isPureHydroDendro = (params, element) => {
  * Linnea    莉奈娅1命：18次
  * Illuga    叶洛亚Q「夜莺之歌」：基础21次 + 额外15次 = 36次
  * Lauma     菈乌玛Q：基础24层，6命机制默认视为无限次全程覆盖
+ * Vodyanitsa 沃雅妮莎天赋「十二弦的泪歌」：前台主C生效25次
  */
 const LIMITED_PLUS = {
   Nicole: {
@@ -195,6 +196,13 @@ const LIMITED_PLUS = {
   Lauma: {
     plus: ({ params }) => (params.Lauma_best || params.Lauma_mid) ? 9600 : params.Lauma_low ? 4000 : 0,
     limit: ({ params }) => params.Lauma_best ? Infinity : 24
+  },
+  Vodyanitsa: {
+    // 高中配默认6万5血吃满上限，低配默认6万血
+    plus: ({ params, element }) => (element === '水' || element === '冰') ? ((params.Vodyanitsa_best || params.Vodyanitsa_mid) ? 3500 : params.Vodyanitsa_low ? 2800 : 0) : 0,
+    // 星扩散基础值对风/冰主C星扩散生效，星超导主C星超导反应传 noStarSwirlFy 移除这个buff
+    fyPlus: ({ params, element }) => (element === '风' || element === '冰') && !params.noStarSwirlFy ? ((params.Vodyanitsa_best || params.Vodyanitsa_mid) ? 6500 : params.Vodyanitsa_low ? 5200 : 0) : 0,
+    limit: 25
   }
 }
 
@@ -1126,14 +1134,20 @@ let TeamBuff = [
     check: ({ params }) => params.Vodyanitsa_low || params.Vodyanitsa_mid || params.Vodyanitsa_best,
     title: '沃雅妮莎',
     // E：降低敌人水/冰抗性，10级26.0%，13级30.7%
-    // 天赋：星扩散降低风扩30
-    // 天赋：领唱buff，暂时没数据，后续出了再加
+    // 天赋：星扩散降低风抗30
+    // 天赋「十二弦的泪歌」：基于血量提升增伤基础值
     // 1命基于生命值提升攻击力，默认高配7万血，中6万
     // 2命水冰暴伤加50%、星扩散暴伤加60%
     // 6命星扩散擢升25%、水冰增伤50%
     data: {
       kx: ({ params, element }) => (element === '水' || element === '冰') ? (params.Vodyanitsa_best ? 30.7 : 26) : 0,
       atkPlus: ({ params }) => params.Vodyanitsa_best ? 490 : params.Vodyanitsa_mid ? 420 : 0,
+      fyplus: LIMITED_PLUS.Vodyanitsa.fyPlus,
+      aPlus: LIMITED_PLUS.Vodyanitsa.plus,
+      a2Plus: LIMITED_PLUS.Vodyanitsa.plus,
+      a3Plus: LIMITED_PLUS.Vodyanitsa.plus,
+      ePlus: LIMITED_PLUS.Vodyanitsa.plus,
+      qPlus: LIMITED_PLUS.Vodyanitsa.plus,
       cdmg: ({ params, element }) => (params.Vodyanitsa_best || params.Vodyanitsa_mid) && (element === '水' || element === '冰') ? 50 : 0,
       stellarVortexCdmg: ({ params }) => (params.Vodyanitsa_best || params.Vodyanitsa_mid) ? 60 : 0,
       starSwirlAnemoCdmg: ({ params }) => (params.Vodyanitsa_best || params.Vodyanitsa_mid) ? 60 : 0,
