@@ -4,14 +4,14 @@ import { Config } from '#lolomi'
 
 const mainCharName = '薇斯纳'
 
-const team = ['奥黛塔', '沃雅妮莎', '珐露珊']
-const artifact_normal = ['炉火', '千岩']
+const team = ['奥黛塔', '沃雅妮莎', '尼可']
+const artifact_normal = ['炉火', '千岩', '天美']
 
-const team_A = ['奥黛塔', '沃雅妮莎', '七七']
+const team_A = ['奥黛塔', '沃雅妮莎', '珐露珊']
 const artifact_A = ['炉火', '千岩']
 
 const config = Config.getConfig('user', 'config')
-const teamParams = { cryo_two: true, rotation: true }
+const teamParams = { rotation: true }
 const applyStandardTeam = withStdTeam(mainCharName, team, artifact_normal, config, { ...teamParams })
 
 // 整肃，2命以下默认4层，2命以上满层6层
@@ -36,6 +36,8 @@ const talentHits = (talent, key) => {
 // 循环伤害构成
 const createHitCalc = (ds, dmg) => {
   const { attr, cons, params = {} } = ds
+  const nicolePlus = LIMITED_PLUS.Nicole.plus({ params })
+  let nicoleRemain = LIMITED_PLUS.Nicole.limit
   const qiQiPlus = LIMITED_PLUS.QiQi.plus({ params })
   const limit = LIMITED_PLUS.QiQi.limit
   let qiQiRemain = typeof limit === 'function' ? limit(ds) : limit
@@ -46,18 +48,23 @@ const createHitCalc = (ds, dmg) => {
   return (pct, slot, { sword = false, stacks = zhengsuStacks(params, cons), inStance = true, reaction = false } = {}) => {
     // 是否为星扩散伤害
     const ele = reaction || (sword && (params.Stellar ?? true) ? 'stellarVortex' : false)
-    // 七七加成生效次数是否覆盖
+    const nicoleSlot = ['a', 'a2', 'a3', 'e', 'q'].includes(slot)
+    const nicoleCovered = nicolePlus > 0 && nicoleSlot && !reaction && nicoleRemain > 0
+    if (nicoleCovered) nicoleRemain--
+    const removeNicole = nicolePlus > 0 && nicoleSlot && !nicoleCovered
     const covered = qiQiPlus > 0 && ele === 'stellarVortex' && qiQiRemain > 0
     if (covered) qiQiRemain--
-    // 沃雅妮莎加成生效次数是否覆盖
     const vodyaCovered = vodyaPlus > 0 && !!ele && vodyaRemain > 0
     if (vodyaCovered) vodyaRemain--
     const c1Delta = (cons >= 1 && inStance ? 20 : 0) - baseC1
     const removeQiQi = !!ele && qiQiPlus > 0 && !covered
     const removeVodya = !!ele && vodyaPlus > 0 && !vodyaCovered
-    const key = `${c1Delta}:${removeQiQi}:${removeVodya}`
+    const key = `${slot}:${c1Delta}:${removeQiQi}:${removeVodya}:${removeNicole}`
     if (!variants.has(key)) {
       const patch = {}
+      if (removeNicole) {
+        patch[slot] = { plus: (attr[slot]?.plus ?? 0) - nicolePlus }
+      }
       if (c1Delta) {
         for (const channel of ['stellarVortex', 'starSwirlAnemo', 'starSwirlCryo']) {
           patch[channel] = (attr[channel] ?? 0) + c1Delta
@@ -86,7 +93,7 @@ const swordDamage = (ds, dmg, keys, slot = 'e') => {
   return total
 }
 
-// 6命「翔风剑·变移」伤害构成
+// 6命「翔风剑·变移」伤害
 const taDamage = (ds, dmg, swordOnly = false) => {
   const hit = createHitCalc(ds, dmg)
   const slot = ds.params?.ta_talent ?? 'e'
@@ -98,11 +105,14 @@ const taDamage = (ds, dmg, swordOnly = false) => {
   return total
 }
 
+
 /**
- * 默认手法：开E → 一阶E → 二阶E → Q → 普攻与三阶E穿插，6命每次三阶接1次变移
+ * 默认手法：开E → 一阶E → 二阶E → Q → 首次三阶E → 普攻与剩余三阶E穿插，6命每次三阶接1次变移
  * q_at_end = true                  ：可把Q调到最后收尾
- * normal_sets                      : 默认普通环境3套普攻，星扩散环境2套普攻
- * wind_plume_hits                  : 默认触发18次风翎
+ * normal_sets                      : 默认非满命2套普攻，满命1套普攻
+ * wind_plume_hits                  : 默认触发12次风翎，没多少伤害，用于加剑气
+ * anemoHits                        : 默认触发10次反应星扩散(风)
+ * cryoHits                         : 默认触发3次反应星扩散(冰)
  * zhengsu_before_hit = false       ：2命以下从0层整肃叠起
  */
 const calcRotation = (ds, dmg) => {
@@ -110,21 +120,27 @@ const calcRotation = (ds, dmg) => {
   const star = params.Stellar ?? true
   const cap = cons >= 1 ? 4 : 3
   const cfg = {
-    normalSets: hitCount(params.normal_sets, star ? 2 : 3),
-    windPlumeHits: hitCount(params.wind_plume_hits, 18),
+    normalSets: hitCount(params.normal_sets, cons >= 6 ? 1 : 2),
+    windPlumeHits: hitCount(params.wind_plume_hits, 12),
     sanJieTimes: Math.min(hitCount(params.san_jie_times, cap), cap),
-    anemoHits: star ? hitCount(params.swirl_anemo_hits, 5) : 0,
-    cryoHits: star ? hitCount(params.swirl_cryo_hits, 2) : 0
+    anemoHits: star ? hitCount(params.swirl_anemo_hits, 10) : 0,
+    cryoHits: star ? hitCount(params.swirl_cryo_hits, 3) : 0
   }
   const taHits = cons >= 6 ? Math.min(hitCount(params.ta_hits, cfg.sanJieTimes), cfg.sanJieTimes) : 0
   const actions = [{ type: 'start' }, { type: 'yi' }, { type: 'er' }]
   if (!(params.q_at_end ?? false)) actions.push({ type: 'q' })
+  const openingSan = !(params.q_at_end ?? false) && cfg.sanJieTimes > 0
+  if (openingSan) {
+    actions.push({ type: 'san' })
+    if (taHits > 0) actions.push({ type: 'ta' })
+  }
   const groups = Math.max(cfg.sanJieTimes, 1)
   const portion = (count, i) => Math.ceil(count * (i + 1) / groups) - Math.ceil(count * i / groups)
   for (let i = 0; i < groups; i++) {
     actions.push({ type: 'normal', count: portion(cfg.normalSets, i) }, { type: 'plume', count: portion(cfg.windPlumeHits, i) })
     actions.push({ type: 'reaction', ele: 'starSwirlAnemo', count: portion(cfg.anemoHits, i) },
       { type: 'reaction', ele: 'starSwirlCryo', count: portion(cfg.cryoHits, i) })
+    if (openingSan && i === 0) continue
     if (i < cfg.sanJieTimes) actions.push({ type: 'san' })
     if (i < taHits) actions.push({ type: 'ta' })
   }
@@ -187,9 +203,6 @@ export const details = applyStandardTeam([
     title: '触发特效后攻击力',
     dmg: ({ attr, calc }) => ({ avg: calc(attr.atk) })
   }, {
-    title: '「操典·制胜有道」伤害',
-    dmg: ({ talent }, dmg) => dmg(talent.e['技能伤害'], 'e')
-  }, {
     title: '「巡风列装」普攻单段伤害',
     dmg: ({ talent }, dmg) => dmg(talent.a['一段伤害'], 'a')
   }, {
@@ -205,18 +218,8 @@ export const details = applyStandardTeam([
     title: '「翔风剑·二阶」星扩散伤害',
     dmg: (ds, dmg) => swordDamage(ds, dmg, ['翔风剑二阶灵剑星扩散伤害'])
   }, {
-    title: '「翔风剑·三阶」前四段星扩散总伤',
-    dmg: (ds, dmg) => swordDamage(ds, dmg, ['翔风剑三阶灵剑星扩散伤害'])
-  }, {
-    title: '「翔风剑·三阶」尾段星扩散伤害',
-    dmg: (ds, dmg) => swordDamage(ds, dmg, ['翔风剑三阶灵剑最终段星扩散伤害'])
-  }, {
     title: '「翔风剑·三阶」星扩散总伤',
     dmg: (ds, dmg) => swordDamage(ds, dmg, ['翔风剑三阶灵剑星扩散伤害', '翔风剑三阶灵剑最终段星扩散伤害'])
-  }, {
-    title: '「致礼·献予女皇陛下」灵剑伤害',
-    params: { Stellar: false },
-    dmg: (ds, dmg) => swordDamage(ds, dmg, ['灵剑伤害'], 'q')
   }, {
     title: '「致礼·献予女皇陛下」星扩散伤害',
     dmg: (ds, dmg) => swordDamage(ds, dmg, ['灵剑星扩散伤害'], 'q')
@@ -268,7 +271,7 @@ export const details = applyStandardTeam([
  * 默认三名冰风元素角色，薇斯纳自身算一名，测试木桩自行调整 teamAtkLv 和 teamMasteryLv
  */
 export const defParams = { Stellar: true, teamAtkLv: 3, teamMasteryLv: 1 }
-export const defDmgIdx = 8
+export const defDmgIdx = 6
 export const consDmgKey = '「巡风列装」星扩散总伤'
 export const mainAttr = 'atk,mastery,cpct,cdmg'
 
@@ -276,12 +279,12 @@ export const buffs = [
   ...TeamBuff,
   {
     title: ({ params, cons }) => {
-      if (params.rotation) return `天赋「仪典·春之行列」：${cons >= 2 ? '入模式满6层' : '从0层叠层'}`
+      if (params.rotation) return `天赋「仪典·春之行列」：${cons >= 2 ? '开E即满6层' : '从0层叠层'}`
       const stacks = zhengsuStacks(params, cons)
-      return `天赋「仪典·春之行列」：${stacks}层整肃，灵剑造成原本${100 + stacks * 10}%的伤害`
+      return `天赋「仪典·春之行列」：${stacks}层整肃，翔风剑灵剑造成原本${100 + stacks * 10}%的伤害`
     },
   }, {
-    title: '天赋「理典·冬之凯风」：攻击力提升[atkPct]%，精通提升[mastery]',
+    title: '天赋「理典·冬之凯风」：攻击力提升[atkPct]%，精通提升[mastery]点',
     check: ({ params }) => params.Stellar ?? true,
     sort: 9,
     data: {
@@ -307,7 +310,7 @@ export const buffs = [
     cons: 2,
     check: ({ params }) => params.rotation || !Number.isFinite(Number(params.zhengsu ?? 6)) || Number(params.zhengsu ?? 6) >= 6,
     data: {
-      atkPct: 60
+      atkPct: 40
     }
   }, {
     title: '4命「先代的荣膺」：「理典·冬之凯风」的攻击力与精通提升效果变为三倍',

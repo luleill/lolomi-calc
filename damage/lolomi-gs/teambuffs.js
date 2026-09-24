@@ -144,7 +144,7 @@ const isPureHydroDendro = (params, element) => {
  * Xilonen   希诺宁4命：6次
  * Escoffier 爱可菲2命：5次
  * XianYun   闲云Q「仙力助推」：8次
- * ShenHe    申鹤「冰翎」：满命无限次、中配双E14次、低配7次
+ * ShenHe    申鹤「冰翎」：满命无限次、非满命7次
  * QiQi      七七6命：4次
  * Linnea    莉奈娅1命：18次
  * Illuga    叶洛亚Q「夜莺之歌」：基础21次 + 额外15次 = 36次
@@ -178,7 +178,7 @@ const LIMITED_PLUS = {
   },
   ShenHe: {
     plus: ({ params }) => params.ShenHe_best ? 5000 : params.ShenHe_mid ? 3500 : params.ShenHe_low ? 3000 : 0,
-    limit: ({ params }) => params.ShenHe_best ? Infinity : params.ShenHe_mid ? 14 : 7
+    limit: ({ params }) => params.ShenHe_best ? Infinity : 7
   },
   QiQi: {
     plus: ({ params }) => params.QiQi_best ? 18000 : 0,
@@ -1133,15 +1133,14 @@ let TeamBuff = [
   {
     check: ({ params }) => params.Vodyanitsa_low || params.Vodyanitsa_mid || params.Vodyanitsa_best,
     title: '沃雅妮莎',
-    // E：降低敌人水/冰抗性，10级26.0%，13级30.7%
-    // 天赋：星扩散降低风抗30
+    // E：降低敌人水/冰抗性，10级30.0%，13级35.4%，星扩散环境风抗降低35%
     // 天赋「十二弦的泪歌」：基于血量提升增伤基础值
-    // 1命基于生命值提升攻击力，默认高配7万血，中6万
+    // 1命基于生命值提升攻击力，高中配默认6.5万血
     // 2命水冰暴伤加50%、星扩散暴伤加60%
-    // 6命星扩散擢升25%、水冰增伤50%
+    // 6命星扩散擢升30%、水冰增伤60%
     data: {
-      kx: ({ params, element }) => (element === '水' || element === '冰') ? (params.Vodyanitsa_best ? 30.7 : 26) : 0,
-      atkPlus: ({ params }) => params.Vodyanitsa_best ? 490 : params.Vodyanitsa_mid ? 420 : 0,
+      kx: ({ params, element }) => (element === '水' || element === '冰') ? (params.Vodyanitsa_best ? 35.4 : 30) : element === '风' ? 35 : 0,
+      atkPlus: ({ params }) => (params.Vodyanitsa_best || params.Vodyanitsa_mid) ? 650 : 0,
       fyplus: LIMITED_PLUS.Vodyanitsa.fyPlus,
       aPlus: LIMITED_PLUS.Vodyanitsa.plus,
       a2Plus: LIMITED_PLUS.Vodyanitsa.plus,
@@ -1152,8 +1151,8 @@ let TeamBuff = [
       stellarVortexCdmg: ({ params }) => (params.Vodyanitsa_best || params.Vodyanitsa_mid) ? 60 : 0,
       starSwirlAnemoCdmg: ({ params }) => (params.Vodyanitsa_best || params.Vodyanitsa_mid) ? 60 : 0,
       starSwirlCryoCdmg: ({ params }) => (params.Vodyanitsa_best || params.Vodyanitsa_mid) ? 60 : 0,
-      elevated: ({ params }) => params.Vodyanitsa_best ? 25 : 0,
-      dmg: ({ params, element }) => params.Vodyanitsa_best && (element === '水' || element === '冰') ? 50 : 0
+      elevated: ({ params }) => params.Vodyanitsa_best ? 30 : 0,
+      dmg: ({ params, element }) => params.Vodyanitsa_best && (element === '水' || element === '冰') ? 60 : 0
     }
   }
 ]
