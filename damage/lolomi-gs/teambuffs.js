@@ -1138,8 +1138,10 @@ let TeamBuff = [
     // 1命基于生命值提升攻击力，高中配默认6.5万血
     // 2命水冰暴伤加50%、星扩散暴伤加60%
     // 6命星扩散擢升30%、水冰增伤60%
+    // 专武漩流颂歌：高中配默认6万血吃满，冻结或星扩散换提升额外75%，精五加攻84，精一加攻42
     data: {
       kx: ({ params, element }) => (element === '水' || element === '冰') ? (params.Vodyanitsa_best ? 35.4 : 30) : element === '风' ? 35 : 0,
+      atkPct: ({ params }) => params.Vodyanitsa_best ? 84 : params.Vodyanitsa_mid ? 42 : 0,
       atkPlus: ({ params }) => (params.Vodyanitsa_best || params.Vodyanitsa_mid) ? 650 : 0,
       fyplus: LIMITED_PLUS.Vodyanitsa.fyPlus,
       aPlus: LIMITED_PLUS.Vodyanitsa.plus,

@@ -338,10 +338,10 @@ export default function (step, staticStep) {
     蝶变: {
       title: '暴击伤害提升[cdmg]%，星扩散伤害提升[stellarVortex]%',
       refine: {
-        cdmg: step(48, 14),
-        stellarVortex: step(28),
-        starSwirlAnemo: step(28),
-        starSwirlCryo: step(28),
+        cdmg: step(56, 16),
+        stellarVortex: step(36),
+        starSwirlAnemo: step(36),
+        starSwirlCryo: step(36),
       }
     },
     银釭: {

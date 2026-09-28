@@ -278,14 +278,16 @@ export default function (step, staticStep) {
         dmg: ({ attr, calc, refine }) => Math.min(Math.floor(calc(attr.atk) / 1000) * step(10, 3)[refine], step(26, 8)[refine])
       }
     }],
-    漩流颂歌: [staticStep('heal', 4, 1), {
-      title: '生命上限提升[hpPct]%，基于生命值提升攻击力[atkPct]%',
+    漩流颂歌: [staticStep('heal', 4), {
+      // 默认包含冻结/星扩散的75%额外提升，队伍伤害不适用时传 params.noSwirlEnhance: true
+      title: '满层生命上限提升[hpPct]%，基于生命值提升攻击力[atkPct]%',
       sort: 9,
       data: {
-        hpPct: ({ refine }) => step(4, 1)[refine] * 3,
-        atkPct: ({ attr, calc, refine }) => {
-          const per = Math.floor(Math.max(calc(attr.hp) - 40000, 0) / 1000) * step(0.4, 0.1)[refine]
-          return Math.min(per * 3, step(8, 2)[refine] * 3)
+        hpPct: ({ refine, params }) => step(4)[refine] * 3 * (params.noSwirlEnhance ? 1 : 1.75),
+        atkPct: ({ attr, calc, refine, params }) => {
+          const boost = params.noSwirlEnhance ? 1 : 1.75
+          const per = Math.floor(Math.max(calc(attr.hp) - 40000, 0) / 1000) * step(0.4)[refine]
+          return Math.min(per * 3, step(8)[refine] * 3) * boost
         }
       }
     }],
