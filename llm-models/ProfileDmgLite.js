@@ -257,7 +257,7 @@ export default class ProfileDmgLite {
       let { attrMap } = LlmMeta.getMeta(game, 'arti')
 
       mainAttr = mainAttr.split(',')
-      let params = lodash.merge({}, defParams, detail.params || {})
+      let params = lodash.merge({}, defParams, lodash.isFunction(detail.params) ? detail.params(meta) : detail.params || {})
       let basicDmg = dmgDetail.basicRet
       lodash.forEach(mainAttr, (reduceAttr) => {
         dmgDetail.attr.push(attrMap[reduceAttr])
