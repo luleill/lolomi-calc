@@ -124,5 +124,6 @@
 - 薇斯纳 Vesna ✅
 - 沃雅妮莎 Vodyanitsa ✅
 - 米提亚 Mitya ✅
+- 瓦列里 Valeriy ✅
 
 </details>

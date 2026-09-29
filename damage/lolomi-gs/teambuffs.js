@@ -33,7 +33,8 @@ const MUTEX_WEAPON_PASSIVES = [
         'Venti',   // 温迪
         'YeLan',   // 夜兰
         'Kazuha',  // 枫原万叶
-        'Jean'     // 琴
+        'Jean',    // 琴
+        'Valeriy'  // 瓦列里
       ].map(char => ({
         char,
         getValue: (params) => params[`${char}_best`] ? 40 : params[`${char}_mid`] ? 20 : 0
@@ -150,6 +151,7 @@ const isPureHydroDendro = (params, element) => {
  * Illuga    叶洛亚Q「夜莺之歌」：基础21次 + 额外15次 = 36次
  * Lauma     菈乌玛Q：基础24层，6命机制默认视为无限次全程覆盖
  * Vodyanitsa 沃雅妮莎天赋「十二弦的泪歌」：前台主C生效25次
+ * Valeriy   瓦列里天赋「攻斥指令」：15次
  */
 const LIMITED_PLUS = {
   Nicole: {
@@ -203,6 +205,22 @@ const LIMITED_PLUS = {
     // 星扩散基础值对风/冰主C星扩散生效，星超导主C星超导反应传 noStarSwirlFy 移除这个buff
     fyPlus: ({ params, element }) => (element === '风' || element === '冰') && !params.noStarSwirlFy ? ((params.Vodyanitsa_best || params.Vodyanitsa_mid) ? 6500 : params.Vodyanitsa_low ? 5200 : 0) : 0,
     limit: 25
+  },
+  Valeriy: {
+    // 攻斥指令：普攻13级，雷伤加成44.54%攻击、星超导加成133.62%攻击
+    // 加成基于瓦列里攻击力，高中配五星武器2800、低配四星武器2500，可传 Valeriy_atk
+    // 每消耗1点势能每层额外加算，辉映·星超导0.9%/点，非辉映0.3%/点（默认辉映状态）
+    // 势能默认60，可传 Valeriy_potential（上限100）
+    // 无 Valeriy 档位参数时返回0，避免主C单人条目误扣限次额度
+    plus: ({ params, element }) => element === '雷' && (params.Valeriy_low || params.Valeriy_mid || params.Valeriy_best)
+      ? (params.Valeriy_atk ?? ((params.Valeriy_best || params.Valeriy_mid) ? 2800 : 2500))
+        * (44.54 + (params.Valeriy_noHuiying ? 0.3 : 0.9) * (params.Valeriy_potential ?? 60)) / 100
+      : 0,
+    fyPlus: ({ params, element }) => element === '雷' && (params.Valeriy_low || params.Valeriy_mid || params.Valeriy_best)
+      ? (params.Valeriy_atk ?? ((params.Valeriy_best || params.Valeriy_mid) ? 2800 : 2500))
+        * (133.62 + (params.Valeriy_noHuiying ? 0.3 : 0.9) * (params.Valeriy_potential ?? 60)) / 100
+      : 0,
+    limit: 15
   }
 }
 
@@ -1155,6 +1173,48 @@ let TeamBuff = [
       starSwirlCryoCdmg: ({ params }) => (params.Vodyanitsa_best || params.Vodyanitsa_mid) ? 60 : 0,
       elevated: ({ params }) => params.Vodyanitsa_best ? 30 : 0,
       dmg: ({ params, element }) => params.Vodyanitsa_best && (element === '水' || element === '冰') ? 60 : 0
+    }
+  },
+  {
+    check: ({ params }) => params.Mitya_low || params.Mitya_mid || params.Mitya_best,
+    title: '米提亚',
+    // 天赋「基准承压测验」：稳态炉心每枚信标全队精通+30，高中配5枚，低配4枚
+    // 天赋「星耀祝礼」：基于精通提升全队星超导基础伤害，默认吃满14%
+    // 1命：炉心存在期间站场角色暴伤+50
+    // 2命：极星辉域内冰/雷抗降低20；
+    //      2命加精通默认按稳态全队+100，过载传 Mitya_overload 切为仅为站场角色+200
+    // 6命：全队星超导擢升+20
+    data: {
+      fypct: 14,
+      mastery: ({ params }) => {
+        const stacks = (params.Mitya_best || params.Mitya_mid) ? 150 : 120
+        const c2 = (params.Mitya_best || params.Mitya_mid) ? (params.Mitya_overload ? 200 : 100) : 0
+        return stacks + c2
+      },
+      kx: ({ params, element }) => (params.Mitya_best || params.Mitya_mid) && (element === '冰' || element === '雷') ? 20 : 0,
+      cdmg: ({ params }) => params.Mitya_best ? 50 : 0,
+      elevated: ({ params }) => params.Mitya_best ? 20 : 0
+    }
+  },
+  {
+    check: ({ params }) => params.Valeriy_low || params.Valeriy_mid || params.Valeriy_best,
+    title: '瓦列里',
+    // 天赋「攻斥指令」：雷伤和雷元素星超导基础值加成
+    // 2命：施放战技后全队精通+100
+    // 6命：雷伤暴击率+10，星超导暴伤+40
+    // 苍古 精五加攻40增伤32 精一加攻20增伤16
+    data: {
+      mastery: 100,
+      atkPct: (ds) => getMutexPassiveValue('千年的大乐章', 'atkPct', 'Valeriy', ds.params, ds),
+      dmg: ({ params }) => params.Valeriy_best ? 32 : params.Valeriy_mid ? 16 : 0,
+      cpct: ({ element }) => element === '雷' ? 10 : 0,
+      stellarConductCdmg: ({ element }) => element === '雷' ? 40 : 0,
+      aPlus: LIMITED_PLUS.Valeriy.plus,
+      a2Plus: LIMITED_PLUS.Valeriy.plus,
+      a3Plus: LIMITED_PLUS.Valeriy.plus,
+      ePlus: LIMITED_PLUS.Valeriy.plus,
+      qPlus: LIMITED_PLUS.Valeriy.plus,
+      fyplus: LIMITED_PLUS.Valeriy.fyPlus
     }
   }
 ]

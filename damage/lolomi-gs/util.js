@@ -152,6 +152,8 @@
     'Alyosha': '阿罗夏',
     'Vodyanitsa': '沃雅妮莎',
     'Vesna': '薇斯纳',
+    'Mitya': '米提亚',
+    'Valeriy': '瓦列里',
   };
 
   // 角色简称 - 常用辅助

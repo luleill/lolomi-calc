@@ -4,8 +4,8 @@ import { Config } from '#lolomi'
 
 const mainCharName = '米提亚'
 
-const team = ['奥黛塔', '希诺宁', '八重神子']
-const artifact_normal = ['炉火', '千岩']
+const team = ['奥黛塔', '希诺宁', '瓦列里']
+const artifact_normal = ['炉火']
 
 const config = Config.getConfig('user', 'config')
 const applyStandardTeam = withStdTeam(mainCharName, team, artifact_normal, config)
@@ -49,6 +49,16 @@ const makeLimitedOver = (plus, limit, slots) => {
   }
 }
 
+// 瓦列里「攻斥指令」：雷直伤与星超导共用15层
+const makeDirectiveOver = (plus, limit) => {
+  let remain = limit
+  return () => {
+    const covered = Math.min(1, Math.max(0, remain))
+    remain -= covered
+    return { starKeep: covered > 0, over: plus * (1 - covered) }
+  }
+}
+
 // 过载站场一轮总伤
 // 手法：长E → Q → 特殊重击递变聚爆持续消耗信标
 // implosions : 递变聚爆施放次数，还不清楚是初始伤害还是持续伤害，先默认2
@@ -63,17 +73,25 @@ const calcOverloadRotation = (ds, calcApi) => {
   const beacons = Math.round(supply / (cons >= 6 ? 0.7 : 1))
   const nicoleOver = makeLimitedOver(LIMITED_PLUS.Nicole.plus({ params }), LIMITED_PLUS.Nicole.limit, ['a', 'a2', 'a3', 'e', 'q'])
   const xiloOver = makeLimitedOver(LIMITED_PLUS.Xilonen.plus({ params }), LIMITED_PLUS.Xilonen.limit, ['a', 'a2', 'a3'])
-  const eHold = basic(calc(attr.atk) * talent.e['长按技能伤害'] / 100 - nicoleOver('e'), 'e')
-  const q = qDmg(ds, calcApi, nicoleOver('q'))
+  const valPlus = LIMITED_PLUS.Valeriy.plus({ params, element: '雷' })
+  const valFy = LIMITED_PLUS.Valeriy.fyPlus({ params, element: '雷' })
+  const valHit = makeDirectiveOver(valPlus, LIMITED_PLUS.Valeriy.limit)
+  const valNoFy = valFy > 0 ? calcApi.withAttr({ fyplus: (attr.fyplus ?? 0) - valFy }) : calcApi
+  const v1 = valHit()
+  const eHold = basic(calc(attr.atk) * talent.e['长按技能伤害'] / 100 - nicoleOver('e') - v1.over, 'e')
+  const v2 = valHit()
+  const q = qDmg(ds, calcApi, nicoleOver('q') + v2.over)
   let totalDmg = eHold.dmg + q.dmg
   let totalAvg = eHold.avg + q.avg
   for (let i = 0; i < implosions; i++) {
     const nStar = Math.floor(beacons / implosions) + (i < beacons % implosions ? 1 : 0)
-    const init = basic(calc(attr.atk) * talent.a['递变聚爆伤害'] / 100 - nicoleOver('a2') - xiloOver('a2'), 'a2')
+    const vi = valHit()
+    const init = basic(calc(attr.atk) * talent.a['递变聚爆伤害'] / 100 - nicoleOver('a2') - xiloOver('a2') - vi.over, 'a2')
     totalDmg += init.dmg
     totalAvg += init.avg
     for (let j = 0; j < nStar; j++) {
-      const star = basic(calc(attr.mastery) * talent.a['递变聚爆星超导伤害'] / 100 - nicoleOver('a2') - xiloOver('a2'), 'a2', 'stellarConduct')
+      const vs = valHit()
+      const star = (vs.starKeep ? basic : valNoFy.basic)(calc(attr.mastery) * talent.a['递变聚爆星超导伤害'] / 100 - nicoleOver('a2') - xiloOver('a2') - vs.over, 'a2', 'stellarConduct')
       totalDmg += star.dmg
       totalAvg += star.avg
     }
