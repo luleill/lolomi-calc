@@ -137,6 +137,7 @@ export const alias = {
   奥黛塔: 'Odette',
   沃雅妮莎: 'Vodyanitsa,妮莎',
   薇斯纳: 'Vesna,威斯纳',
+  米提亚: 'Mitya,米提亚',
 
   // 自定义
   初音未来: 'Hatsunemiku,初音,miku,Miku'

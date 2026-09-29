@@ -319,6 +319,15 @@ export default function (step, staticStep) {
         starSwirlAnemo: step(16),
         starSwirlCryo: step(16),
       }
+    },
+    秘星典谕: {
+      // 默认满层算式离析
+      title: '暴伤提升[cdmg]%，满层精通提升[mastery]点，星超导暴伤提升[stellarConductCdmg]%',
+      refine: {
+        cdmg: step(24),
+        mastery: step(48 + 24 * 3),
+        stellarConductCdmg: step(12 * 3)
+      }
     }
   }
 }
