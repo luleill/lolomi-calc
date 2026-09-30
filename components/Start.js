@@ -96,24 +96,31 @@ const Start = {
    */
   initialization() {
     this.logCache = new Map()
-    
     const sourceBasePath = `${basePath}/plugins/lolomi-calc/replace/data/1`
     const fileMappings = [{
       source: `${sourceBasePath}/PlayerData/gs`,
       miaomiao: `${basePath}/data/PlayerData/gs`,
       extension: '.json'
     }]
-    
+    // 清理lolomi可能残留的预设面板数据文件，新文件名已改为999999997.json和999999998.json
+    const legacyFiles = ['777777777.json', '888888888.json']
     fileMappings.forEach(mapping => {
       try {
         const sourceFiles = fs.readdirSync(mapping.source)
           .filter(file => file.endsWith(mapping.extension))
-        
         sourceFiles.forEach(filename => {
           fs.copyFileSync(
             `${mapping.source}/${filename}`, 
             `${mapping.miaomiao}/${filename}`
           )
+        })
+          
+        legacyFiles.forEach(filename => {
+          const filePath = `${mapping.source}/${filename}`
+          if (fs.existsSync(filePath)) {
+            fs.unlinkSync(filePath)
+            logger.mark(`[lolomi-calc] 清理预设面板旧数据：${filePath}`)
+          }
         })
       } catch (error) {
         logger.debug(`[lolomi-calc] 初始化面板数据失败: ${error.message}`)

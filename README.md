@@ -6,6 +6,14 @@
 # Yunzai目录下安装
 git clone --depth=1 https://gitee.com/land-route_lu/lolomi-calc.git ./plugins/lolomi-calc/
 
+# ⚠️ **预设面板文件变动**
+> 旧核爆/辅助面板预设UID（888888888、777777777）与国际正式服实际UID有冲突，目前已改为 999999998（核爆 hb）、999999997（辅助 fz）。
+> 云崽数据目录里历史复制过去的旧文件lolomi不自动进行删除，可手动删掉以下两个预设面板文件，删之前最好再检查一下是否是真实UID数据，应该也没这两个UID本人在使用，实际没多少影响
+> ```
+> /Yunzai/data/PlayerData/gs/777777777.json
+> /Yunzai/data/PlayerData/gs/888888888.json
+> ```
+
 # 声明
 复用liangshi-calc基础框架模版，组队和计算逻辑已重构
 * 梁氏源地址 https://gitee.com/liangshi233/liangshi-calc/tree/master

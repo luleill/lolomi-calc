@@ -42,7 +42,7 @@ export class ysmb_input_replace extends plugin {
     let Msg = []
     msg.forEach(i => {
       let idx = replace_list.findIndex(k => i.includes(k))
-      const replacements = ['999999999', '888888888', '777777777']
+      const replacements = ['999999999', '999999998', '999999997']
       Msg.push(idx !== -1 ? i.replace(replace_list[idx], replacements[idx]) : i)
     })
     return Msg
