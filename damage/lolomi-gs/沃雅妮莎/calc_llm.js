@@ -23,7 +23,11 @@ const calcRotation = ({ talent, attr, calc }, { basic }) => {
 
 export const details = applyStandardTeam([
   {
-    title: '触发特效后生命值',
+    title: '单人触发特效后生命值',
+    dmg: ({ attr, calc }) => ({ avg: Math.floor(calc(attr.hp)) })
+  }, {
+    title: '双水+2命希诺宁生命值',
+    params: { Xilonen_hydro: true, hydro_two: true },
     dmg: ({ attr, calc }) => ({ avg: Math.floor(calc(attr.hp)) })
   }, {
     title: '「遥久之歌」治疗量',
@@ -31,10 +35,6 @@ export const details = applyStandardTeam([
       const [flat, pct] = talent.e['遥久之歌治疗量2']
       return heal(flat + pct * calc(attr.hp) / 100)
     }
-  }, {
-    title: '提供基础攻击力增益',
-    cons: 1,
-    dmg: ({ attr, calc }) => ({ avg: Math.floor(calc(attr.hp) / 100), type: 'text' })
   }, {
     title: '提供水冰减抗增益',
     dmg: ({ talent }) => ({ avg: talent.e['水元素/冰元素抗性降低'] + '%', type: 'text' })
@@ -45,20 +45,21 @@ export const details = applyStandardTeam([
     title: '提供水冰基础伤害增益',
     dmg: ({ attr, calc }) => ({ avg: Math.min(Math.floor(Math.max(calc(attr.hp) - 40000, 0) / 1000) * 140, 3500), type: 'text' })
   }, {
+    title: '1命提供基础攻击力增益',
+    cons: 1,
+    dmg: ({ attr, calc }) => ({ avg: Math.floor(calc(attr.hp) * 0.8 / 100), type: 'text' })
+  }, {
     title: '2命提供水冰爆伤增益',
     cons: 2,
     dmg: () => ({ avg: '50%', type: 'text' })
   }, {
     title: ({ cons }) => cons >= 6 ? '6命提供星扩散增益' : '2命提供星扩散增益',
     cons: 2,
-    dmg: ({ cons }) => ({ avg: cons >= 6 ? '爆伤60%、擢升30%' : '爆伤60%', type: 'text' })
+    dmg: ({ cons }) => ({ avg: cons >= 6 ? '爆伤60%、擢升25%' : '爆伤60%', type: 'text' })
   }, {
     title: '6命提供水冰增伤增益',
     cons: 6,
     dmg: () => ({ avg: '60%', type: 'text' })
-  }, {
-    title: '「宣叙·晨声纷流」释放伤害',
-    dmg: ({ talent, attr, calc }, { basic }) => basic(calc(attr.hp) * talent.e['技能伤害'] / 100, 'e')
   }, {
     title: '「唤春角笛」协同伤害',
     dmg: ({ talent, attr, calc }, { basic }) => basic(calc(attr.hp) * talent.e['唤春角笛伤害'] / 100, 'e')
@@ -117,7 +118,7 @@ export const buffs = [
     sort: 9,
     cons: 1,
     data: {
-      atkPlus: ({ attr, calc }) => calc(attr.hp) / 100
+      atkPlus: ({ attr, calc }) => calc(attr.hp) * 0.8 / 100
     }
   }, {
     title: '2命「穿彻风雪的余响」：水冰暴伤提升[cdmg]%，星扩散暴伤提升[stellarVortexCdmg]%',
@@ -138,7 +139,7 @@ export const buffs = [
     title: '6命「永不落幕的盛歌」：星扩散反应擢升[elevated]%、水冰伤害提升[dmg]%',
     cons: 6,
     data: {
-      elevated: 30,
+      elevated: 25,
       dmg: 60
     }
   }

@@ -1153,14 +1153,14 @@ let TeamBuff = [
     title: '沃雅妮莎',
     // E：降低敌人水/冰抗性，10级30.0%，13级35.4%，星扩散环境风抗降低35%
     // 天赋「十二弦的泪歌」：基于血量提升增伤基础值
-    // 1命基于生命值提升攻击力，高中配默认6.5万血
+    // 1命基于生命值0.8%提升攻击力，默认高配8万血，中配7.5万
     // 2命水冰暴伤加50%、星扩散暴伤加60%
-    // 6命星扩散擢升30%、水冰增伤60%
-    // 专武漩流颂歌：高中配默认6万血吃满，冻结或星扩散换提升额外75%，精五加攻84，精一加攻42
+    // 6命星扩散擢升25%、水冰增伤60%
+    // 专武漩流颂歌：6万血即吃满，冻结或星扩散换提升额外75%，精五加攻84，精一加攻42
     data: {
       kx: ({ params, element }) => (element === '水' || element === '冰') ? (params.Vodyanitsa_best ? 35.4 : 30) : element === '风' ? 35 : 0,
       atkPct: ({ params }) => params.Vodyanitsa_best ? 84 : params.Vodyanitsa_mid ? 42 : 0,
-      atkPlus: ({ params }) => (params.Vodyanitsa_best || params.Vodyanitsa_mid) ? 650 : 0,
+      atkPlus: ({ params }) => params.Vodyanitsa_best ? 640 : params.Vodyanitsa_mid ? 600 : 0,
       fyplus: LIMITED_PLUS.Vodyanitsa.fyPlus,
       aPlus: LIMITED_PLUS.Vodyanitsa.plus,
       a2Plus: LIMITED_PLUS.Vodyanitsa.plus,
@@ -1171,7 +1171,7 @@ let TeamBuff = [
       stellarVortexCdmg: ({ params }) => (params.Vodyanitsa_best || params.Vodyanitsa_mid) ? 60 : 0,
       starSwirlAnemoCdmg: ({ params }) => (params.Vodyanitsa_best || params.Vodyanitsa_mid) ? 60 : 0,
       starSwirlCryoCdmg: ({ params }) => (params.Vodyanitsa_best || params.Vodyanitsa_mid) ? 60 : 0,
-      elevated: ({ params }) => params.Vodyanitsa_best ? 30 : 0,
+      elevated: ({ params }) => params.Vodyanitsa_best ? 25 : 0,
       dmg: ({ params, element }) => params.Vodyanitsa_best && (element === '水' || element === '冰') ? 60 : 0
     }
   },
