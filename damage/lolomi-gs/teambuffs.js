@@ -211,7 +211,6 @@ const LIMITED_PLUS = {
     // 加成基于瓦列里攻击力，高中配五星武器2800、低配四星武器2500，可传 Valeriy_atk
     // 每消耗1点势能每层额外加算，辉映·星超导0.9%/点，非辉映0.3%/点（默认辉映状态）
     // 势能默认60，可传 Valeriy_potential（上限100）
-    // 无 Valeriy 档位参数时返回0，避免主C单人条目误扣限次额度
     plus: ({ params, element }) => element === '雷' && (params.Valeriy_low || params.Valeriy_mid || params.Valeriy_best)
       ? (params.Valeriy_atk ?? ((params.Valeriy_best || params.Valeriy_mid) ? 2800 : 2500))
         * (44.54 + (params.Valeriy_noHuiying ? 0.3 : 0.9) * (params.Valeriy_potential ?? 60)) / 100
@@ -235,9 +234,15 @@ const BUFF_KEY_LABELS = {
   aDmg: '普攻增伤', a2Dmg: '重击增伤', a3Dmg: '下落增伤', eDmg: '战技增伤', qDmg: '爆发增伤',
   vaporize: '蒸发增伤', melt: '融化增伤', swirl: '扩散增伤', electroCharged: '感电增伤',
   lunarCharged: '月感电增伤', lunarBloom: '月绽放增伤', lunarCrystallize: '月结晶增伤',
+  lunarChargedCpct: '月感电暴击提升', lunarChargedCdmg: '月感电暴伤提升',
   lunarBloomCpct: '月绽放暴击提升', lunarBloomCdmg: '月绽放暴伤提升',
+  lunarCrystallizeCpct: '月结晶暴击提升', lunarCrystallizeCdmg: '月结晶暴伤提升',
   stellarConduct: '星超导增伤', stellarVortex: '星扩散增伤',
-  stellarVortexCdmg: '星扩散暴伤提升',
+  starSwirlAnemo: '星扩散(风)增伤', starSwirlCryo: '星扩散(冰)增伤',
+  stellarConductCpct: '星超导暴击提升', stellarConductCdmg: '星超导暴伤提升',
+  stellarVortexCpct: '星扩散暴击提升', stellarVortexCdmg: '星扩散暴伤提升',
+  starSwirlAnemoCpct: '星扩散(风)暴击提升', starSwirlAnemoCdmg: '星扩散(风)暴伤提升',
+  starSwirlCryoCpct: '星扩散(冰)暴击提升', starSwirlCryoCdmg: '星扩散(冰)暴伤提升',
   elevated: '擢升', fypct: '反应基础增伤', fyplus: '反应基础值提升'
 }
 const FLAT_KEYS = ['atkPlus', 'defPlus', 'mastery', 'aPlus', 'a2Plus', 'a3Plus', 'ePlus', 'qPlus', 'fyplus']
@@ -253,10 +258,13 @@ const makeAutoTitle = (base, data) => (ds) => {
   const handled = new Set()
   for (const [keys, label, flat] of [
     [['aPlus', 'a2Plus', 'a3Plus', 'ePlus', 'qPlus'], '全攻击基础值提升', true],
-    [['aDmg', 'a2Dmg', 'a3Dmg', 'eDmg', 'qDmg'], '全攻击增伤', false]
+    [['aDmg', 'a2Dmg', 'a3Dmg', 'eDmg', 'qDmg'], '全攻击增伤', false],
+    [['stellarVortex', 'starSwirlAnemo', 'starSwirlCryo'], '星扩散增伤', false],
+    [['stellarVortexCpct', 'starSwirlAnemoCpct', 'starSwirlCryoCpct'], '星扩散暴击提升', false],
+    [['stellarVortexCdmg', 'starSwirlAnemoCdmg', 'starSwirlCryoCdmg'], '星扩散暴伤提升', false]
   ]) {
     const present = keys.filter(k => vals[k] !== undefined)
-    if (present.length === 5 && present.every(k => vals[k] === vals[present[0]])) {
+    if (present.length === keys.length && present.every(k => vals[k] === vals[present[0]])) {
       segs.push(`${label}${vals[present[0]]}${flat ? '' : '%'}`)
       present.forEach(k => handled.add(k))
     }
