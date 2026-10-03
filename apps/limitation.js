@@ -36,6 +36,7 @@ export class ysmb_input_replace extends plugin {
       result[0] = `#${name}${/面板|圣遗物|伤害|武器/.test(Msg) ? '' : '面板'}${uid}`
     }
     e.msg = msg.length > 1 ? result.slice(0).join('换') : result[0]
+    e.original_msg = e.msg
   }
 
   _replace (msg) {
