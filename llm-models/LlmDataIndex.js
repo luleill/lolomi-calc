@@ -69,6 +69,11 @@ let LlmDataIndex = {
         if (alias[ds.name]) {
           missingAlias[ds.name] = alias[ds.name]
         }
+      } else {
+        let miaoDs = miaoChar.getData(ds.id)
+        if (miaoDs && miaoDs.eta && miaoDs.eta * 1 >= new Date() * 1) {
+          miaoDs.eta = 1
+        }
       }
     })
     if (!lodash.isEmpty(missingData)) {
