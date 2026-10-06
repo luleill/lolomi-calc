@@ -3,11 +3,17 @@
 * 极限面板数据沿用老数据，目前仅更新新角色的极限面板数据用于计算测试
 * 核爆和辅助面板没时间搞，有个别角色需要单独加的可提
 * */
+import plugin from '../../../lib/plugins/plugin.js'
 import { Character } from '../../miao-plugin/models/index.js'
 const replace_list = [
   'jx',
   'hb',
   'fz'
+]
+export const LIMIT_UIDS = [
+  '999999999',
+  '999999998',
+  '999999997',
 ]
 
 export class ysmb_input_replace extends plugin {
@@ -43,7 +49,7 @@ export class ysmb_input_replace extends plugin {
     let Msg = []
     msg.forEach(i => {
       let idx = replace_list.findIndex(k => i.includes(k))
-      const replacements = ['999999999', '999999998', '999999997']
+      const replacements = LIMIT_UIDS
       Msg.push(idx !== -1 ? i.replace(replace_list[idx], replacements[idx]) : i)
     })
     return Msg

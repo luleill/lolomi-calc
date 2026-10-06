@@ -4,6 +4,8 @@
  */
 
 import ProfileDmg from '../../miao-plugin/models/ProfileDmg.js'
+import ProfileRank from '../../miao-plugin/models/ProfileRank.js'
+import { LIMIT_UIDS } from '../apps/limitation.js'
 import Config from './Config.js'
 import ConsCompare from './Constellation.js'
 import LlmDataIndex from '../llm-models/LlmDataIndex.js'
@@ -35,6 +37,7 @@ const Start = {
     this.initialization()
     this.initLlmData()
     this.setupPrioritySystem()
+    this.setupRankBlacklist()
     this.setupRuleGuard()
     // 如果回落miao计算框架，传入lolomi的新加参数
     patchMiaoDynamic()
@@ -141,6 +144,27 @@ const Start = {
       }
       return self.handleGenshinCharacter.call(self, name, game, originalMethod)
     }
+  },
+
+  /**
+   * lolomi预设面板不参与群排名
+   */
+  setupRankBlacklist() {
+    const originalCheck = ProfileRank.checkRankLimit
+    if (typeof originalCheck !== 'function') {
+      logger.warn('[lolomi-calc] miao排名方法不存在，跳过极限面板排名')
+      return
+    }
+    if (originalCheck._lolomiWrapped) {
+      return
+    }
+    ProfileRank.checkRankLimit = async function (uid) {
+      if (LIMIT_UIDS.includes(uid + '')) {
+        return false
+      }
+      return originalCheck.call(this, uid)
+    }
+    ProfileRank.checkRankLimit._lolomiWrapped = true
   },
 
   /**

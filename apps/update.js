@@ -25,6 +25,10 @@ export class calc extends plugin {
   }
   init() {
     Bot.once('online', this.restartMsg.bind(this))
+    // alemonjs加载完成后延迟5秒主动查看"重启成功"标记
+    if (process.env.YUNZAI_DIR || process.env.__ALEMON_IPC) {
+      setTimeout(() => this.restartMsg(), 5000)
+    }
   }
   async setCacheJSON (key, data, EX = 3600 * 24 * 365) {
     await redis.set(key, JSON.stringify(data), { EX })
@@ -95,6 +99,16 @@ export class calc extends plugin {
           redis.set(this.key, JSON.stringify(restartInfo), { EX: 3600 })
           
           setTimeout(() => {
+            // alemonjs框架：不需要npm重启命令
+            // 调用桥接层alemonjs-load-yunzai重启接口，调用失败时再尝试由父进程client.js拉起
+            if (process.env.YUNZAI_DIR || process.env.__ALEMON_IPC) {
+              if (typeof Bot.restart === 'function') {
+                Bot.restart().catch(() => process.exit(1))
+              } else {
+                process.exit(1)
+              }
+              return
+            }
             let restartCommand = 'npm run start'
             if (process.argv[1].includes('pm2')) {
               restartCommand = 'npm run restart'
