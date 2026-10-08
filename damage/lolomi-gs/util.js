@@ -446,6 +446,65 @@ function withStdTeam(mainCharName, team = [], artifact_normal = [], config = nul
   };
 }
 
+/**
+ * 伤害计算传值参数区间检查
+ * @param {*} value - 传值
+ * @param {number} fallback - 默认值
+ * @param {number} min - 区间下限
+ * @param {number} max - 区间上限
+ */
+const bounded = (value, fallback, min = 0, max = 100) => value != null && Number.isFinite(Number(value))
+  ? Math.max(min, Math.min(max, Number(value))) : fallback
+
+/**
+ * 伤害列表计算求和
+ * @param {Array<{dmg:number,avg:number}>} hits - 暴击和期望单次伤害
+ * @returns {{dmg:number,avg:number}} 累计
+ */
+const sumHits = (hits) => hits.reduce((acc, h) => ({ dmg: acc.dmg + h.dmg, avg: acc.avg + h.avg }), { dmg: 0, avg: 0 })
+
+/**
+ * 单次伤害计算累加
+ * @param {{dmg:number,avg:number}} acc - 累加计数
+ * @param {{dmg:number,avg:number}} hit - 单次伤害
+ * @param {number} times - 攻击次数，默认1
+ * @returns {{dmg:number,avg:number}} 累加结果
+ */
+const addHit = (acc, hit, times = 1) => {
+  acc.dmg += hit.dmg * times
+  acc.avg += hit.avg * times
+  return acc
+}
+
+/**
+ * 手法序列，队友buff生效范围
+ * @param {Array<string>} seq - 手法序列
+ * @param {number} len - 只统计多少次攻击（buff生效范围内的攻击次数）
+ * @param {Object} init - 攻击类型计数
+ */
+const countSeq = (seq, len, init) => seq.slice(0, len).reduce((ret, key) => {
+  ret[key]++
+  return ret
+}, { ...init })
+
+/**
+ * 队伍计算条目标题
+ * @param {string} mainCharName - 主角色名称
+ * @param {Array<string>} team - 队友配置
+ * @param {Array<string>} artifact - 队伍圣遗物
+ * @param {string|Function} suffix - 标题后缀
+ * @param {Function} dmg - 伤害计算条目
+ * @param {Object|Function} extraParams - 额外参数
+ */
+const teamDetail = (mainCharName, team, artifact, suffix, dmg, extraParams = {}) => ({
+  title: ({ cons }) => `${teamConfig(cons, team, artifact, mainCharName).title} ${typeof suffix === 'function' ? suffix({ cons }) : suffix}`,
+  params: ({ cons }) => ({
+    ...teamConfig(cons, team, artifact).params,
+    ...(typeof extraParams === 'function' ? extraParams({ cons }) : extraParams)
+  }),
+  dmg
+})
+
 export { 
   teammateConfig, 
   getTeamtitle, 
@@ -455,5 +514,10 @@ export {
   nameAbbr,
   getEngName,
   withStdTeam,
-  checkConfig
+  checkConfig,
+  bounded,
+  sumHits,
+  addHit,
+  countSeq,
+  teamDetail
 };

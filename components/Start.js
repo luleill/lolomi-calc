@@ -410,9 +410,11 @@ const Start = {
             ruleSnapshot: calcRule
           }
           await self.calcConsDiff(characterName, currentCons, consCalcData, this.profile, result)
+        } else {
+          logger.mark(logger.red(`[lolomi-calc] ${characterName} 命座对比未触发：规则快照缺失或伤害索引无效`))
         }
       } catch (error) {
-        logger.debug(`[lolomi-calc] 命座计算出错: ${error.message}`)
+        logger.mark(logger.red(`[lolomi-calc] 命座计算出错: ${error.message}`))
       }
       
       return result
@@ -440,6 +442,7 @@ const Start = {
       )
       
       if (!comparison?.comparisons?.length) {
+        logger.mark(logger.yellow(`[lolomi-calc] ${characterName} 命座对比无有效结果，跳过展示`))
         return
       }
       result.constellationInfo = comparison
@@ -452,9 +455,13 @@ const Start = {
         result.ret = []
       }
       
-      const resolvedTitle = typeof dmgTitle === 'function' 
-        ? dmgTitle({ cons: currentCons }) 
-        : dmgTitle
+      // 标题函数同样只拿得到 cons，依赖完整 ds 的条目求值失败时用默认文案兜底
+      let resolvedTitle = '未知伤害'
+      try {
+        resolvedTitle = typeof dmgTitle === 'function' ? (dmgTitle({ cons: currentCons }) || '未知伤害') : dmgTitle
+      } catch {
+        resolvedTitle = consCalcData.consDmgKey || '未知伤害'
+      }
       
       result.ret.push({
         title: `命座对比 ${resolvedTitle}`,

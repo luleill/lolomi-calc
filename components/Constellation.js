@@ -48,6 +48,7 @@ const ConsCompare = {
       return null
     }
     if (!details || defDmgIdx === undefined || defDmgIdx < 0) {
+      logger.mark(logger.red(`[lolomi-calc] ${characterName} 命座对比中止：伤害详情缺失或索引无效`))
       return null
     }
     
@@ -56,20 +57,31 @@ const ConsCompare = {
     if (consDmgKey) {
       const normalizedKey = consDmgKey.trim()
       const foundIdx = details.findIndex(d => {
-        const title = typeof d.title === 'function' ? d.title({ cons: currentCons }) : d.title
+        let title
+        try {
+          // 部分计算条目标题求值报错后跳过
+          title = typeof d.title === 'function' ? d.title({ cons: currentCons }) : d.title
+        } catch {
+          return false
+        }
         return title && title.includes(normalizedKey)
       })
       if (foundIdx >= 0) {
         targetIdx = foundIdx
           // logger.mark(`[lolomi-calc] 命座对比 [${consDmgKey}] 匹配索引 ${foundIdx}`)
+      } else {
+        // consDmgKey 未匹配成功则回退 defDmgIdx
+        logger.mark(logger.red(`[lolomi-calc] ${characterName} 命座对比键 [${consDmgKey}] 未匹配到伤害条目，回退索引 ${defDmgIdx}`))
       }
     }
     
     const targetDetail = details[targetIdx]
     if (!targetDetail) {
+      logger.mark(logger.red(`[lolomi-calc] ${characterName} 命座对比中止：索引 ${targetIdx} 无对应伤害条目`))
       return null
     }
     if (targetDetail.cons && currentCons < targetDetail.cons) {
+      logger.mark(`[lolomi-calc] ${characterName} 命座对比跳过：计算需 ${targetDetail.cons} 命，当前 ${currentCons}`)
       return null
     }
     
@@ -103,6 +115,7 @@ const ConsCompare = {
     )
     
     if (!currentDmgResult.valid) {
+      logger.mark(logger.red(`[lolomi-calc] ${characterName} 命座对比中止：当前 ${currentCons} 命计算无效（索引 ${targetIdx}）`))
       return null
     }
     
@@ -257,6 +270,7 @@ const ConsCompare = {
       })
       
       if (!result) {
+        logger.mark(logger.red(`[lolomi-calc] ${characterName} ${cons}命对比计算无结果（索引 ${targetIdx}）`))
         return { dmg: 0, avg: 0, valid: false }
       }
       
@@ -266,7 +280,7 @@ const ConsCompare = {
         valid: true
       }
     } catch (error) {
-      logger.debug(`[lolomi-calc] ${characterName} ${cons}命计算出错：${error.message}`)
+      logger.mark(logger.red(`[lolomi-calc] ${characterName} ${cons}命计算出错：${error.message}`))
       return { dmg: 0, avg: 0, valid: false }
     }
   },

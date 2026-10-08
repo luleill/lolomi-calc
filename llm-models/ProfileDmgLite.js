@@ -117,7 +117,7 @@ export default class ProfileDmgLite {
         defDmgIdx: cfg.defDmgIdx || -1, // 默认详情index
         defDmgKey: cfg.defDmgKey || '',
         mainAttr: cfg.mainAttr || 'atk,cpct,cdmg', // 伤害属性
-        enemyName: cfg.enemyName || this.isGs ? '小宝' : '弱点敌人' // 敌人名称
+        enemyName: cfg.enemyName || (this.isGs ? '小宝' : '弱点敌人') // 敌人名称
       }
     }
     return false
