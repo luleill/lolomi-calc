@@ -14,10 +14,10 @@ const applyStandardTeam = withStdTeam(mainCharName, team, artifact_normal, confi
 const c6Boost = (cons) => cons >= 6 ? 2 : 1
 
 // 攻斥指令强化
-// 默认势能消耗默认按E后直接接重击消耗40点，1命60点
-// 如果要提前放Q获取势能时修改 params.potential 上限100点
+// 势能消耗默认E后直接接重击消耗40点，1命100点
+// 如果要提前放Q获取势能传 params.potential
 const directivePct = ({ attr, calc, talent, cons, params }, key) => {
-  const potential = params.potential ?? (cons >= 1 ? 60 : 40)
+  const potential = params.potential ?? (cons >= 1 ? 100 : 40)
   // 默认辉映星超导状态0.9系数
   const perPoint = params.noHuiying ? 0.3 : 0.9
   return calc(attr.atk) * (talent.a[key] + perPoint * potential) / 100

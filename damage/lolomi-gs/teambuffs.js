@@ -207,17 +207,17 @@ const LIMITED_PLUS = {
     limit: 25
   },
   Valeriy: {
-    // 攻斥指令：普攻13级，雷伤加成44.54%攻击、星超导加成133.62%攻击
+    // 攻斥指令：普攻13级，雷伤加成51.68%攻击、星超导加成155.04%攻击
     // 加成基于瓦列里攻击力，高中配五星武器2800、低配四星武器2500，可传 Valeriy_atk
     // 每消耗1点势能每层额外加算，辉映·星超导0.9%/点，非辉映0.3%/点（默认辉映状态）
-    // 势能默认60，可传 Valeriy_potential（上限100）
+    // 势能默认100，可传 Valeriy_potential
     plus: ({ params, element }) => element === '雷' && (params.Valeriy_low || params.Valeriy_mid || params.Valeriy_best)
       ? (params.Valeriy_atk ?? ((params.Valeriy_best || params.Valeriy_mid) ? 2800 : 2500))
-        * (44.54 + (params.Valeriy_noHuiying ? 0.3 : 0.9) * (params.Valeriy_potential ?? 60)) / 100
+        * (51.68 + (params.Valeriy_noHuiying ? 0.3 : 0.9) * (params.Valeriy_potential ?? 100)) / 100
       : 0,
     fyPlus: ({ params, element }) => element === '雷' && (params.Valeriy_low || params.Valeriy_mid || params.Valeriy_best)
       ? (params.Valeriy_atk ?? ((params.Valeriy_best || params.Valeriy_mid) ? 2800 : 2500))
-        * (133.62 + (params.Valeriy_noHuiying ? 0.3 : 0.9) * (params.Valeriy_potential ?? 60)) / 100
+        * (155.04 + (params.Valeriy_noHuiying ? 0.3 : 0.9) * (params.Valeriy_potential ?? 100)) / 100
       : 0,
     limit: 15
   }
@@ -1188,19 +1188,19 @@ let TeamBuff = [
     title: '米提亚',
     // 天赋「基准承压测验」：稳态炉心每枚信标全队精通+30，高中配5枚，低配4枚
     // 天赋「星耀祝礼」：基于精通提升全队星超导基础伤害，默认吃满14%
-    // 1命：炉心存在期间站场角色暴伤+50
+    // 1命：炉心存在期间站场角色暴伤+40
     // 2命：极星辉域内冰/雷抗降低20；
-    //      2命加精通默认按稳态全队+100，过载传 Mitya_overload 切为仅为站场角色+200
+    //      2命加精通默认按稳态全队+123，过载传 Mitya_overload 切为仅为站场角色+234
     // 6命：全队星超导擢升+20
     data: {
       fypct: 14,
       mastery: ({ params }) => {
         const stacks = (params.Mitya_best || params.Mitya_mid) ? 150 : 120
-        const c2 = (params.Mitya_best || params.Mitya_mid) ? (params.Mitya_overload ? 200 : 100) : 0
+        const c2 = (params.Mitya_best || params.Mitya_mid) ? (params.Mitya_overload ? 234 : 123) : 0
         return stacks + c2
       },
       kx: ({ params, element }) => (params.Mitya_best || params.Mitya_mid) && (element === '冰' || element === '雷') ? 20 : 0,
-      cdmg: ({ params }) => params.Mitya_best ? 50 : 0,
+      cdmg: ({ params }) => params.Mitya_best ? 40 : 0,
       elevated: ({ params }) => params.Mitya_best ? 20 : 0
     }
   },

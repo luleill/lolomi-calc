@@ -64,13 +64,13 @@ const makeDirectiveOver = (plus, limit) => {
 // implosions : 递变聚爆施放次数，还不清楚是初始伤害还是持续伤害，先默认2
 // beacons    : 消耗的信标总数，默认基础16
 //   供给估算：站场15秒，天赋每1.5秒恢复两枚，还不清楚消耗速度
-//   6命过载30%概率恢复一枚
+//   6命过载34%概率恢复一枚
 const calcOverloadRotation = (ds, calcApi) => {
   const { attr, calc, talent, cons, params } = ds
   const { basic } = calcApi
   const implosions = params.implosions ?? 2
   const supply = (params.beacons ?? 16) + (cons >= 1 ? 2 : 0)
-  const beacons = Math.round(supply / (cons >= 6 ? 0.7 : 1))
+  const beacons = Math.round(supply / (cons >= 6 ? 0.66 : 1))
   const nicoleOver = makeLimitedOver(LIMITED_PLUS.Nicole.plus({ params }), LIMITED_PLUS.Nicole.limit, ['a', 'a2', 'a3', 'e', 'q'])
   const xiloOver = makeLimitedOver(LIMITED_PLUS.Xilonen.plus({ params }), LIMITED_PLUS.Xilonen.limit, ['a', 'a2', 'a3'])
   const valPlus = LIMITED_PLUS.Valeriy.plus({ params, element: '雷' })
@@ -97,7 +97,7 @@ const calcOverloadRotation = (ds, calcApi) => {
     }
   }
   if (cons >= 4) {
-    const c4 = basic(calc(attr.mastery) * 4, '', 'stellarConduct')
+    const c4 = basic(calc(attr.mastery) * 3, '', 'stellarConduct')
     const n = Math.floor(beacons / 5)
     totalDmg += c4.dmg * n
     totalAvg += c4.avg * n
@@ -123,7 +123,7 @@ const calcSteadyRotation = (ds, calcApi) => {
   let totalDmg = eTap.dmg + q.dmg + core.dmg * ticks + cStar.dmg * consume + deto.dmg
   let totalAvg = eTap.avg + q.avg + core.avg * ticks + cStar.avg * consume + deto.avg
   if (cons >= 4) {
-    const c4 = basic(calc(attr.mastery) * 4, '', 'stellarConduct')
+    const c4 = basic(calc(attr.mastery) * 3, '', 'stellarConduct')
     const n = Math.floor((consume + hold) / 5)
     totalDmg += c4.dmg * n
     totalAvg += c4.avg * n
@@ -152,7 +152,7 @@ export const details = applyStandardTeam([
   }, {
     title: '4命协同星超导伤害',
     cons: 4,
-    dmg: ({ attr, calc }, { basic }) => basic(calc(attr.mastery) * 4, '', 'stellarConduct')
+    dmg: ({ attr, calc }, { basic }) => basic(calc(attr.mastery) * 3, '', 'stellarConduct')
   }, {
     title: '过载站场15秒总伤',
     dmg: calcOverloadRotation
@@ -207,10 +207,10 @@ export const buffs = [
     }
   }, {
     check: ({ params }) => params.steady !== true,
-    title: '1命「缺位寻踪的观察者」：递变信标携带上限提升至5枚，暴击伤害提升50%',
+    title: '1命「缺位寻踪的观察者」：递变信标携带上限提升至5枚，暴击伤害提升[cdmg]%',
     cons: 1,
     data: {
-      cdmg: 50
+      cdmg: 40
     }
   }, {
     title: '2命「惰性之外的沉寂物」：炉心存在期间极星辉域内敌人冰/雷抗性降低20%',
@@ -220,20 +220,20 @@ export const buffs = [
     }
   }, {
     check: ({ params }) => params.steady === true,
-    title: '2命「惰性之外的沉寂物」稳态：队伍中附近角色精通提升100点',
+    title: '2命「惰性之外的沉寂物」稳态：队伍中附近角色精通提升[mastery]点',
     cons: 2,
     data: {
-      mastery: 100
+      mastery: 123
     }
   }, {
     check: ({ params }) => params.steady !== true,
-    title: '2命「惰性之外的沉寂物」过载：当前场上角色精通提升200点',
+    title: '2命「惰性之外的沉寂物」过载：当前场上角色精通提升[mastery]点',
     cons: 2,
     data: {
-      mastery: 200
+      mastery: 234
     }
   }, {
-    title: '6命「元素阶跃的理之门」：稳态炉心造成原本115%伤害，星超导反应伤害擢升20%',
+    title: '6命「元素阶跃的理之门」：稳态炉心造成原本115%伤害，星超导反应伤害擢升[elevated]%',
     cons: 6,
     data: {
       elevated: 20
