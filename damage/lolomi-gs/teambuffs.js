@@ -1233,4 +1233,4 @@ TeamBuff.forEach(b => {
   }
 })
 
-export { TeamBuff, LIMITED_PLUS }
+export { TeamBuff, LIMITED_PLUS, makeAutoTitle }
