@@ -112,6 +112,7 @@ git clone --depth=1 https://gitee.com/land-route_lu/lolomi-calc.git ./plugins/lo
 - 基尼奇
 - 艾梅莉埃
 - 那维莱特
+- 芙宁娜
 - 米提亚
 - 瓦列里
 

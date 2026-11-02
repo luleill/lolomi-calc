@@ -76,7 +76,7 @@
 - 莱欧斯利 Wriothesley ✅
 - 那维莱特 Neuvillette ✅
 - 夏洛蒂 Charlotte
-- 芙宁娜 Furina
+- 芙宁娜 Furina ✅
 - 夏沃蕾 Chevreuse
 - 娜维娅 Navia ✅
 - 嘉明 Gaming
