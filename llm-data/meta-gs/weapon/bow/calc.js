@@ -352,6 +352,16 @@ export default function (step, staticStep) {
       refine: {
         mastery: step(120),
       }
+    },
+    银昼: {
+      title: '攻击力提升[atkPct]%，星烁反应的暴击伤害提升[stellarConductCdmg]%',
+      refine: {
+        atkPct: step(40, 12),
+        stellarConductCdmg: step(40, 12),
+        stellarVortexCdmg: step(40, 12),
+        starSwirlAnemoCdmg: step(40, 12),
+        starSwirlCryoCdmg: step(40, 12),
+      }
     }
   }
 }

@@ -125,5 +125,6 @@
 - 沃雅妮莎 Vodyanitsa ✅
 - 米提亚 Mitya ✅
 - 瓦列里 Valeriy ✅
+- 安娜丝塔夏 Anastasya ✅
 
 </details>

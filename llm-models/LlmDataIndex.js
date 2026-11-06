@@ -6,6 +6,7 @@ import { Data, Meta } from '../../miao-plugin/components/index.js'
 import Weapon from '../../miao-plugin/models/Weapon.js'
 import Character from '../../miao-plugin/models/Character.js'
 import CharImg from '../../miao-plugin/models/character/CharImg.js'
+import Artifact from '../../miao-plugin/models/Artifact.js'
 import ProfileChange from '../../miao-plugin/apps/profile/ProfileChange.js'
 import LlmMeta from './LlmMeta.js'
 
@@ -28,7 +29,9 @@ let LlmDataIndex = {
     LlmDataIndex._stat = {
       char: LlmMeta.getIds('gs', 'char').filter((id) => LlmDataIndex.hasCharDetail(id)).length,
       weapon: LlmMeta.getIds('gs', 'weapon').length,
-      artiSet: LlmMeta.getIds('gs', 'artiSet').length
+      artiSet: LlmMeta.getIds('gs', 'artiSet').length,
+      artiMerged: LlmDataIndex._artiMerged || 0,
+      aliasMerged: LlmDataIndex._aliasMerged || 0
     }
     LlmDataIndex._initialized = true
     return LlmDataIndex._stat
@@ -62,13 +65,9 @@ let LlmDataIndex = {
     let miaoChar = Meta.create('gs', 'char')
     let existingIds = new Set(miaoChar.getIds())
     let missingData = {}
-    let missingAlias = {}
     lodash.forEach(data, (ds) => {
       if (!existingIds.has(ds.id + '')) {
         missingData[ds.id] = ds
-        if (alias[ds.name]) {
-          missingAlias[ds.name] = alias[ds.name]
-        }
       } else {
         let miaoDs = miaoChar.getData(ds.id)
         if (miaoDs && miaoDs.eta && miaoDs.eta * 1 >= new Date() * 1) {
@@ -78,10 +77,37 @@ let LlmDataIndex = {
     })
     if (!lodash.isEmpty(missingData)) {
       miaoChar.addData(missingData)
-      miaoChar.addAlias(missingAlias)
     }
+    // 别名独立补缺
+    LlmDataIndex._aliasMerged = LlmDataIndex.mergeCharAlias(miaoChar, alias)
 
     LlmDataIndex.patchCharFallback()
+  },
+
+  /**
+   * 将 lolomi 角色别名补进 miao 注册表
+   * 只补缺失别名，用于lolomi下版本新角色计算
+   */
+  mergeCharAlias (miaoChar, aliasCfg) {
+    let used = (key) => !!(miaoChar.alias[key] || miaoChar.alias2[key])
+    let added = 0
+    lodash.forEach(aliasCfg, (txt, name) => {
+      let id = miaoChar.getId(name)
+      if (!id) {
+        return true
+      }
+      lodash.forEach(String(txt).split(','), (t) => {
+        let key = lodash.trim(t + '').toLowerCase()
+        if (!key || used(key)) {
+          return true
+        }
+        miaoChar.alias[key] = id
+        added++
+        return true
+      })
+      return true
+    })
+    return added
   },
 
   async regWeapon () {
@@ -345,9 +371,98 @@ let LlmDataIndex = {
       artiBuffs: calc
     })
 
+    LlmDataIndex._artiMerged = LlmDataIndex.mergeArtiToMiao({
+      artis, setIds, setAbbr, setAlias, calc, usefulAttr,
+      attrMeta: { mainAttr, subAttr, attrMap, attrNameMap, mainIdMap, attrIdMap }
+    })
+
+    LlmDataIndex.patchArtiFallback()
+  },
+
+  /**
+   * 将 lolomi 圣遗物数据写进 miao 表
+   */
+  mergeArtiToMiao (ctx) {
+    let { artis, setIds, setAbbr, setAlias, calc, usefulAttr, attrMeta } = ctx
+    let miaoSet = Meta.create('gs', 'artiSet')
     let miaoArti = Meta.create('gs', 'arti')
-    miaoArti.addMeta({
-      usefulAttr: lodash.assign({}, miaoArti.getMeta('usefulAttr'), usefulAttr)
+    let existSets = new Set(miaoSet.getIds())
+    let added = 0
+
+    lodash.forEach(artis, (ds) => {
+      if (!existSets.has(ds.name)) {
+        added++
+      }
+      let artiSet = {
+        name: ds.name,
+        effect: ds.effect,
+        idxs: {}
+      }
+      miaoSet.addDataItem(ds.name, artiSet)
+      lodash.forEach(ds.idxs, (as, idx) => {
+        if (!as.name) {
+          return true
+        }
+        miaoArti.addDataItem(as.name, {
+          set: ds.name,
+          name: as.name,
+          idx
+        })
+        artiSet.idxs[idx] = as.name
+        return true
+      })
+      return true
+    })
+
+    miaoSet.addAbbr(setAbbr)
+    miaoSet.addAlias(setAlias)
+    miaoSet.addAlias(setIds)
+
+    let miaoSetCfg = miaoSet.getMeta()
+    miaoSet.addMeta({
+      artiBuffs: lodash.assign({}, miaoSetCfg.artiBuffs, calc)
+    })
+
+    let miaoArtiCfg = miaoArti.getMeta()
+    let mergedCfg = lodash.assign({}, miaoArtiCfg, { subAttr: attrMeta.subAttr })
+    lodash.forEach(['mainAttr', 'attrMap', 'attrNameMap', 'mainIdMap', 'attrIdMap'], (k) => {
+      mergedCfg[k] = lodash.assign({}, miaoArtiCfg[k], attrMeta[k])
+    })
+    mergedCfg.artiBuffs = lodash.assign({}, miaoArtiCfg.artiBuffs, calc)
+    mergedCfg.usefulAttr = lodash.assign({}, miaoArtiCfg.usefulAttr, usefulAttr)
+    miaoArti.addMeta(mergedCfg)
+
+    return added
+  },
+
+  /**
+   * 圣遗物图标回退：miao 还没有添加新圣遗物套装时，指向 lolomi 侧
+   */
+  patchArtiFallback () {
+    if (LlmDataIndex._artiPatched) {
+      return
+    }
+    LlmDataIndex._artiPatched = true
+
+    const miaoRoot = Data.getRoot('miao')
+    const iconCache = {}
+    const useLlmIcon = (arti) => {
+      let key = `${arti.setName}/${arti.idx}`
+      if (lodash.isUndefined(iconCache[key])) {
+        iconCache[key] = !!(arti.isGs && arti.setName && arti.idx &&
+          !fs.existsSync(`${miaoRoot}resources/meta-gs/artifact/imgs/${key}.webp`) &&
+          fs.existsSync(`${pluginRoot}/${resPath}/artifact/imgs/${key}.webp`))
+      }
+      return iconCache[key]
+    }
+
+    const origImg = Object.getOwnPropertyDescriptor(Artifact.prototype, 'img').get
+    Object.defineProperty(Artifact.prototype, 'img', {
+      get () {
+        return useLlmIcon(this)
+          ? `../../${pluginName}/${resPath}/artifact/imgs/${this.setName}/${this.idx}.webp`
+          : origImg.call(this)
+      }
     })
   }
 }

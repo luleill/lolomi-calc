@@ -669,6 +669,20 @@ const buffs = {
     }
   },
 
+  肇史之遗: {
+    2: attr('atkPct', 18),
+    4: {
+      title: '冰元素伤害暴击率提升[cpct]%，若该伤害为星烁反应，暴击率额外提升[stellarConductCpct]%。',
+      data: {
+        cpct: 20,
+        stellarConductCpct: 20,
+        stellarVortexCpct: 20,
+        starSwirlAnemoCpct: 20,
+        starSwirlCryoCpct: 20
+      }
+    }
+  },
+
 }
 
 export default buffs

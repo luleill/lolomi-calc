@@ -139,6 +139,7 @@ export const alias = {
   薇斯纳: 'Vesna,威斯纳',
   米提亚: 'Mitya,米提亚',
   瓦列里: 'Valeriy,瓦列里',
+  安娜丝塔夏: 'Anastasya,安娜,冰神',
 
   // 自定义
   初音未来: 'Hatsunemiku,初音,miku,Miku'

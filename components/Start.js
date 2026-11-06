@@ -48,7 +48,7 @@ const Start = {
   initLlmData() {
     this.llmDataReady = LlmDataIndex.init()
       .then((stat) => {
-        logger.mark(`[lolomi-calc] 自有数据加载完成 - 已写角色:${stat.char}`)
+        logger.mark(`[lolomi-calc] 自有数据加载完成 - 已写角色:${stat.char} 补别名:${stat.aliasMerged}`)
         return true
       })
       .catch((e) => {
