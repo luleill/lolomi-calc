@@ -5,7 +5,8 @@
 
 import ProfileDmg from '../../miao-plugin/models/ProfileDmg.js'
 import ProfileRank from '../../miao-plugin/models/ProfileRank.js'
-import { LIMIT_UIDS } from '../apps/limitation.js'
+import Avatar from '../../miao-plugin/models/Avatar.js'
+import { LIMIT_UIDS, LIMIT_SOURCE_NAMES } from '../apps/limitation.js'
 import Config from './Config.js'
 import ConsCompare from './Constellation.js'
 import LlmDataIndex from '../llm-models/LlmDataIndex.js'
@@ -38,6 +39,7 @@ const Start = {
     this.initLlmData()
     this.setupPrioritySystem()
     this.setupRankBlacklist()
+    this.setupDataSourceName()
     this.setupRuleGuard()
     // 如果回落miao计算框架，传入lolomi的新加参数
     patchMiaoDynamic()
@@ -165,6 +167,34 @@ const Start = {
       return originalCheck.call(this, uid)
     }
     ProfileRank.checkRankLimit._lolomiWrapped = true
+  },
+
+  /**
+   * 面板图数据源渲染替换
+   */
+  setupDataSourceName() {
+    const desc = Object.getOwnPropertyDescriptor(Avatar.prototype, 'dataSource')
+    if (!desc || typeof desc.get !== 'function') {
+      logger.warn('[lolomi-calc] miao数据源属性不存在，跳过面板数据源替换')
+      return
+    }
+    if (desc.get._lolomiWrapped) {
+      return
+    }
+    const originalGet = desc.get
+    Object.defineProperty(Avatar.prototype, 'dataSource', {
+      ...desc,
+      get() {
+        if (this._source !== 'change') {
+          const idx = LIMIT_UIDS.indexOf(this.uid + '')
+          if (idx !== -1) {
+            return LIMIT_SOURCE_NAMES[idx]
+          }
+        }
+        return originalGet.call(this)
+      }
+    })
+    Object.getOwnPropertyDescriptor(Avatar.prototype, 'dataSource').get._lolomiWrapped = true
   },
 
   /**

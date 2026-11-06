@@ -8,12 +8,24 @@ import { Character } from '../../miao-plugin/models/index.js'
 const replace_list = [
   'jx',
   'hb',
-  'fz'
+  'fz',
+  'by'
 ]
 export const LIMIT_UIDS = [
   '999999999',
   '999999998',
   '999999997',
+  '999999996',
+]
+
+/*
+* 面板渲染数据源替换
+* */
+export const LIMIT_SOURCE_NAMES = [
+  'lolomi-calc 极限面板',
+  'lolomi-calc 核爆面板',
+  'lolomi-calc 辅助面板',
+  'lolomi-calc 毕业面板',
 ]
 
 export class ysmb_input_replace extends plugin {

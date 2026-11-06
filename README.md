@@ -27,7 +27,7 @@ git clone --depth=1 https://gitee.com/land-route_lu/lolomi-calc.git ./plugins/lo
 * miao-plugin   https://github.com/yoimiya-kokomi/miao-plugin
 # 插件说明
 * 操作指令说明  #洛洛米帮助
-* 移除其他不必要功能，仅保留原神角色伤害计算和极限/核爆/辅助面板，目前仅更新维护极限面板数据
+* 移除其他不必要功能，仅保留原神角色伤害计算和极限/核爆/辅助/毕业面板
 * 精力有限，新版本角色计算会优先更新，老角色计算按角色顺序从后往前更新，有需要先加的角色可提，已写角色可查看 character.md 文件
 * 首次安装默认开启 lolomi-calc，默认开启前后命座提升对比，默认关闭预设2+1标配队友
 * 伤害计算优先级：存在已写好的角色数据默认使用 lolomi-calc 计算，如果不存在则使用梁氏>喵喵
@@ -35,6 +35,7 @@ git clone --depth=1 https://gitee.com/land-route_lu/lolomi-calc.git ./plugins/lo
 * 主角色 6 命默认配置五星 6+5 队友，2-5 命默认配置 2+1 队友，2 命以下配置 0+0 队友，四星队友默认配置6命
 * 部分队伍伤害计算暂未考虑buff覆盖率和生效次数，高配情况下存在几十万的队伍伤害差异属于正常现象
 * 如遇lolomi插件计算伤害明显错误或疑似错误等异常问题请提Issues
+* 已新增扩展插件支持队伍实际DPS计算，测试阶段，接入角色较少，同步接入新版本角色，感兴趣的可前往仓库查看，目前仅在gitee更新，不推送github https://gitee.com/land-route_lu/lolomi-sim
 
 <details>
 <summary><b>效果图预览</b></summary>

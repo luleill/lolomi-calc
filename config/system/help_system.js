@@ -43,6 +43,11 @@ export const helpList = [
         desc: '辅助面板'
       },
       {
+        icon: 57,
+        title: 'by绫华',
+        desc: '接近大毕业面板，控制在32有效词条左右，仅供参考'
+      },
+      {
         icon: 81,
         title: '#标配计算停用',
         desc: '首次安装默认停用'
@@ -65,12 +70,12 @@ export const helpList = [
       {
         icon: 81,
         title: '#命座对比停用',
-        desc: '首次安装默认停用，计算面板不展示命座对比'
+        desc: '面板图不展示命座对比，重启生效'
       },
       {
         icon: 81,
         title: '#命座对比启用',
-        desc: '开启前后命座提升对比，重启生效'
+        desc: '首次安装默认启用'
       },
       {
         icon: 81,
