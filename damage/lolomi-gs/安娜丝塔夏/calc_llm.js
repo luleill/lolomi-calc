@@ -80,8 +80,8 @@ const calcLoveRotation = (ds, calcApi) => {
   const [ch, si] = starRoute(params)
   const ticks = params.crownTicks ?? 7
   const cycle = crownCycle(ds, calcApi, true)
-  const tap = dmg(talent.e['点按瞬时伤害'], 'e')
-  const q = dmg(talent.q['致新世界瞬时伤害'], 'q')
+  const tap = dmg(talent.e['点按技能伤害'], 'e')
+  const q = dmg(talent.q['致新世界技能伤害'], 'q')
   const triumph = basic(calc(attr.atk) * talent.q['凯旋星超导/星扩散伤害2'][si] / 100, 'e', ch)
   let total = { dmg: tap.dmg + q.dmg, avg: tap.avg + q.avg }
   total.dmg += cycle.dmg * ticks
@@ -101,7 +101,7 @@ const calcGloryRotation = (ds, calcApi) => {
   const [ch, si] = starRoute(params)
   const rounds = params.spearRotations ?? 3
   const quota = xilonenQuota(ds, calcApi)
-  const hold = dmg(talent.e['长按瞬时伤害'], 'e')
+  const hold = dmg(talent.e['长按技能伤害'], 'e')
   const night = basic(calc(attr.atk) * talent.q['永夜将明星超导/星扩散伤害2'][si] / 100 * gloryMult(ds), 'q', ch)
   const dec = calcDecimation(ds, calcApi)
   let total = { dmg: hold.dmg + night.dmg + dec.dmg, avg: hold.avg + night.avg + dec.avg }

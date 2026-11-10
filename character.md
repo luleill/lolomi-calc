@@ -126,5 +126,6 @@
 - 米提亚 Mitya ✅
 - 瓦列里 Valeriy ✅
 - 安娜丝塔夏 Anastasya ✅
+- 达妮卡 Danica ✅
 
 </details>

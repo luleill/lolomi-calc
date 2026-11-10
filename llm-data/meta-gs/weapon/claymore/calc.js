@@ -265,5 +265,14 @@ export default function (step, staticStep) {
         atkPct: step(16),
       }
     },
+    春潮: [staticStep('atkPct', 16), {
+      // 默认雷属性角色特效全触发
+      check: ({ element }) => element === '雷',
+      title: '攻击力提升[atkPct]%，场上角色星超导反应伤害提升[stellarConduct]%',
+      refine: {
+        atkPct: step(16),
+        stellarConduct: step(20 * 2, 5 * 2),
+      }
+    }],
   }
 }
