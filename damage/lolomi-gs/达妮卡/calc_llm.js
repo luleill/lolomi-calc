@@ -13,12 +13,12 @@ const applyStandardTeam = withStdTeam(mainCharName, team, artifact_normal, confi
 // sweeper true = 清扫者（站场），false = 护卫（后台）
 const isSweeper = (ds) => ds.params.sweeper === true
 
-// 2命「炽流砂的静心」祝酒：星超导反应附加基础值
-// 清扫者形态消耗全部祝酒，提升至150%；后台协同队友提升100%
+// 2命「炽流砂的静心」祝歌：星超导反应附加基础值
+// 持有祝歌的角色消耗1层提升80%攻击力；清扫者形态达妮卡至多消耗2层提升350%攻击力
 const c2Flat = (ds) => {
   const { cons, attr, calc } = ds
   if (cons < 2) return 0
-  return calc(attr.atk) * (isSweeper(ds) ? 1.5 : 1.0)
+  return calc(attr.atk) * (isSweeper(ds) ? 3.5 : 0.8)
 }
 
 const starConduct = (ds, calcApi, rate, slot) => {
@@ -109,7 +109,7 @@ export const details = applyStandardTeam([
     title: '「御前护卫」为队伍提供攻击力',
     params: { sweeper: false },
     dmg: ({ attr, calc, talent, cons }) => ({
-      avg: `${Math.round(Math.min(calc(attr.atk) * talent.q['攻击力加成比例'] / 100, talent.q['攻击力加成上限']) * (cons >= 1 ? 1.8 : 1))}`,
+      avg: `${Math.round(Math.min(calc(attr.atk) * talent.q['攻击力加成比例'] / 100, talent.q['攻击力加成上限']) * (cons >= 1 ? 2 : 1))}`,
       type: 'text'
     })
   }, {
@@ -117,7 +117,7 @@ export const details = applyStandardTeam([
     params: { sweeper: false },
     dmg: ({ talent, calc, attr }, { shield }) => shield(talent.e['护盾吸收量2'][0] * calc(attr.atk) / 100 + talent.e['护盾吸收量2'][1])
   }, {
-    title: '2命「祝酒」提供星超导反应基础值',
+    title: '2命「祝歌」提供星超导反应基础值',
     cons: 2,
     params: { sweeper: false },
     dmg: (ds) => ({ avg: `${Math.round(c2Flat(ds))}`, type: 'text' })
@@ -203,19 +203,19 @@ export const buffs = [
     title: '元素爆发「净世卫仪」御前护卫：为队伍提供基础攻击力[atkPlus]',
     sort: 9,
     data: {
-      atkPlus: ({ attr, calc, talent, cons }) => Math.min(calc(attr.atk) * talent.q['攻击力加成比例'] / 100, talent.q['攻击力加成上限']) * (cons >= 1 ? 1.8 : 1)
+      atkPlus: ({ attr, calc, talent, cons }) => Math.min(calc(attr.atk) * talent.q['攻击力加成比例'] / 100, talent.q['攻击力加成上限']) * (cons >= 1 ? 2 : 1)
     }
   }, {
-    title: '1命「冰宫殿的奉侍」：元素爆发提升清扫者效果120%，提升御前护卫效果80%',
+    title: '1命「冰宫殿的奉侍」：元素爆发提升清扫者效果120%，提升御前护卫效果100%',
     cons: 1
   }, {
-    title: '2命「炽流砂的静心」：祝酒基于攻击力提升星超导反应基础伤害',
+    title: '2命「炽流砂的静心」：祝歌基于攻击力提升星超导反应基础伤害',
     cons: 2
   }, {
     title: '6命「醒于晨前之星」：准雷定锚期间队伍星超导反应伤害擢升[elevated]%',
     cons: 6,
     data: {
-      elevated: 20
+      elevated: 15
     }
   }, {
     check: ({ params }) => params.sweeper !== true,

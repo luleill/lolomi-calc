@@ -62,7 +62,7 @@ const crownCycle = (ds, calcApi, withExtra = false) => {
   const ice = crownIce ? dmg(crownPer * crownIce, 'e') : { dmg: 0, avg: 0 }
   const star = crownStar ? basic(calc(attr.atk) * talent.e['苍星圣冕星超导/星扩散伤害2'][si] / 100, 'e', ch) : { dmg: 0, avg: 0 }
   const extra = withExtra
-    ? basic(calc(attr.atk) * talent.q['苍星圣冕星超导/星扩散伤害2'][si] / 100, 'e', ch)
+    ? basic(calc(attr.atk) * talent.q['苍星圣冕额外星超导/星扩散伤害2'][si] / 100, 'e', ch)
     : { dmg: 0, avg: 0 }
   return { dmg: ice.dmg + star.dmg + extra.dmg, avg: ice.avg + star.avg + extra.avg }
 }
@@ -87,7 +87,7 @@ const calcLoveRotation = (ds, calcApi) => {
   total.dmg += cycle.dmg * ticks
   total.avg += cycle.avg * ticks
   total = addTriumph(total, triumph, 1)
-  if (cons >= 6) total = addTriumph(total, triumph, 2.5)
+  if (cons >= 6) total = addTriumph(total, triumph, 2)
   return total
 }
 
@@ -113,7 +113,7 @@ const calcGloryRotation = (ds, calcApi) => {
     }
   }
   if (cons >= 6) {
-    const c6 = basic(calc(attr.atk) * talent.q['裁灭三段星超导/星扩散伤害2'][si] / 100 * 2 * gloryMult(ds), 'e', ch)
+    const c6 = basic(calc(attr.atk) * talent.q['裁灭三段星超导/星扩散伤害2'][si] / 100 * 2.5 * gloryMult(ds), 'e', ch)
     total.dmg += c6.dmg
     total.avg += c6.avg
   }
@@ -179,7 +179,7 @@ export const details = applyStandardTeam([
   }, {
     title: '2命「慈爱」提供星烁暴伤',
     cons: 2,
-    dmg: () => ({ avg: '60%', type: 'text' })
+    dmg: () => ({ avg: '50%', type: 'text' })
   }, {
     title: '「苍星圣冕」星超导伤害',
     params: { starSwirl: false, huiying: true },
@@ -277,10 +277,10 @@ export const buffs = [
   }, {
     // 星超导 只提到极辉星域效果进一步提升，但没说具体数值效果
     check: ({ params }) => params.starSwirl === true,
-    title: '天赋「未挽的悼亡」：星扩散基础反应系数提升15%',
+    title: '天赋「未挽的悼亡」：星扩散基础反应系数提升[fypct]%',
     sort: 9,
     data: {
-      fypct: 15
+      fypct: 10
     }
   }, {
     check: ({ params }) => params.glory !== true,
@@ -317,14 +317,14 @@ export const buffs = [
     }
   }, {
     check: ({ params }) => params.glory !== true,
-    title: '2命「致严冬，致同饮苦寒的人」慈爱：全队星烁反应暴击伤害提升60%，星烁反应擢升[elevated]%',
+    title: '2命「致严冬，致同饮苦寒的人」慈爱：全队星烁反应暴击伤害提升[stellarConductCdmg]%，星烁反应擢升[elevated]%',
     cons: 2,
     data: {
       elevated: 5,
-      stellarConductCdmg: 60,
-      stellarVortexCdmg: 60,
-      starSwirlAnemoCdmg: 60,
-      starSwirlCryoCdmg: 60
+      stellarConductCdmg: 50,
+      stellarVortexCdmg: 50,
+      starSwirlAnemoCdmg: 50,
+      starSwirlCryoCdmg: 50
     }
   }, {
     check: ({ params }) => params.glory === true,
